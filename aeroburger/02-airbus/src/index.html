@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Aero Burger — Airbus</title>
-<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+<style>@font-face{font-family:'AirbusSlab';src:url('../assets/fonts/AlfaSlabOne-Regular.ttf')}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
 </head>
 <body>
 <canvas id="c" width="1080" height="1920"></canvas>
@@ -13,7 +14,8 @@
    Animación determinista: window.seek(t) dibuja el instante t.
    ========================================================================= */
 const W = 1080, H = 1920;
-const ORANGE = '#FF8A1F', ORANGE2 = '#FFC46B';
+const ORANGE = '#C6720E', ORANGE2 = '#E8A23C';   // tono ámbar del afiche de la Airbus
+const SLAB = '"AirbusSlab", serif';
 const FONT = '"Inter Display", "Inter", sans-serif';
 const TEXT = '"Inter", sans-serif';
 
@@ -65,17 +67,19 @@ function maskedText(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){
   ctx.restore();
 }
 const orangeGrad=(ctx,y,size)=>{ const g=ctx.createLinearGradient(0,y-size*0.8,0,y); g.addColorStop(0,ORANGE2); g.addColorStop(1,ORANGE); return g; };
+const amberGrad=(ctx,y,size)=>{ const g=ctx.createLinearGradient(0,y-size*0.78,0,y+size*0.02);
+  g.addColorStop(0,'#EDAA45'); g.addColorStop(0.45,'#D4841C'); g.addColorStop(0.8,'#C06C0E'); g.addColorStop(1,'#A95D0A'); return g; };
 
 // palabra grande con letras escalonadas
 function bigWord(ctx,word,cx,y,size,t,tIn,tOut,fill,stagger=0.055){
   ctx.save();
-  ctx.font=`900 ${size}px ${FONT}`; ctx.letterSpacing='-4px';
+  ctx.font=`400 ${size}px ${SLAB}`; ctx.letterSpacing='3px';
   const total=ctx.measureText(word).width; let x=cx-total/2;
   ctx.restore();
   for(let i=0;i<word.length;i++){
-    ctx.save(); ctx.font=`900 ${size}px ${FONT}`; ctx.letterSpacing='-4px';
+    ctx.save(); ctx.font=`400 ${size}px ${SLAB}`; ctx.letterSpacing='3px';
     const ch=word[i]; const w=ctx.measureText(ch).width; ctx.restore();
-    maskedText(ctx,ch,x,y,size,900,fill,tIn+i*stagger,tOut==null?null:tOut+i*0.025,t,{align:'left',tracking:-4,inDur:0.6,outDur:0.3,shadow:true});
+    maskedText(ctx,ch,x,y,size,400,fill,tIn+i*stagger,tOut==null?null:tOut+i*0.025,t,{align:'left',tracking:3,inDur:0.6,outDur:0.3,shadow:true,font:SLAB});
     x+=w;
   }
 }
@@ -106,7 +110,7 @@ function warmBG(ctx){
 function sTitle(ctx,t){
   if(t>2.95) return;
   maskedText(ctx,'AERO BURGER PRESENTA',540,1180,30,600,'rgba(255,255,255,.85)',0.25,2.45,t,{font:TEXT,tracking:9});
-  bigWord(ctx,'AIRBUS',540,1420,236,t,0.45,2.5,orangeGrad);
+  bigWord(ctx,'AIRBUS',540,1410,196,t,0.45,2.5,amberGrad);
   maskedText(ctx,'Doble carne.',540,1515,66,700,'#fff',1.05,2.6,t,{tracking:-1.5,shadow:true});
 }
 function sSpec(ctx,t){
@@ -176,7 +180,7 @@ function sPhoto(ctx,t){
 function sEnd(ctx,t){
   if(t<14.6) return;
   const T0=14.75;
-  bigWord(ctx,'AIRBUS',540,1150,176,t,T0,null,orangeGrad,0.045);
+  bigWord(ctx,'AIRBUS',540,1150,158,t,T0,null,amberGrad,0.045);
   maskedText(ctx,'Para un apetito voraz.',540,1238,50,600,'#fff',T0+0.35,null,t,{tracking:-1});
   // píldora "400 g"
   const p=eOut5(prog(t,T0+0.55,T0+1.0));
@@ -228,7 +232,7 @@ window.seek=async function(t){
   for(let i=0;i<times.length;i++){ render(actx,Math.max(0,times[i]),imgs[i]); ctx.globalAlpha=1/(i+1); ctx.drawImage(accC,0,0); ctx.globalAlpha=1; }
 };
 window.ready=(async()=>{
-  await Promise.all([document.fonts.load(`900 80px "Inter Display"`),document.fonts.load(`800 80px "Inter Display"`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`900 80px "Inter Display"`),document.fonts.load(`800 80px "Inter Display"`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
   for(const [k,src] of [['poster','../assets/poster_burger.jpg'],['photo','../assets/photo_wrapped.jpg'],['logo','../assets/logo_crop.png'],['a4','../frames/a4/0001.jpg']]){ KEEP.add(src); IMG[k]=await loadImg(src); }
   await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
   return true;
