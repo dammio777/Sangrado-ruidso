@@ -8,3 +8,13 @@ c4 Cada rincón · 20261115_160132 0.0 1.45 · c5 La luna · 160127 0.0 2.27 · 
 c7 La barra · 160117 1.95 1.1 · c8 Tu mesa · 160501 (4K) 0.0 2.44 (x 0.4)
 
 **Regenerar:** `node src/render.js video 60 && python3 src/make_sfx.py out/sfx.wav`, luego unir con ffmpeg.
+
+## v3: interfaz cálida y super-resolución con IA
+- **Interfaz:** cada toma tiene su `bg` (tono claro) y su `ink` (café oscuro) medidos del propio clip; el fondo y los textos cambian suavemente en cada corte. Intro y cierre en crema `#F3ECE2` con tinta `#2A221B`.
+- **IA:** los 3 clips de WhatsApp pasan por Real-ESRGAN compacto (realesr-general-x4v3 mezclado 0,6 con wdn), ejecutado con ONNX Runtime en CPU, sin PyTorch:
+```
+python src/sr_build_onnx.py realesr-general-x4v3.pth realesr-general-wdn-x4v3.pth 0.6 out/tmp/srvgg_mix06.onnx
+python src/sr_clip.py out/tmp/srvgg_mix06.onnx VID-WA0074.mp4 1.7 130 0 136 720 1008 out/tmp/c1_sr.mp4   # ídem c2 (3.4,148) y c3 (8.0,160)
+bash src/extract.sh      # usa los *_sr.mp4 si existen
+LOSSLESS=1 CRF=14 node src/render.js video 60
+```
