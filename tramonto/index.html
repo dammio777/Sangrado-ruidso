@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Tramonto di Santa Elena | Restaurante Italiano en Santa Elena, Medellín</title>
+    <meta name="description" content="Un pedacito de Italia en Santa Elena. Pizza, pasta, dolci y cócteles de autor en una cabaña de madera en la montaña, en el corazón de Santa Elena, Medellín. Abierto de jueves a domingo y festivos. Pet friendly. Reservas y domicilios por WhatsApp." />
+    <meta name="theme-color" content="#EB7126" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- Favicon: el sol del logo -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="alternate icon" type="image/png" href="./logo-512.png" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+
+    <!-- Open Graph / redes. [PONER] el dominio final y cambiar las rutas a URLs absolutas (https://dominio.com/logo.png) -->
+    <meta property="og:type" content="restaurant.restaurant" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content="Tramonto di Santa Elena" />
+    <meta property="og:title" content="Tramonto di Santa Elena · Un pedacito de Italia en Santa Elena" />
+    <meta property="og:description" content="Comida italiana en el corazón de Santa Elena, Medellín. Jueves a domingo y festivos. Pet friendly." />
+    <meta property="og:image" content="./logo.png" />
+    <meta property="og:image:width" content="1080" />
+    <meta property="og:image:height" content="1080" />
+    <meta property="og:image:alt" content="Logo de Tramonto di Santa Elena: un sol naranja con rayos blancos y anillo en zigzag rojo" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Tramonto di Santa Elena" />
+    <meta name="twitter:description" content="Un pedacito de Italia en Santa Elena, Medellín." />
+    <meta name="twitter:image" content="./logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Italiana&family=Italianno&family=Manrope:wght@400;500;700&display=swap" />
+
+    <!-- schema.org Restaurant. [PONER]: teléfono, dirección exacta, horas reales y zonas de domicilio -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Tramonto di Santa Elena",
+      "slogan": "Un pedacito de Italia en Santa Elena",
+      "description": "Restaurante de comida italiana en el corazón de Santa Elena, Medellín. Pizza, pasta, postres y cócteles de autor en una cabaña de madera en la montaña.",
+      "servesCuisine": ["Italian", "Pizza", "Pasta"],
+      "image": "./logo.png",
+      "logo": "./logo.png",
+      "acceptsReservations": true,
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "[PONER dirección exacta]",
+        "addressLocality": "Santa Elena, Medellín",
+        "addressRegion": "Antioquia",
+        "addressCountry": "CO"
+      },
+      "telephone": "[PONER número de WhatsApp]",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "12:00",
+          "closes": "21:00"
+        }
+      ],
+      "areaServed": [
+        { "@type": "Place", "name": "Santa Elena, Medellín" },
+        { "@type": "Place", "name": "[PONER zonas de domicilio]" }
+      ],
+      "amenityFeature": [
+        { "@type": "LocationFeatureSpecification", "name": "Pet friendly", "value": true },
+        { "@type": "LocationFeatureSpecification", "name": "Domicilios", "value": true }
+      ],
+      "sameAs": ["https://www.instagram.com/tramontosantaelena/"]
+    }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <div style="padding:32px;font-family:Georgia,serif;background:#EB7126;color:#2A1410">
+        <h1>Tramonto di Santa Elena</h1>
+        <p>Un pedacito de Italia en Santa Elena, Medellín. Abierto de jueves a domingo y festivos. Pet friendly.</p>
+        <p><a style="color:#2A1410" href="https://wa.link/04iqwg">Reservar por WhatsApp</a> · <a style="color:#2A1410" href="https://www.instagram.com/tramontosantaelena/">@tramontosantaelena</a></p>
+      </div>
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
