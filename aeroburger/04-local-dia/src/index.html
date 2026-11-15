@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Aero Burger — De día</title>
 <style>@font-face{font-family:'AirbusSlab';src:url('../assets/fonts/Bevan-Regular.ttf')}
-html,body{margin:0;background:#fff;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+html,body{margin:0;background:#F3ECE2;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
 </head>
 <body>
 <canvas id="c" width="1080" height="1920"></canvas>
@@ -17,20 +17,33 @@ html,body{margin:0;background:#fff;overflow:hidden}canvas{display:block;width:10
 const W=1080, H=1920;
 const TEXT='"Inter", sans-serif', DISP='"Inter Display", "Inter", sans-serif', SLAB='"AirbusSlab", serif';
 const CLIPS=[
-  {dir:'c1', n:115, label:'La llegada'},
-  {dir:'c2', n:133, label:'Bajo la carpa'},
-  {dir:'c3', n:145, label:'El corredor'},
-  {dir:'c4', n:87,  label:'Cada rincón'},
-  {dir:'c5', n:136, label:'La luna'},
-  {dir:'c6', n:114, label:'Alma de piloto'},
-  {dir:'c7', n:68,  label:'La barra'},
-  {dir:'c8', n:147, label:'Tu mesa'},
+  // bg/ink: tono claro y tinta oscura del mismo matiz, medidos de cada toma
+  {dir:'c1', n:115, label:'La llegada',     bg:'#EEF2E6', ink:'#3E4433'},
+  {dir:'c2', n:133, label:'Bajo la carpa',  bg:'#F3EDE0', ink:'#463F2A'},
+  {dir:'c3', n:145, label:'El corredor',    bg:'#F2EBE1', ink:'#45392B'},
+  {dir:'c4', n:87,  label:'Cada rincón',    bg:'#F3E9D8', ink:'#46381F'},
+  {dir:'c5', n:136, label:'La luna',        bg:'#F3E3DB', ink:'#472C22'},
+  {dir:'c6', n:114, label:'Alma de piloto', bg:'#F2EAE1', ink:'#45392D'},
+  {dir:'c7', n:68,  label:'La barra',       bg:'#F2E5E1', ink:'#462826'},
+  {dir:'c8', n:147, label:'Tu mesa',        bg:'#F3E7DE', ink:'#453427'},
 ];
 const START=2.4;
 let acc=START; for(const c of CLIPS){ c.start=acc; c.dur=c.n/60; acc+=c.dur; c.end=acc; }
 const CEND=acc;                 // ~18.1
 const DURATION=Math.ceil((CEND+3.4)*10)/10; window.DURATION=DURATION;
 const CARD={x:90,y:300,w:900,h:1260,r:28};
+const CREAM='#F3ECE2', INK='#2A221B';   // intro y cierre: crema y café oscuro (madera y bambú del local)
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mixc=(a,b,e)=>{ const A=hex(a),B=hex(b); return `rgb(${A.map((v,i)=>Math.round(lerp(v,B[i],e))).join(',')})`; };
+const rgba=(h,al)=>`rgba(${hex(h).join(',')},${al})`;
+function themeAt(t){
+  // el color cambia suavemente (0,35 s) en cada corte; intro y cierre en crema
+  const seq=[{t:-1,bg:CREAM,ink:INK}, ...CLIPS.map(c=>({t:c.start-0.12,bg:c.bg,ink:c.ink})), {t:CEND-0.05,bg:CREAM,ink:INK}];
+  let k=0; for(let i=0;i<seq.length;i++) if(t>=seq[i].t) k=i;
+  const cur=seq[k], prev=seq[Math.max(0,k-1)], e=eInOut(prog(t,cur.t,cur.t+0.35));
+  const bg=mixc(prev.bg,cur.bg,e), ink=mixc(prev.ink,cur.ink,e);
+  return {bg, ink, inkHex: e>0.5?cur.ink:prev.ink};
+}
 
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const prog=(t,a,b)=>clamp((t-a)/(b-a));
@@ -57,7 +70,7 @@ function txt(ctx,str,x,y,font,col,align,tIn,tOut,t,o={}){
   ctx.fillText(str,x,y+(1-a)*(o.dy??14)); ctx.restore();
 }
 const graphite=(ctx,y,size)=>{ const cy=y-size*1.6, R=size*3.0; const g=ctx.createRadialGradient(540,cy,0,540,cy,R);
-  ['#000000','#141414','#333333','#575757','#767676'].forEach((c,i)=>g.addColorStop([0,0.3,0.52,0.78,1][i],c)); return g; };
+  ['#1A140F','#2A221B','#3F3328','#5E4F40','#7D6C5B'].forEach((c,i)=>g.addColorStop([0,0.3,0.52,0.78,1][i],c)); return g; };
 function logo(ctx,x,y,r,a=1){ ctx.save(); ctx.globalAlpha=a; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x-r/0.985,y-r/0.985,2*r/0.985,2*r/0.985); ctx.restore(); }
 
 function sIntro(ctx,t){
@@ -67,7 +80,7 @@ function sIntro(ctx,t){
   logo(ctx,540,760,lerp(100,120,p),p*out);
   ctx.save(); ctx.globalAlpha=out;
   txt(ctx,'AERO BURGER',540,1040,`400 104px ${SLAB}`,graphite(ctx,1040,104),'center',0.45,null,t,{ls:3});
-  txt(ctx,'de día.',540,1120,`500 50px ${TEXT}`,'#7a7a7a','center',0.8,null,t);
+  txt(ctx,'de día.',540,1120,`500 50px ${TEXT}`,rgba(INK,.55),'center',0.8,null,t);
   ctx.restore();
 }
 function sGallery(ctx,t,img){
@@ -77,36 +90,41 @@ function sGallery(ctx,t,img){
   const s=lerp(0.97,1,eOut(prog(t,START-0.3,START+0.2)));
   const cx=CARD.x+CARD.w/2, cy=CARD.y+CARD.h/2;
   ctx.save(); ctx.globalAlpha=a; ctx.translate(cx,cy); ctx.scale(s,s); ctx.translate(-cx,-cy);
-  ctx.shadowColor='rgba(0,0,0,.10)'; ctx.shadowBlur=50; ctx.shadowOffsetY=18; rr(ctx,CARD.x,CARD.y,CARD.w,CARD.h,CARD.r); ctx.fillStyle='#eee'; ctx.fill(); ctx.shadowColor='transparent';
+  const th=themeAt(t); ctx.shadowColor=rgba(th.inkHex,.22); ctx.shadowBlur=60; ctx.shadowOffsetY=22; rr(ctx,CARD.x,CARD.y,CARD.w,CARD.h,CARD.r); ctx.fillStyle=th.bg; ctx.fill(); ctx.shadowColor='transparent';
   rr(ctx,CARD.x,CARD.y,CARD.w,CARD.h,CARD.r); ctx.clip();
   if(img) ctx.drawImage(img,CARD.x,CARD.y,CARD.w,CARD.h);
   ctx.restore();
+  ctx.save(); ctx.globalAlpha=a; rr(ctx,CARD.x+.5,CARD.y+.5,CARD.w-1,CARD.h-1,CARD.r); ctx.strokeStyle=rgba(th.inkHex,.10); ctx.lineWidth=1.5; ctx.stroke(); ctx.restore();
   // etiquetas tipo galería
   ctx.save(); ctx.globalAlpha=a;
   for(let i=0;i<CLIPS.length;i++){
     const c=CLIPS[i]; const tin=c.start-(i===0?0:0.02), tout=i===CLIPS.length-1?null:c.end-0.2;
-    txt(ctx,String(i+1).padStart(2,'0'),CARD.x,262,`600 30px ${TEXT}`,'#000','left',tin,tout,t,{d:0.25,dy:10});
-    txt(ctx,c.label,CARD.x+58,262,`600 30px ${TEXT}`,'#000','left',tin+0.04,tout,t,{d:0.25,dy:10});
+    txt(ctx,String(i+1).padStart(2,'0'),CARD.x,262,`600 30px ${TEXT}`,rgba(c.ink,.55),'left',tin,tout,t,{d:0.25,dy:10});
+    txt(ctx,c.label,CARD.x+58,262,`600 30px ${TEXT}`,c.ink,'left',tin+0.04,tout,t,{d:0.25,dy:10});
   }
-  txt(ctx,'Santa Elena',CARD.x+CARD.w,262,`500 30px ${TEXT}`,'#9a9a9a','right',START-0.2,null,t);
+  txt(ctx,'Santa Elena',CARD.x+CARD.w,262,`500 30px ${TEXT}`,th.ink,'right',START-0.2,null,t,{});
   // línea de progreso finita bajo la tarjeta
   const P=clamp((t-START)/(CEND-START));
-  ctx.fillStyle='rgba(0,0,0,.10)'; ctx.fillRect(CARD.x,CARD.y+CARD.h+40,CARD.w,2);
-  ctx.fillStyle='#000'; ctx.fillRect(CARD.x,CARD.y+CARD.h+40,CARD.w*P,2);
-  txt(ctx,'AERO BURGER  ·  DE DÍA',540,CARD.y+CARD.h+92,`600 22px ${TEXT}`,'#9a9a9a','center',START,null,t,{ls:5});
+  ctx.fillStyle=rgba(th.inkHex,.14); ctx.fillRect(CARD.x,CARD.y+CARD.h+40,CARD.w,2);
+  ctx.fillStyle=th.ink; ctx.fillRect(CARD.x,CARD.y+CARD.h+40,CARD.w*P,2);
+  txt(ctx,'AERO BURGER  ·  DE DÍA',540,CARD.y+CARD.h+92,`600 22px ${TEXT}`,rgba(th.inkHex,.5),'center',START,null,t,{ls:5});
   ctx.restore();
 }
 function sOutro(ctx,t){
   if(t<CEND) return;
   const T0=CEND+0.25;
   const p=eOut(prog(t,T0,T0+0.6)); logo(ctx,540,740,lerp(96,110,p),p);
-  txt(ctx,'Te esperamos.',540,1010,`700 80px ${DISP}`,'#000','center',T0+0.25,null,t,{ls:-2});
-  txt(ctx,'Aero Burger  ·  Santa Elena',540,1080,`500 38px ${TEXT}`,'#7a7a7a','center',T0+0.4,null,t);
-  txt(ctx,'Somos petfriendly.',540,1132,`500 34px ${TEXT}`,'#9a9a9a','center',T0+0.5,null,t);
-  txt(ctx,'@aero.burger',540,1250,`600 38px ${TEXT}`,'#000','center',T0+0.7,null,t);
+  txt(ctx,'Te esperamos.',540,1010,`700 80px ${DISP}`,INK,'center',T0+0.25,null,t,{ls:-2});
+  txt(ctx,'Aero Burger  ·  Santa Elena',540,1080,`500 38px ${TEXT}`,rgba(INK,.6),'center',T0+0.4,null,t);
+  txt(ctx,'Somos petfriendly.',540,1132,`500 34px ${TEXT}`,rgba(INK,.45),'center',T0+0.5,null,t);
+  txt(ctx,'@aero.burger',540,1250,`600 38px ${TEXT}`,INK,'center',T0+0.7,null,t);
 }
 function render(ctx,t,img){
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  const th=themeAt(t);
+  ctx.fillStyle=th.bg; ctx.fillRect(0,0,W,H);
+  // luz suave arriba, como papel iluminado
+  const g=ctx.createRadialGradient(540,500,0,540,500,1400); g.addColorStop(0,'rgba(255,255,255,.35)'); g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
   sIntro(ctx,t); sGallery(ctx,t,img); sOutro(ctx,t);
 }
 const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
