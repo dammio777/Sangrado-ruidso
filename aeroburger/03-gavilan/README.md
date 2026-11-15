@@ -17,3 +17,5 @@ ffmpeg -i out/video_noaudio.mp4 -i out/sfx.wav -c:v copy -c:a aac -b:a 256k -sho
 ```
 THEME=light OUT=video_light.mp4 node src/render.js video 60
 ```
+
+**Color de los pasos (cálido y luminoso):** `curves=all='0/0.06 0.2/0.36 0.5/0.68 0.8/0.9 1/1',colortemperature=temperature=4300:mix=0.95,eq=contrast=1.04:saturation=1.45,colorbalance=rs=0.06:gs=0.01:bs=-0.08:rm=0.08:gm=0.02:bm=-0.08:rh=0.04:bh=-0.03`
