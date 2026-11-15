@@ -67,8 +67,16 @@ function maskedText(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){
   ctx.restore();
 }
 const orangeGrad=(ctx,y,size)=>{ const g=ctx.createLinearGradient(0,y-size*0.8,0,y); g.addColorStop(0,ORANGE2); g.addColorStop(1,ORANGE); return g; };
-const amberGrad=(ctx,y,size)=>{ const g=ctx.createLinearGradient(0,y-size*0.78,0,y+size*0.02);
-  g.addColorStop(0,'#DE9024'); g.addColorStop(0.5,'#CA7711'); g.addColorStop(1,'#AD5F0B'); return g; };   // ámbar medido del afiche
+const amberGrad=(ctx,y,size)=>{
+  // degradado doble (como el afiche): más claro arriba al centro, se oscurece hacia abajo y hacia los bordes
+  const cy=y-size*1.6, R=size*3.0;
+  const g=ctx.createRadialGradient(540,cy,0,540,cy,R);
+  g.addColorStop(0.00,'#FFC255');
+  g.addColorStop(0.27,'#F2A436');
+  g.addColorStop(0.50,'#D4800F');
+  g.addColorStop(0.78,'#AE5F0A');
+  g.addColorStop(1.00,'#8A4A08');
+  return g; };
 
 // palabra grande con letras escalonadas
 function bigWord(ctx,word,cx,y,size,t,tIn,tOut,fill,stagger=0.055){
