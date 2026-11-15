@@ -199,13 +199,14 @@ function sEnd(ctx,t){
     plane(ctx,lerp(x+260,x+w/2,fly),y+h/2,64,0,FGC);
     ctx.restore();
   }
-  maskedText(ctx,'Salchicha · Plátano · Papas · Maíz · Salsas · Queso',540,1400,30,500,fg(.55),T0+0.7,null,t,{font:TEXT});
+  maskedText(ctx,'Maicitos · Pollo desmechado · Plátano maduro',540,1395,31,500,fg(.6),T0+0.7,null,t,{font:TEXT});
+  maskedText(ctx,'Salchicha ranchera · Salsas de la casa · Queso',540,1443,31,500,fg(.6),T0+0.8,null,t,{font:TEXT});
   const q=eOut(prog(t,T0+0.85,T0+1.35));
   if(q>0){
     ctx.save(); ctx.globalAlpha=q; ctx.translate(0,(1-q)*20);
     ctx.font=`500 32px ${TEXT}`; const s='@aero.burger  ·  Santa Elena'; const w=ctx.measureText(s).width; const L=64; const x0=540-(w+L+20)/2;
-    ctx.save(); ctx.beginPath(); ctx.arc(x0+L/2,1500,L/2,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x0,1500-L/2,L,L); ctx.restore();
-    ctx.fillStyle=fg(.7); ctx.textAlign='left'; ctx.fillText(s,x0+L+20,1511);
+    ctx.save(); ctx.beginPath(); ctx.arc(x0+L/2,1535,L/2,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x0,1535-L/2,L,L); ctx.restore();
+    ctx.fillStyle=fg(.7); ctx.textAlign='left'; ctx.fillText(s,x0+L+20,1546);
     ctx.restore();
   }
 }
