@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 const ROOT = path.resolve(__dirname, '..');
-const URL = 'file://' + path.join(ROOT, 'src', 'index.html');
+const URL = 'file://' + path.join(ROOT, 'src', 'index.html') + (process.env.THEME ? '?theme=' + process.env.THEME : '');
 
 (async () => {
   const [mode, ...args] = process.argv.slice(2);
@@ -30,7 +30,7 @@ const URL = 'file://' + path.join(ROOT, 'src', 'index.html');
     const fps = parseInt(args[0] || '60', 10);
     const dur = await page.evaluate(() => window.DURATION);
     const N = Math.round(dur * fps);
-    const out = path.join(ROOT, 'out', 'video_noaudio.mp4');
+    const out = path.join(ROOT, 'out', process.env.OUT || 'video_noaudio.mp4');
     const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
       '-c:v', 'libx264', '-preset', 'slow', '-crf', '15', '-pix_fmt', 'yuv420p', '-r', String(fps), '-movflags', '+faststart', out],
       { stdio: ['pipe', 'inherit', 'inherit'] });

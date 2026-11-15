@@ -17,6 +17,10 @@ html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:10
 const W=1080, H=1920;
 const ORANGE='#BDBDBD', ORANGE2='#E6E6E6';   // paleta blanco y negro
 const FONT='"Inter Display", "Inter", sans-serif', TEXT='"Inter", sans-serif', SLAB='"AirbusSlab", serif';
+// Tema: ?theme=dark (fondo negro, elementos blancos) | ?theme=light (fondo blanco, elementos negros)
+const LIGHT=new URLSearchParams(location.search).get('theme')==='light';
+const fg=a=>LIGHT?`rgba(0,0,0,${a})`:`rgba(255,255,255,${a})`;
+const FGC=LIGHT?'#000':'#fff', BGC=LIGHT?'#fff':'#000';
 const DURATION=21.0; window.DURATION=DURATION;
 
 // ---------- Línea de tiempo ----------
@@ -63,7 +67,7 @@ function maskedText(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){
   ctx.font=`${weight} ${size}px ${o.font||FONT}`; ctx.textAlign=o.align||'center'; ctx.textBaseline='alphabetic';
   if(o.tracking!=null) ctx.letterSpacing=o.tracking+'px';
   ctx.globalAlpha=clamp(pIn*1.6)*(1-pOut);
-  if(o.shadow){ ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=30; ctx.shadowOffsetY=4; }
+  if(o.shadow){ ctx.shadowColor=LIGHT?'rgba(0,0,0,.12)':'rgba(0,0,0,.5)'; ctx.shadowBlur=30; ctx.shadowOffsetY=4; }
   ctx.fillStyle=typeof fill==='function'?fill(ctx,y,size):fill;
   ctx.fillText(str,x+(o.dx||0),y+(1-pIn)*lh-pOut*lh);
   ctx.restore();
@@ -71,7 +75,8 @@ function maskedText(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){
 // degradado ámbar doble, igual que la Airbus
 // degradado plateado (blanco y negro como el logo): blanco arriba al centro, gris hacia abajo y los bordes
 const amberGrad=(ctx,y,size)=>{ const cy=y-size*1.6, R=size*3.0; const g=ctx.createRadialGradient(540,cy,0,540,cy,R);
-  g.addColorStop(0,'#FFFFFF'); g.addColorStop(0.3,'#F4F4F4'); g.addColorStop(0.52,'#D2D2D2'); g.addColorStop(0.78,'#A2A2A2'); g.addColorStop(1,'#7E7E7E'); return g; };
+  const st=LIGHT?['#000000','#141414','#333333','#575757','#767676']:['#FFFFFF','#F4F4F4','#D2D2D2','#A2A2A2','#7E7E7E'];
+  [0,0.3,0.52,0.78,1].forEach((o,i)=>g.addColorStop(o,st[i])); return g; };
 function bigWord(ctx,word,cx,y,size,t,tIn,tOut,fill,stagger=0.055){
   ctx.save(); ctx.font=`400 ${size}px ${SLAB}`; ctx.letterSpacing='3px'; const total=ctx.measureText(word).width; ctx.restore();
   let x=cx-total/2;
@@ -94,15 +99,15 @@ function plane(ctx,x,y,s,rot,col){
 }
 function quad(p0,p1,p2,u){ const a=(1-u)*(1-u), b=2*(1-u)*u, c=u*u; return [a*p0[0]+b*p1[0]+c*p2[0], a*p0[1]+b*p1[1]+c*p2[1]]; }
 function warmBG(ctx,t=0){
-  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
-  let g=ctx.createRadialGradient(540,620,0,540,620,1150); g.addColorStop(0,'rgba(255,255,255,0.07)'); g.addColorStop(0.6,'rgba(255,255,255,0.02)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=BGC; ctx.fillRect(0,0,W,H);
+  let g=ctx.createRadialGradient(540,620,0,540,620,1150); g.addColorStop(0,fg(0.07)); g.addColorStop(0.6,fg(0.02)); g.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
   // ruta de vuelo de fondo con un avión que la recorre durante todo el video
   const P0=[-120,1860], P1=[540,1500], P2=[1200,1700];
-  ctx.save(); ctx.strokeStyle='rgba(255,255,255,0.10)'; ctx.lineWidth=2; ctx.setLineDash([10,14]);
+  ctx.save(); ctx.strokeStyle=fg(0.10); ctx.lineWidth=2; ctx.setLineDash([10,14]);
   ctx.beginPath(); ctx.moveTo(...P0); ctx.quadraticCurveTo(...P1,...P2); ctx.stroke(); ctx.restore();
   const u=clamp(t/DURATION*0.9+0.05); const [px,py]=quad(P0,P1,P2,u); const [qx,qy]=quad(P0,P1,P2,Math.min(1,u+0.001));
-  plane(ctx,px,py,46,Math.atan2(qy-py,qx-px),'rgba(255,255,255,0.22)');
+  plane(ctx,px,py,46,Math.atan2(qy-py,qx-px),fg(0.22));
 }
 
 // ---------- Tarjeta (un solo objeto que viaja por todo el video) ----------
@@ -124,7 +129,7 @@ function cardRect(t){
 function drawCard(ctx,t,foot){
   const c=cardRect(t);
   ctx.save(); ctx.globalAlpha=c.a;
-  ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=70; ctx.shadowOffsetY=30; rr(ctx,c.x,c.y,c.w,c.h,c.r); ctx.fillStyle='#000'; ctx.fill(); ctx.shadowColor='transparent';
+  ctx.shadowColor=LIGHT?'rgba(0,0,0,.22)':'rgba(0,0,0,.6)'; ctx.shadowBlur=70; ctx.shadowOffsetY=30; rr(ctx,c.x,c.y,c.w,c.h,c.r); ctx.fillStyle='#000'; ctx.fill(); ctx.shadowColor='transparent';
   rr(ctx,c.x,c.y,c.w,c.h,c.r); ctx.clip();
   // capas de contenido con fundidos cruzados
   const layer=(img,a,k=1,ay=0.5)=>{ if(a<=0||!img) return; ctx.globalAlpha=c.a*a; drawCover(ctx,img,c.x,c.y,c.w,c.h,k,0.5,ay); };
@@ -132,24 +137,24 @@ function drawCard(ctx,t,foot){
   if(foot) layer(foot, prog(t,OPEN1-0.1,OPEN1+0.25)*(1-prog(t,RES0-0.1,RES0+0.25)), 1+0.03*((t-STEP0)%STEPD)/STEPD);
   layer(IMG.bottom, prog(t,RES0-0.1,RES0+0.25), lerp(1.12,1.02,eOut(prog(t,RES0,RES1+0.6))));
   ctx.restore();
-  ctx.save(); ctx.globalAlpha=c.a; rr(ctx,c.x+.5,c.y+.5,c.w-1,c.h-1,c.r); ctx.strokeStyle='rgba(255,255,255,.22)'; ctx.lineWidth=2; ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.globalAlpha=c.a; rr(ctx,c.x+.5,c.y+.5,c.w-1,c.h-1,c.r); ctx.strokeStyle=fg(.22); ctx.lineWidth=2; ctx.stroke(); ctx.restore();
 }
 
 // ---------- Textos ----------
 function sOpen(ctx,t){
   if(t>OPEN1+0.2) return;
-  maskedText(ctx,'AERO BURGER PRESENTA',540,1130,30,600,'rgba(255,255,255,.8)',0.35,2.75,t,{font:TEXT,tracking:9});
+  maskedText(ctx,'AERO BURGER PRESENTA',540,1130,30,600,fg(.8),0.35,2.75,t,{font:TEXT,tracking:9});
   bigWord(ctx,'GAVILÁN',540,1340,170,t,0.55,2.8,amberGrad);
-  maskedText(ctx,'Desgranado especial.',540,1440,62,700,'#fff',1.2,2.9,t,{tracking:-1.5});
+  maskedText(ctx,'Desgranado especial.',540,1440,62,700,FGC,1.2,2.9,t,{tracking:-1.5});
 }
 function sSteps(ctx,t){
   if(t<STEP0-0.1||t>STEP1+0.3) return;
-  maskedText(ctx,'PLAN DE VUELO  ·  5 ESCALAS',540,1250,28,700,'rgba(255,255,255,.6)',STEP0+0.1,STEP1-0.3,t,{font:TEXT,tracking:7});
+  maskedText(ctx,'PLAN DE VUELO  ·  5 ESCALAS',540,1250,28,700,fg(.6),STEP0+0.1,STEP1-0.3,t,{font:TEXT,tracking:7});
   for(let i=0;i<STEPS.length;i++){
     const a=STEP0+i*STEPD, b=a+STEPD;
     const tin=a+(i===0?0.25:0.05), tout=b-0.3;
     maskedText(ctx,String(i+1).padStart(2,'0'),540,1400,110,400,amberGrad,tin,tout,t,{font:SLAB,tracking:2,shadow:true});
-    maskedText(ctx,STEPS[i].label,540,1490,64,700,'#fff',tin+0.08,tout+0.04,t,{tracking:-1.5});
+    maskedText(ctx,STEPS[i].label,540,1490,64,700,FGC,tin+0.08,tout+0.04,t,{tracking:-1.5});
   }
   // ruta de vuelo: 5 escalas y un avión que avanza entre ellas
   const pa=eOut(prog(t,STEP0+0.2,STEP0+0.6))*(1-eInOut(prog(t,STEP1-0.2,STEP1+0.2)));
@@ -158,49 +163,49 @@ function sSteps(ctx,t){
     const n=STEPS.length, x0=230, x1=850, y=1585, dx=(x1-x0)/(n-1);
     const i=clamp(Math.floor((t-STEP0)/STEPD),0,n-1), u=(t-STEP0)-i*STEPD;
     const pos = i===0 ? 0 : (i-1)+eInOutQ(clamp(u/0.7));
-    ctx.strokeStyle='rgba(255,255,255,.25)'; ctx.lineWidth=2.5; ctx.setLineDash([8,10]);
+    ctx.strokeStyle=fg(.25); ctx.lineWidth=2.5; ctx.setLineDash([8,10]);
     ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); ctx.setLineDash([]);
-    ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x0+dx*pos,y); ctx.stroke();
+    ctx.strokeStyle=FGC; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x0+dx*pos,y); ctx.stroke();
     for(let k=0;k<n;k++){
       const on=pos>=k-0.01; const cx=x0+k*dx;
       ctx.beginPath(); ctx.arc(cx,y,on?9:7,0,Math.PI*2);
-      if(on){ ctx.fillStyle='#fff'; ctx.fill(); } else { ctx.fillStyle='#000'; ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.45)'; ctx.lineWidth=2; ctx.stroke(); }
+      if(on){ ctx.fillStyle=FGC; ctx.fill(); } else { ctx.fillStyle=BGC; ctx.fill(); ctx.strokeStyle=fg(.45); ctx.lineWidth=2; ctx.stroke(); }
     }
-    plane(ctx,x0+dx*pos,y-34,58,0,'#fff');
+    plane(ctx,x0+dx*pos,y-34,58,0,FGC);
     ctx.restore();
   }
 }
 function sResult(ctx,t){
-  maskedText(ctx,'Todo en un solo bowl.',540,1210,70,700,'#fff',RES0+0.35,END0-0.35,t,{tracking:-1.6});
-  maskedText(ctx,'Aterrizaje perfecto.',540,1290,44,500,'rgba(255,255,255,.65)',RES0+0.55,END0-0.3,t,{font:TEXT});
+  maskedText(ctx,'Todo en un solo bowl.',540,1210,70,700,FGC,RES0+0.35,END0-0.35,t,{tracking:-1.6});
+  maskedText(ctx,'Aterrizaje perfecto.',540,1290,44,500,fg(.65),RES0+0.55,END0-0.3,t,{font:TEXT});
 }
 function sEnd(ctx,t){
   if(t<END0) return;
   const T0=END0+0.45;
   bigWord(ctx,'GAVILÁN',540,1070,150,t,T0,null,amberGrad,0.045);
-  maskedText(ctx,'Desgranado especial.',540,1158,52,600,'#fff',T0+0.35,null,t,{tracking:-1});
+  maskedText(ctx,'Desgranado especial.',540,1158,52,600,FGC,T0+0.35,null,t,{tracking:-1});
   // pase de abordar
   const bp=eOut5(prog(t,T0+0.5,T0+1.0));
   if(bp>0){
     ctx.save(); ctx.globalAlpha=bp; ctx.translate(0,(1-bp)*30);
     const x=140,y=1205,w=800,h=136;
-    rr(ctx,x,y,w,h,22); ctx.fillStyle='rgba(255,255,255,.05)'; ctx.fill(); ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=2; ctx.stroke();
-    ctx.textAlign='left'; ctx.fillStyle='rgba(255,255,255,.5)'; ctx.font=`600 22px ${TEXT}`; ctx.letterSpacing='4px'; ctx.fillText('DESDE',x+40,y+50);
+    rr(ctx,x,y,w,h,22); ctx.fillStyle=fg(.05); ctx.fill(); ctx.strokeStyle=fg(.35); ctx.lineWidth=2; ctx.stroke();
+    ctx.textAlign='left'; ctx.fillStyle=fg(.5); ctx.font=`600 22px ${TEXT}`; ctx.letterSpacing='4px'; ctx.fillText('DESDE',x+40,y+50);
     ctx.textAlign='right'; ctx.fillText('DESTINO',x+w-40,y+50);
-    ctx.letterSpacing='0px'; ctx.fillStyle='#fff'; ctx.font=`700 40px ${FONT}`;
+    ctx.letterSpacing='0px'; ctx.fillStyle=FGC; ctx.font=`700 40px ${FONT}`;
     ctx.textAlign='left'; ctx.fillText('Cocina',x+40,y+102); ctx.textAlign='right'; ctx.fillText('Tu mesa',x+w-40,y+102);
-    ctx.strokeStyle='rgba(255,255,255,.4)'; ctx.lineWidth=2; ctx.setLineDash([6,8]); ctx.beginPath(); ctx.moveTo(x+250,y+h/2); ctx.lineTo(x+w-250,y+h/2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle=fg(.4); ctx.lineWidth=2; ctx.setLineDash([6,8]); ctx.beginPath(); ctx.moveTo(x+250,y+h/2); ctx.lineTo(x+w-250,y+h/2); ctx.stroke(); ctx.setLineDash([]);
     const fly=eInOutQ(prog(t,T0+0.7,T0+1.6));
-    plane(ctx,lerp(x+260,x+w/2,fly),y+h/2,64,0,'#fff');
+    plane(ctx,lerp(x+260,x+w/2,fly),y+h/2,64,0,FGC);
     ctx.restore();
   }
-  maskedText(ctx,'Salchicha · Plátano · Papas · Maíz · Salsas · Queso',540,1400,30,500,'rgba(255,255,255,.55)',T0+0.7,null,t,{font:TEXT});
+  maskedText(ctx,'Salchicha · Plátano · Papas · Maíz · Salsas · Queso',540,1400,30,500,fg(.55),T0+0.7,null,t,{font:TEXT});
   const q=eOut(prog(t,T0+0.85,T0+1.35));
   if(q>0){
     ctx.save(); ctx.globalAlpha=q; ctx.translate(0,(1-q)*20);
     ctx.font=`500 32px ${TEXT}`; const s='@aero.burger  ·  Santa Elena'; const w=ctx.measureText(s).width; const L=64; const x0=540-(w+L+20)/2;
     ctx.save(); ctx.beginPath(); ctx.arc(x0+L/2,1500,L/2,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x0,1500-L/2,L,L); ctx.restore();
-    ctx.fillStyle='rgba(255,255,255,.7)'; ctx.textAlign='left'; ctx.fillText(s,x0+L+20,1511);
+    ctx.fillStyle=fg(.7); ctx.textAlign='left'; ctx.fillText(s,x0+L+20,1511);
     ctx.restore();
   }
 }
