@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Gavilán</title>
+<style>@font-face{font-family:'AirbusSlab';src:url('../assets/fonts/Bevan-Regular.ttf')}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · Desgranado especial GAVILÁN · Reel 1080x1920 @60fps
+   Serie de producto: misma tipografía slab ámbar que la Airbus.
+   Animación determinista: window.seek(t).
+   ========================================================================= */
+const W=1080, H=1920;
+const ORANGE='#C2700F', ORANGE2='#DB8D20';
+const FONT='"Inter Display", "Inter", sans-serif', TEXT='"Inter", sans-serif', SLAB='"AirbusSlab", serif';
+const DURATION=21.0; window.DURATION=DURATION;
+
+// ---------- Línea de tiempo ----------
+const OPEN1=3.2;                  // termina la apertura
+const STEP0=3.2, STEPD=2.0;       // 5 pasos de 2 s
+const STEPS=[
+  {dir:'s1', label:'Salchicha y plátano'},
+  {dir:'s2', label:'Papas a la francesa'},
+  {dir:'s3', label:'Salsas de la casa'},
+  {dir:'s4', label:'Lluvia de queso'},
+  {dir:'s5', label:'Y un toque final.'},
+];
+const STEP1=STEP0+STEPS.length*STEPD;   // 13.2
+const RES0=STEP1, RES1=16.3;            // resultado (foto con tenedor)
+const END0=RES1;                        // cierre
+
+// ---------- Utilidades ----------
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eOut5=x=>1-Math.pow(1-x,5);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eInOutQ=x=>x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2;
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const cache=new Map(); const KEEP=new Set();
+function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>40){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
+const IMG={};
+
+function stepAt(t){ const i=Math.floor((t-STEP0)/STEPD); return (t>=STEP0 && i>=0 && i<STEPS.length)? i : -1; }
+function footageSrc(t){
+  if(t>=STEP1 && t<STEP1+0.4) return '../frames/s5/0120.jpg';   // se sostiene durante el fundido al resultado
+  const i=stepAt(t); if(i<0) return null;
+  const idx=clamp(Math.floor((t-STEP0-i*STEPD)*60)+1,1,120);
+  return `../frames/${STEPS[i].dir}/${String(idx).padStart(4,'0')}.jpg`;
+}
+
+function maskedText(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){
+  const pIn=eOut5(prog(t,tIn,tIn+(o.inDur||0.5)));
+  const pOut=tOut==null?0:eInOut(prog(t,tOut,tOut+(o.outDur||0.28)));
+  if(pIn<=0||pOut>=1) return;
+  const lh=size*1.3;
+  ctx.save(); ctx.beginPath(); ctx.rect(0,y-size*1.02,W,lh); ctx.clip();
+  ctx.font=`${weight} ${size}px ${o.font||FONT}`; ctx.textAlign=o.align||'center'; ctx.textBaseline='alphabetic';
+  if(o.tracking!=null) ctx.letterSpacing=o.tracking+'px';
+  ctx.globalAlpha=clamp(pIn*1.6)*(1-pOut);
+  if(o.shadow){ ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=30; ctx.shadowOffsetY=4; }
+  ctx.fillStyle=typeof fill==='function'?fill(ctx,y,size):fill;
+  ctx.fillText(str,x+(o.dx||0),y+(1-pIn)*lh-pOut*lh);
+  ctx.restore();
+}
+// degradado ámbar doble, igual que la Airbus
+const amberGrad=(ctx,y,size)=>{ const cy=y-size*1.6, R=size*3.0; const g=ctx.createRadialGradient(540,cy,0,540,cy,R);
+  g.addColorStop(0,'#FFC255'); g.addColorStop(0.27,'#F2A436'); g.addColorStop(0.5,'#D4800F'); g.addColorStop(0.78,'#AE5F0A'); g.addColorStop(1,'#8A4A08'); return g; };
+function bigWord(ctx,word,cx,y,size,t,tIn,tOut,fill,stagger=0.055){
+  ctx.save(); ctx.font=`400 ${size}px ${SLAB}`; ctx.letterSpacing='3px'; const total=ctx.measureText(word).width; ctx.restore();
+  let x=cx-total/2;
+  for(let i=0;i<word.length;i++){
+    ctx.save(); ctx.font=`400 ${size}px ${SLAB}`; ctx.letterSpacing='3px'; const w=ctx.measureText(word[i]).width; ctx.restore();
+    maskedText(ctx,word[i],x,y,size,400,fill,tIn+i*stagger,tOut==null?null:tOut+i*0.025,t,{align:'left',tracking:3,inDur:0.6,outDur:0.3,shadow:true,font:SLAB});
+    x+=w;
+  }
+}
+function drawCover(ctx,img,x,y,w,h,k=1,ax=0.5,ay=0.5){ const s=Math.max(w/img.width,h/img.height)*k; const dw=img.width*s, dh=img.height*s; ctx.drawImage(img,x+(w-dw)*ax,y+(h-dh)*ay,dw,dh); }
+function warmBG(ctx){
+  ctx.fillStyle='#08070a'; ctx.fillRect(0,0,W,H);
+  let g=ctx.createRadialGradient(540,700,0,540,700,1100); g.addColorStop(0,'rgba(150,80,25,0.30)'); g.addColorStop(0.55,'rgba(90,45,15,0.12)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  g=ctx.createRadialGradient(980,1850,0,980,1850,900); g.addColorStop(0,'rgba(255,138,31,0.20)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+}
+
+// ---------- Tarjeta (un solo objeto que viaja por todo el video) ----------
+function cardRect(t){
+  // apertura: entra; pasos: se vuelve cuadrada; resultado: foto apaisada; cierre: se encoge y sube
+  const A={x:90,y:250,w:900,h:683};            // foto de arriba (1080:820)
+  const B={x:90,y:230,w:900,h:900};            // pasos
+  const C={x:90,y:260,w:900,h:717};            // foto con tenedor (1080:860)
+  const D={x:240,y:250,w:600,h:600};           // cierre
+  const L=(p,q,e)=>({x:lerp(p.x,q.x,e),y:lerp(p.y,q.y,e),w:lerp(p.w,q.w,e),h:lerp(p.h,q.h,e)});
+  let r=A;
+  r=L(r,B,eInOutQ(prog(t,OPEN1-0.15,OPEN1+0.35)));
+  r=L(r,C,eInOutQ(prog(t,RES0-0.1,RES0+0.4)));
+  r=L(r,D,eInOutQ(prog(t,END0-0.1,END0+0.6)));
+  const pin=eOut5(prog(t,0.0,0.8));
+  const s=lerp(0.9,1,pin);
+  return {x:r.x+r.w*(1-s)/2, y:r.y+r.h*(1-s)/2+(1-pin)*50, w:r.w*s, h:r.h*s, r:44, a:clamp(pin*1.5)};
+}
+function drawCard(ctx,t,foot){
+  const c=cardRect(t);
+  ctx.save(); ctx.globalAlpha=c.a;
+  ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=70; ctx.shadowOffsetY=30; rr(ctx,c.x,c.y,c.w,c.h,c.r); ctx.fillStyle='#000'; ctx.fill(); ctx.shadowColor='transparent';
+  rr(ctx,c.x,c.y,c.w,c.h,c.r); ctx.clip();
+  // capas de contenido con fundidos cruzados
+  const layer=(img,a,k=1,ay=0.5)=>{ if(a<=0||!img) return; ctx.globalAlpha=c.a*a; drawCover(ctx,img,c.x,c.y,c.w,c.h,k,0.5,ay); };
+  layer(IMG.top,1, lerp(1.12,1.0,eOut(prog(t,0,3.2))));
+  if(foot) layer(foot, prog(t,OPEN1-0.1,OPEN1+0.25)*(1-prog(t,RES0-0.1,RES0+0.25)), 1+0.03*((t-STEP0)%STEPD)/STEPD);
+  layer(IMG.bottom, prog(t,RES0-0.1,RES0+0.25), lerp(1.12,1.02,eOut(prog(t,RES0,RES1+0.6))));
+  ctx.restore();
+  ctx.save(); ctx.globalAlpha=c.a; rr(ctx,c.x+.5,c.y+.5,c.w-1,c.h-1,c.r); ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=2; ctx.stroke(); ctx.restore();
+}
+
+// ---------- Textos ----------
+function sOpen(ctx,t){
+  if(t>OPEN1+0.2) return;
+  maskedText(ctx,'AERO BURGER PRESENTA',540,1130,30,600,'rgba(255,255,255,.8)',0.35,2.75,t,{font:TEXT,tracking:9});
+  bigWord(ctx,'GAVILÁN',540,1340,170,t,0.55,2.8,amberGrad);
+  maskedText(ctx,'Desgranado especial.',540,1440,62,700,'#fff',1.2,2.9,t,{tracking:-1.5});
+}
+function sSteps(ctx,t){
+  if(t<STEP0-0.1||t>STEP1+0.3) return;
+  maskedText(ctx,'ASÍ SE ARMA',540,1250,28,700,ORANGE2,STEP0+0.1,STEP1-0.3,t,{font:TEXT,tracking:7});
+  for(let i=0;i<STEPS.length;i++){
+    const a=STEP0+i*STEPD, b=a+STEPD;
+    const tin=a+(i===0?0.25:0.05), tout=b-0.3;
+    maskedText(ctx,String(i+1).padStart(2,'0'),540,1400,110,400,amberGrad,tin,tout,t,{font:SLAB,tracking:2,shadow:true});
+    maskedText(ctx,STEPS[i].label,540,1490,64,700,'#fff',tin+0.08,tout+0.04,t,{tracking:-1.5});
+  }
+  // indicador de progreso: 5 segmentos
+  const pa=eOut(prog(t,STEP0+0.2,STEP0+0.6))*(1-eInOut(prog(t,STEP1-0.2,STEP1+0.2)));
+  if(pa>0){
+    ctx.save(); ctx.globalAlpha=pa;
+    const n=STEPS.length, seg=100, gap=14, tw=n*seg+(n-1)*gap, x0=540-tw/2, y=1560;
+    for(let i=0;i<n;i++){
+      rr(ctx,x0+i*(seg+gap),y,seg,6,3); ctx.fillStyle='rgba(255,255,255,.18)'; ctx.fill();
+      const f=clamp((t-STEP0-i*STEPD)/STEPD);
+      if(f>0){ rr(ctx,x0+i*(seg+gap),y,Math.max(6,seg*f),6,3); ctx.fillStyle=ORANGE2; ctx.fill(); }
+    }
+    ctx.restore();
+  }
+}
+function sResult(ctx,t){
+  maskedText(ctx,'Todo en un solo bowl.',540,1210,70,700,'#fff',RES0+0.35,END0-0.35,t,{tracking:-1.6});
+  maskedText(ctx,'Hecho para compartir… o no.',540,1290,44,500,'rgba(255,255,255,.65)',RES0+0.55,END0-0.3,t,{font:TEXT});
+}
+function sEnd(ctx,t){
+  if(t<END0) return;
+  const T0=END0+0.45;
+  bigWord(ctx,'GAVILÁN',540,1070,150,t,T0,null,amberGrad,0.045);
+  maskedText(ctx,'Desgranado especial.',540,1158,52,600,'#fff',T0+0.35,null,t,{tracking:-1});
+  maskedText(ctx,'Salchicha · Plátano · Papas · Maíz',540,1232,34,500,'rgba(255,255,255,.6)',T0+0.5,null,t,{font:TEXT});
+  maskedText(ctx,'Salsas de la casa · Queso',540,1280,34,500,'rgba(255,255,255,.6)',T0+0.6,null,t,{font:TEXT});
+  const q=eOut(prog(t,T0+0.85,T0+1.35));
+  if(q>0){
+    ctx.save(); ctx.globalAlpha=q; ctx.translate(0,(1-q)*20);
+    ctx.font=`500 32px ${TEXT}`; const s='@aero.burger  ·  Santa Elena'; const w=ctx.measureText(s).width; const L=64; const x0=540-(w+L+20)/2;
+    ctx.save(); ctx.beginPath(); ctx.arc(x0+L/2,1420,L/2,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x0,1420-L/2,L,L); ctx.restore();
+    ctx.fillStyle='rgba(255,255,255,.7)'; ctx.textAlign='left'; ctx.fillText(s,x0+L+20,1431);
+    ctx.restore();
+  }
+}
+
+function render(ctx,t,foot){
+  warmBG(ctx);
+  drawCard(ctx,t,foot);
+  sOpen(ctx,t); sSteps(ctx,t); sResult(ctx,t); sEnd(ctx,t);
+}
+
+const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
+const accC=document.createElement('canvas'); accC.width=W; accC.height=H; const actx=accC.getContext('2d');
+const BLUR=[[0,0.8],[OPEN1-0.15,OPEN1+0.35],[RES0-0.1,RES0+0.4],[END0-0.1,END0+0.6]];
+const inBlur=t=>BLUR.some(([a,b])=>t>a-0.02&&t<b+0.02);
+const SUB=5, SHUTTER=0.32/60;
+window.seek=async function(t){
+  const times=inBlur(t)?Array.from({length:SUB},(_,i)=>t+(i/(SUB-1)-0.5)*SHUTTER):[t];
+  const imgs=await Promise.all(times.map(async tt=>{ const s=footageSrc(tt); return s?await loadImg(s):null; }));
+  // en el cruce a los pasos se necesita el primer frame aunque t aún sea de la apertura
+  for(let i=0;i<times.length;i++) if(!imgs[i] && times[i]>OPEN1-0.15 && times[i]<STEP0) imgs[i]=await loadImg('../frames/s1/0001.jpg');
+  if(times.length===1){ render(ctx,t,imgs[0]); return; }
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<times.length;i++){ render(actx,Math.max(0,times[i]),imgs[i]); ctx.globalAlpha=1/(i+1); ctx.drawImage(accC,0,0); ctx.globalAlpha=1; }
+};
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  for(const [k,src] of [['top','../assets/photo_top.jpg'],['bottom','../assets/photo_bottom.jpg'],['logo','../assets/logo_crop.png']]){ KEEP.add(src); IMG[k]=await loadImg(src); }
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+  return true;
+})();
+</script>
+</body>
+</html>
