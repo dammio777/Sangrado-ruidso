@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Aero Burger — Airbus</title>
-<style>@font-face{font-family:'AirbusSlab';src:url('../assets/fonts/AlfaSlabOne-Regular.ttf')}
+<style>@font-face{font-family:'AirbusSlab';src:url('../assets/fonts/Bevan-Regular.ttf')}
 html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
 </head>
 <body>
@@ -14,7 +14,7 @@ html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:10
    Animación determinista: window.seek(t) dibuja el instante t.
    ========================================================================= */
 const W = 1080, H = 1920;
-const ORANGE = '#C6720E', ORANGE2 = '#E8A23C';   // tono ámbar del afiche de la Airbus
+const ORANGE = '#C2700F', ORANGE2 = '#DB8D20';   // tono ámbar del afiche de la Airbus
 const SLAB = '"AirbusSlab", serif';
 const FONT = '"Inter Display", "Inter", sans-serif';
 const TEXT = '"Inter", sans-serif';
@@ -68,7 +68,7 @@ function maskedText(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){
 }
 const orangeGrad=(ctx,y,size)=>{ const g=ctx.createLinearGradient(0,y-size*0.8,0,y); g.addColorStop(0,ORANGE2); g.addColorStop(1,ORANGE); return g; };
 const amberGrad=(ctx,y,size)=>{ const g=ctx.createLinearGradient(0,y-size*0.78,0,y+size*0.02);
-  g.addColorStop(0,'#EDAA45'); g.addColorStop(0.45,'#D4841C'); g.addColorStop(0.8,'#C06C0E'); g.addColorStop(1,'#A95D0A'); return g; };
+  g.addColorStop(0,'#DE9024'); g.addColorStop(0.5,'#CA7711'); g.addColorStop(1,'#AD5F0B'); return g; };   // ámbar medido del afiche
 
 // palabra grande con letras escalonadas
 function bigWord(ctx,word,cx,y,size,t,tIn,tOut,fill,stagger=0.055){
@@ -110,7 +110,7 @@ function warmBG(ctx){
 function sTitle(ctx,t){
   if(t>2.95) return;
   maskedText(ctx,'AERO BURGER PRESENTA',540,1180,30,600,'rgba(255,255,255,.85)',0.25,2.45,t,{font:TEXT,tracking:9});
-  bigWord(ctx,'AIRBUS',540,1410,196,t,0.45,2.5,amberGrad);
+  bigWord(ctx,'AIRBUS',540,1410,192,t,0.45,2.5,amberGrad);
   maskedText(ctx,'Doble carne.',540,1515,66,700,'#fff',1.05,2.6,t,{tracking:-1.5,shadow:true});
 }
 function sSpec(ctx,t){
