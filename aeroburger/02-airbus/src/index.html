@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Airbus</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · Producto: AIRBUS (doble carne) · Reel 1080x1920 @60fps
+   Animación determinista: window.seek(t) dibuja el instante t.
+   ========================================================================= */
+const W = 1080, H = 1920;
+const ORANGE = '#FF8A1F', ORANGE2 = '#FFC46B';
+const FONT = '"Inter Display", "Inter", sans-serif';
+const TEXT = '"Inter", sans-serif';
+
+// ---------- Metraje: tramos [carpeta, nº frames, inicio, fin] ----------
+const SEG = [];
+function seg(dir,n,start,end){ SEG.push({dir,n,start,end}); }
+seg('a1',175, 0.00, 2.92);   // cámara lenta: el queso se derrite al apretar
+seg('a2', 30, 2.92, 3.42);   // tocineta
+seg('a3', 85, 3.42, 4.83);   // la tapa
+seg('a4', 61, 8.30, 9.32);   // vista lateral
+seg('a5',108, 9.32,11.12);   // envoltorio
+const PHOTO = {start:11.12, end:13.65};
+const DURATION = 19.5;
+window.DURATION = DURATION;
+
+// ---------- Utilidades ----------
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eOut5=x=>1-Math.pow(1-x,5);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eInOutQ=x=>x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2;
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+const cache=new Map(); const KEEP=new Set();
+function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>40){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
+const IMG={};
+
+function footageSrc(t){
+  const s = SEG.find(s=>t>=s.start && t<s.end); if(!s) return null;
+  const idx = clamp(Math.floor((t-s.start)*60)+1,1,s.n);
+  return `../frames/${s.dir}/${String(idx).padStart(4,'0')}.jpg`;
+}
+
+// texto con máscara: sube dentro de su línea y sale hacia arriba
+function maskedText(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){
+  const pIn=eOut5(prog(t,tIn,tIn+(o.inDur||0.5)));
+  const pOut=tOut==null?0:eInOut(prog(t,tOut,tOut+(o.outDur||0.28)));
+  if(pIn<=0||pOut>=1) return;
+  const lh=size*1.3;
+  ctx.save(); ctx.beginPath(); ctx.rect(0,y-size*1.02,W,lh); ctx.clip();
+  ctx.font=`${weight} ${size}px ${o.font||FONT}`; ctx.textAlign=o.align||'center'; ctx.textBaseline='alphabetic';
+  if(o.tracking!=null) ctx.letterSpacing=o.tracking+'px';
+  ctx.globalAlpha=clamp(pIn*1.6)*(1-pOut);
+  if(o.shadow){ ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=30; ctx.shadowOffsetY=4; }
+  ctx.fillStyle=typeof fill==='function'?fill(ctx,y,size):fill;
+  ctx.fillText(str,x,y+(1-pIn)*lh-pOut*lh);
+  ctx.restore();
+}
+const orangeGrad=(ctx,y,size)=>{ const g=ctx.createLinearGradient(0,y-size*0.8,0,y); g.addColorStop(0,ORANGE2); g.addColorStop(1,ORANGE); return g; };
+
+// palabra grande con letras escalonadas
+function bigWord(ctx,word,cx,y,size,t,tIn,tOut,fill,stagger=0.055){
+  ctx.save();
+  ctx.font=`900 ${size}px ${FONT}`; ctx.letterSpacing='-4px';
+  const total=ctx.measureText(word).width; let x=cx-total/2;
+  ctx.restore();
+  for(let i=0;i<word.length;i++){
+    ctx.save(); ctx.font=`900 ${size}px ${FONT}`; ctx.letterSpacing='-4px';
+    const ch=word[i]; const w=ctx.measureText(ch).width; ctx.restore();
+    maskedText(ctx,ch,x,y,size,900,fill,tIn+i*stagger,tOut==null?null:tOut+i*0.025,t,{align:'left',tracking:-4,inDur:0.6,outDur:0.3,shadow:true});
+    x+=w;
+  }
+}
+
+function drawCover(ctx,img,x,y,w,h,k=1,ax=0.5,ay=0.5){
+  // dibuja img cubriendo el rect (x,y,w,h) con zoom k y ancla (ax,ay)
+  const s=Math.max(w/img.width,h/img.height)*k;
+  const dw=img.width*s, dh=img.height*s;
+  ctx.drawImage(img, x+(w-dw)*ax, y+(h-dh)*ay, dw, dh);
+}
+
+function scrim(ctx,a=1){
+  if(a<=0) return; ctx.save(); ctx.globalAlpha=a;
+  let g=ctx.createLinearGradient(0,950,0,H); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(0.5,'rgba(0,0,0,.5)'); g.addColorStop(1,'rgba(0,0,0,.78)');
+  ctx.fillStyle=g; ctx.fillRect(0,950,W,H-950);
+  g=ctx.createLinearGradient(0,0,0,260); g.addColorStop(0,'rgba(0,0,0,.35)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,260);
+  ctx.restore();
+}
+function warmBG(ctx){
+  ctx.fillStyle='#07080d'; ctx.fillRect(0,0,W,H);
+  let g=ctx.createRadialGradient(980,1750,0,980,1750,1100); g.addColorStop(0,'rgba(255,138,31,0.30)'); g.addColorStop(0.5,'rgba(255,100,20,0.10)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  g=ctx.createRadialGradient(80,-100,0,80,-100,1000); g.addColorStop(0,'rgba(40,60,140,0.30)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+}
+
+// ---------- Escenas ----------
+function sTitle(ctx,t){
+  if(t>2.95) return;
+  maskedText(ctx,'AERO BURGER PRESENTA',540,1180,30,600,'rgba(255,255,255,.85)',0.25,2.45,t,{font:TEXT,tracking:9});
+  bigWord(ctx,'AIRBUS',540,1420,236,t,0.45,2.5,orangeGrad);
+  maskedText(ctx,'Doble carne.',540,1515,66,700,'#fff',1.05,2.6,t,{tracking:-1.5,shadow:true});
+}
+function sSpec(ctx,t){
+  if(t<2.9||t>4.85) return;
+  const n=Math.round(400*eOut(prog(t,3.05,3.95)));
+  maskedText(ctx,`${n} g`,540,1420,200,800,orangeGrad,3.0,4.5,t,{tracking:-6,shadow:true,inDur:0.45});
+  maskedText(ctx,'de carne de res.',540,1510,62,600,'#fff',3.15,4.55,t,{tracking:-1.2,shadow:true});
+}
+
+const LIST=['Doble carne de res','Doble queso cheddar','Tocineta crocante','Lechuga y cebolla'];
+const CARD={x:150,y:250,s:780};
+function sIngredients(ctx,t){
+  if(t<4.83||t>8.32) return;
+  warmBG(ctx);
+  // tarjeta con la foto heroica
+  const pin=eOut5(prog(t,4.83,5.5));
+  const ex=eInOutQ(prog(t,7.85,8.3));        // la tarjeta se expande a pantalla completa
+  const sc=lerp(0.88,1,pin);
+  let x=CARD.x+CARD.s*(1-sc)/2, y=CARD.y+CARD.s*(1-sc)/2+(1-pin)*60, w=CARD.s*sc, h=CARD.s*sc, r=44;
+  x=lerp(x,0,ex); y=lerp(y,0,ex); w=lerp(w,W,ex); h=lerp(h,H,ex); r=lerp(r,0,ex);
+  ctx.save(); ctx.globalAlpha=clamp(pin*1.5);
+  ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=70; ctx.shadowOffsetY=30; rr(ctx,x,y,w,h,r); ctx.fillStyle='#000'; ctx.fill(); ctx.shadowColor='transparent';
+  rr(ctx,x,y,w,h,r); ctx.clip();
+  drawCover(ctx,IMG.poster,x,y,w,h,lerp(1.12,1.0,eOut(prog(t,4.83,7.9))),0.5,0.5);
+  if(ex>0){ ctx.globalAlpha=eInOut(prog(t,7.85,8.2)); drawCover(ctx,IMG.a4,x,y,w,h,1,0.5,0.45); }
+  ctx.restore();
+  if(ex<0.02){ ctx.save(); rr(ctx,x+.5,y+.5,w-1,h-1,r); ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=2; ctx.globalAlpha=pin; ctx.stroke(); ctx.restore(); }
+  // lista
+  const lo=7.55;
+  maskedText(ctx,'LO QUE LLEVA',150,1150,28,700,ORANGE,5.15,lo,t,{font:TEXT,align:'left',tracking:6});
+  for(let i=0;i<LIST.length;i++){
+    const ti=5.3+i*0.14, yy=1240+i*98;
+    const p=eOut(prog(t,ti,ti+0.5))*(1-eInOut(prog(t,lo+i*0.04,lo+0.25+i*0.04)));
+    if(p<=0) continue;
+    ctx.save(); ctx.globalAlpha=p;
+    ctx.fillStyle=ORANGE; ctx.beginPath(); ctx.arc(162,yy-15+(1-p)*20,8,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    maskedText(ctx,LIST[i],196,yy,48,600,'#fff',ti,lo+i*0.04,t,{align:'left',tracking:-0.8,font:TEXT});
+    // línea divisoria que se dibuja de izquierda a derecha
+    const lp=eInOut(prog(t,ti+0.1,ti+0.6))*(1-eInOut(prog(t,lo,lo+0.3)));
+    if(lp>0){ ctx.fillStyle='rgba(255,255,255,.12)'; ctx.fillRect(150,yy+34,780*lp,2); }
+  }
+}
+
+function sCaption(ctx,t,str,a,b){ maskedText(ctx,str,540,1470,70,700,'#fff',a,b,t,{tracking:-1.6,shadow:true}); }
+
+function sPhoto(ctx,t){
+  if(t<PHOTO.start) return;
+  const local=t-PHOTO.start;
+  const sh=eInOutQ(prog(t,13.65,14.35));    // se encoge a tarjeta
+  const up=eInOutQ(prog(t,14.45,15.0));     // sube a su posición final
+  const S0=700, S1=600;
+  let m={x:0,y:0,w:W,h:H,r:0};
+  if(sh>0){ m={x:lerp(0,(W-S0)/2,sh),y:lerp(0,860-S0/2,sh),w:lerp(W,S0,sh),h:lerp(H,S0,sh),r:lerp(0,44,sh)}; }
+  if(up>0){ const S=lerp(S0,S1,up); m={x:(W-S)/2,y:lerp(860,640,up)-S/2,w:S,h:S,r:44}; }
+  if(sh>0){ ctx.save(); ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=70; ctx.shadowOffsetY=30; rr(ctx,m.x,m.y,m.w,m.h,m.r); ctx.fillStyle='#000'; ctx.fill(); ctx.restore(); }
+  ctx.save(); rr(ctx,m.x,m.y,m.w,m.h,m.r); ctx.clip();
+  const k=lerp(1.40,1.30,eOut(prog(local,0,2.6)));
+  drawCover(ctx,IMG.photo,m.x,m.y,m.w,m.h,k*lerp(1,0.78,sh),0.5,0.6);
+  const xf=eInOut(prog(t,14.1,14.6));       // fundido a la foto heroica
+  if(xf>0){ ctx.globalAlpha=xf; drawCover(ctx,IMG.poster,m.x,m.y,m.w,m.h,1.02,0.5,0.5); }
+  ctx.restore();
+  if(sh>0){ ctx.save(); rr(ctx,m.x+.5,m.y+.5,m.w-1,m.h-1,m.r); ctx.strokeStyle=`rgba(255,255,255,${.12*sh})`; ctx.lineWidth=2; ctx.stroke(); ctx.restore(); }
+  if(sh<1) scrim(ctx,1-sh);
+}
+
+function sEnd(ctx,t){
+  if(t<14.6) return;
+  const T0=14.75;
+  bigWord(ctx,'AIRBUS',540,1150,176,t,T0,null,orangeGrad,0.045);
+  maskedText(ctx,'Para un apetito voraz.',540,1238,50,600,'#fff',T0+0.35,null,t,{tracking:-1});
+  // píldora "400 g"
+  const p=eOut5(prog(t,T0+0.55,T0+1.0));
+  if(p>0){
+    ctx.save(); ctx.globalAlpha=p; ctx.font=`600 34px ${TEXT}`; const s='400 g de carne de res'; const w=ctx.measureText(s).width+64;
+    const y=1290+(1-p)*24; rr(ctx,540-w/2,y,w,70,35); ctx.strokeStyle=ORANGE; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.fillStyle=ORANGE2; ctx.textAlign='center'; ctx.fillText(s,540,y+47); ctx.restore();
+  }
+  // firma
+  const q=eOut(prog(t,T0+0.85,T0+1.35));
+  if(q>0){
+    ctx.save(); ctx.globalAlpha=q; ctx.translate(0,(1-q)*20);
+    ctx.font=`500 32px ${TEXT}`; const s='@aero.burger  ·  Santa Elena'; const w=ctx.measureText(s).width; const L=64; const x0=540-(w+L+20)/2;
+    ctx.save(); ctx.beginPath(); ctx.arc(x0+L/2,1480,L/2,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x0,1480-L/2,L,L); ctx.restore();
+    ctx.fillStyle='rgba(255,255,255,.7)'; ctx.textAlign='left'; ctx.fillText(s,x0+L+20,1491);
+    ctx.restore();
+  }
+}
+
+function render(ctx,t,foot){
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  if(t>=13.65) warmBG(ctx);
+  if(foot && !(t>=4.83&&t<8.3)){
+    // pequeño "push-in" continuo en cada toma
+    const s=SEG.find(s=>t>=s.start&&t<s.end); const k=1+0.035*prog(t,s.start,s.end);
+    drawCover(ctx,foot,0,0,W,H,k,0.5,0.45);
+    scrim(ctx,1);
+  }
+  sIngredients(ctx,t);
+  sPhoto(ctx,t);
+  sTitle(ctx,t);
+  sSpec(ctx,t);
+  sCaption(ctx,t,'Hecha al momento.',8.42,9.02);
+  sCaption(ctx,t,'Lista para despegar.',9.5,10.75);
+  sCaption(ctx,t,'Con papas a la francesa.',11.3,13.25);
+  sEnd(ctx,t);
+}
+
+const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
+const accC=document.createElement('canvas'); accC.width=W; accC.height=H; const actx=accC.getContext('2d');
+const BLUR=[[4.83,5.5],[7.85,8.3],[13.65,14.35],[14.45,15.0]];
+const inBlur=t=>BLUR.some(([a,b])=>t>a-0.02&&t<b+0.02);
+const SUB=5, SHUTTER=0.32/60;
+window.seek=async function(t){
+  const times=inBlur(t)?Array.from({length:SUB},(_,i)=>t+(i/(SUB-1)-0.5)*SHUTTER):[t];
+  const imgs=await Promise.all(times.map(async tt=>{ const s=footageSrc(tt); return s?await loadImg(s):null; }));
+  if(times.length===1){ render(ctx,t,imgs[0]); return; }
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<times.length;i++){ render(actx,Math.max(0,times[i]),imgs[i]); ctx.globalAlpha=1/(i+1); ctx.drawImage(accC,0,0); ctx.globalAlpha=1; }
+};
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`900 80px "Inter Display"`),document.fonts.load(`800 80px "Inter Display"`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  for(const [k,src] of [['poster','../assets/poster_burger.jpg'],['photo','../assets/photo_wrapped.jpg'],['logo','../assets/logo_crop.png'],['a4','../frames/a4/0001.jpg']]){ KEEP.add(src); IMG[k]=await loadImg(src); }
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+  return true;
+})();
+</script>
+</body>
+</html>
