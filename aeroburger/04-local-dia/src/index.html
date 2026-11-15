@@ -46,7 +46,7 @@ function clipAt(t){ if(t<START-0.3) return null; return CLIPS.find(c=>t<c.end) |
 function footageSrc(t){
   const c=clipAt(t); if(!c) return null;
   const idx=clamp(Math.floor((t-c.start)*60)+1,1,c.n);
-  return `../frames/${c.dir}/${String(idx).padStart(4,'0')}.jpg`;
+  return `../frames/${c.dir}/${String(idx).padStart(4,'0')}.png`;
 }
 // texto que aparece con un pequeño desplazamiento y se va igual
 function txt(ctx,str,x,y,font,col,align,tIn,tOut,t,o={}){

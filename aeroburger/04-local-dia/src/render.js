@@ -31,14 +31,19 @@ const URL = 'file://' + path.join(ROOT, 'src', 'index.html') + (process.env.THEM
     const dur = await page.evaluate(() => window.DURATION);
     const N = Math.round(dur * fps);
     const out = path.join(ROOT, 'out', process.env.OUT || 'video_noaudio.mp4');
-    const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
-      '-c:v', 'libx264', '-preset', 'slow', '-crf', '15', '-pix_fmt', 'yuv420p', '-r', String(fps), '-movflags', '+faststart', out],
+    const FMT = process.env.LOSSLESS ? 'png' : 'jpeg';
+    // RGB -> YUV con matriz BT.709 y etiquetas de color correctas (si no, Instagram/teléfonos desplazan los colores)
+    const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', FMT === 'png' ? 'png' : 'mjpeg', '-i', '-',
+      '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p',
+      '-c:v', 'libx264', '-preset', 'slow', '-crf', process.env.CRF || '15', '-tune', 'film', '-profile:v', 'high',
+      '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
+      '-r', String(fps), '-movflags', '+faststart', out],
       { stdio: ['pipe', 'inherit', 'inherit'] });
     const t0 = Date.now();
     for (let i = 0; i < N; i++) {
       const t = i / fps;
       await page.evaluate(t => window.seek(t), t);
-      const buf = await canvas.screenshot({ type: 'jpeg', quality: 96 });
+      const buf = FMT === 'png' ? await canvas.screenshot({ type: 'png' }) : await canvas.screenshot({ type: 'jpeg', quality: 96 });
       if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
       if (i % 120 === 0) console.log(`frame ${i}/${N}  ${((Date.now() - t0) / 1000).toFixed(0)}s`);
     }
