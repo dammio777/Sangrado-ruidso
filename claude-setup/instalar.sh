@@ -12,6 +12,13 @@ elif [ ! -f ~/.claude/CLAUDE.md ]; then
   cp "$DIR/CLAUDE.md" ~/.claude/CLAUDE.md
 fi
 
+echo "== Modo de permisos por defecto: acceptEdits =="
+node -e '
+const fs=require("fs"),f=require("os").homedir()+"/.claude/settings.json";
+const s=fs.existsSync(f)?JSON.parse(fs.readFileSync(f,"utf8")):{};
+s.permissions={...(s.permissions||{}),defaultMode:"acceptEdits"};
+fs.writeFileSync(f,JSON.stringify(s,null,2)+"\n");'
+
 echo "== CLIs =="
 if [ "$(uname)" = "Darwin" ] && command -v brew >/dev/null; then
   command -v gh >/dev/null     || brew install gh
