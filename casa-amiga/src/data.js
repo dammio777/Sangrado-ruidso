@@ -35,7 +35,7 @@ export const HORARIO_NOTA = 'Festivos: de 10:00 a. m. a 6:00 p. m.' // [PONER]
 export const PERRO = null
 
 export const wa = (msg) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
-export const asset = (p) => `${import.meta.env.BASE_URL}${p}`
+export const asset = (p) => (p.startsWith("data:") ? p : `${import.meta.env.BASE_URL}${p}`)
 
 /* ---------- El camino (mapa ilustrado) [CONFIRMAR orden] ---------- */
 export const PARADAS = [
