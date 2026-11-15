@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --blanco: #ffffff;
+  --hueso: #fbf6ee;
+  --ambar: #f29021;
+  --ambar-oscuro: #b4600e;
+  --canela: #7c2d12;
+  --tinta: #2b1a12;
+}
+
+@layer base {
+  html {
+    background: var(--blanco);
+    color: var(--tinta);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply font-sans bg-blanco text-tinta;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+  ::selection { background: var(--ambar); color: var(--tinta); }
+  :focus-visible { outline: 2px solid var(--canela); outline-offset: 3px; border-radius: 6px; }
+  img { user-select: none; -webkit-user-drag: none; }
+}
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+@layer components {
+  .font-display { font-stretch: 78%; font-variation-settings: 'wdth' 78; }
+  .titulo { @apply font-display font-extrabold uppercase; line-height: 0.92; letter-spacing: -0.01em; }
+  .cedula { @apply font-mono uppercase; font-size: 0.72rem; letter-spacing: 0.1em; line-height: 1.5; }
+  .eyebrow { @apply font-mono uppercase text-ambar-oscuro; font-size: 0.75rem; letter-spacing: 0.14em; }
+  .wrap { @apply mx-auto w-full max-w-site px-4 sm:px-8 lg:px-12; }
+
+  .btn { @apply relative inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 font-semibold transition-[transform,background-color,box-shadow,color] duration-300; }
+  .btn-ambar { @apply btn bg-ambar text-tinta hover:shadow-[0_10px_30px_-10px_rgba(180,96,14,.7)]; }
+  .btn-outline { @apply btn border border-canela/80 text-canela; }
+
+  /* Línea que se dibuja al hover */
+  .hover-line path { stroke-dashoffset: 1.05; transition: stroke-dashoffset .6s cubic-bezier(.65,0,.35,1); }
+  .group:hover .hover-line path, .group:focus-visible .hover-line path { stroke-dashoffset: 0; }
+}
+
+/* Trazos: path con pathLength=1. Por defecto DIBUJADOS (reduced-motion / sin JS). GSAP los oculta y dibuja. */
+.draw { stroke-dasharray: 1 2; stroke-dashoffset: 0; }
+
+/* Papel de libro de visitas */
+.papel {
+  background-color: #fff;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 35px, rgba(124, 45, 18, .12) 35px 36px);
+}
+
+/* Pulso del botón de WhatsApp: cada 6 s */
+@keyframes pulso6 {
+  0% { box-shadow: 0 0 0 0 rgba(242, 144, 33, .55); }
+  14% { box-shadow: 0 0 0 18px rgba(242, 144, 33, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(242, 144, 33, 0); }
+}
+.pulso { animation: pulso6 6s ease-out infinite 2s; }
+
+@keyframes girar { to { transform: rotate(360deg); } }
+.girar { animation: girar 22s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+
+/* Ocultar scrollbar en carriles */
+.no-bar { scrollbar-width: none; }
+.no-bar::-webkit-scrollbar { display: none; }
