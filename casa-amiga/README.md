@@ -24,7 +24,7 @@ npm run preview
 |---|---|
 | **Número de WhatsApp** (hoy `573000000000`, ficticio) | `WHATSAPP` |
 | Dirección / pin exacto de Google Maps | `DIRECCION` |
-| Horario real (alimenta el indicador "Abierto ahora") | `HORARIO`, `HORARIO_NOTA` |
+| Horario real; luego `HORARIO_CONFIRMADO = true` para activar "Abierto ahora" | `HORARIO`, `HORARIO_NOTA`, `HORARIO_CONFIRMADO` |
 | Nombre del perro (hoy "El anfitrión") | `PERRO` |
 | Orden de las paradas del mapa | `PARADAS` |
 | Obras: artista, título, técnica, medidas, precio | `OBRAS` |
@@ -35,11 +35,11 @@ npm run preview
 | Respuestas del FAQ | `FAQ` |
 | Texto del manifiesto | `src/components/Manifiesto.jsx` |
 
-### Fotos
-Las imágenes de `public/img/` son **recortes de baja resolución del Instagram**, solo para maquetar.
-Reemplázalas por las originales manteniendo el nombre de archivo (ideal ≥ 2000 px de ancho, JPG/WebP):
-
-`fachada-noche.jpg` (hero: la puerta debe quedar centrada) · `fachada-dia.jpg` · `interior.jpg` · `obra-01…04.jpg` · `obras-pared.jpg` · `objeto-lampara-hongo.jpg` · `plantas.jpg` · `perro-anfitrion.jpg` · `artista-1.jpg` · `artista-2.jpg` · `mapa-ilustrado.jpg` · `logo-casa-amiga.jpg`.
+### Fotos y contenido ya cargados (del Drive de Casa Amiga)
+Las fotos de `public/img/` son reales (feria, montaje y ecards), optimizadas a ~1700 px. Se reemplazan manteniendo el nombre.
+Los datos de marcas, programa y horarios de la **Feria Casa Amiga (20 de septiembre)** salen de las ecards.
+**Pendiente:** fotos del mapa ilustrado completo (hoy es un recorte de Instagram), permiso de las personas que aparecen en las fotos y de las marcas, Instagram de cada marca, técnica/medidas/precio de cada pieza y eventos futuros (`EVENTOS` con `pasado: false`).
+Los PDFs de asistencia e inscripciones del Drive tienen datos personales: **no se usaron ni se suben al repositorio**.
 
 ## Estructura
 

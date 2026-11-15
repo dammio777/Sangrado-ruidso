@@ -19,7 +19,7 @@ export const DIRECCION = {
 export const MAPS_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(DIRECCION.consulta)}&output=embed`
 export const MAPS_DIR = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(DIRECCION.consulta)}`
 
-/** [PONER] Horario. Día 0 = domingo … 6 = sábado. null = cerrado. Horas en formato 24 h (hora de Bogotá). */
+/** [PONER] Horario (hoy es un EJEMPLO, no se muestra hasta confirmar). Día 0 = domingo … 6 = sábado. null = cerrado. Horas en formato 24 h (hora de Bogotá). */
 export const HORARIO = {
   0: [10, 18],
   1: null,
@@ -30,6 +30,8 @@ export const HORARIO = {
   6: [10, 19],
 }
 export const HORARIO_NOTA = 'Festivos: de 10:00 a. m. a 6:00 p. m.' // [PONER]
+/** Cambia a true cuando el horario de arriba sea el real: activa el indicador "Abierto ahora". */
+export const HORARIO_CONFIRMADO = false
 
 /** Nombre del perro de la casa. [CONFIRMAR NOMBRE] (si es null se muestra "el anfitrión") */
 export const PERRO = null
@@ -47,52 +49,83 @@ export const PARADAS = [
   { n: '06', nombre: 'Casa Amiga', nota: 'Vereda El Placer · Amor y Amistad', casa: true },
 ]
 
-/* ---------- Galería ---------- */
+/* ---------- Galería (fotos reales de la feria y del montaje) ---------- */
 export const CATEGORIAS = [
   { id: 'todo', label: 'Todo' },
-  { id: 'pintura', label: 'Pintura' },
-  { id: 'ilustracion', label: 'Ilustración' },
+  { id: 'arte', label: 'Ilustración y arte' },
   { id: 'diseno', label: 'Diseño y objetos' },
-  { id: 'plantas', label: 'Plantas' },
-] // [AJUSTAR]
+  { id: 'moda', label: 'Moda y textil' },
+  { id: 'bienestar', label: 'Sabores y bienestar' },
+]
 
-/** [PONER] artista, título, técnica, medidas y precio reales. precio: null => "Precio a consultar".
-    Las imágenes actuales son recortes de Instagram: reemplazar por fotos originales en /public/img. */
+/** Las marcas y descripciones salen de las ecards de la Feria Casa Amiga.
+    [PONER] técnica exacta, medidas y precio de cada pieza (precio: null => "Precio a consultar"). */
 export const OBRAS = [
-  { id: 'o1', n: '01', titulo: 'Floración interior', artistaId: 'a1', categoria: 'pintura', tecnica: 'Acrílico sobre lienzo', medidas: '60 × 90 cm', precio: null, img: 'img/obra-04.jpg', destacada: true, descripcion: 'Color en estado líquido: una flor que se abre hacia adentro. Pieza central de la sala.' },
-  { id: 'o2', n: '02', titulo: 'Vórtice I', artistaId: 'a1', categoria: 'pintura', tecnica: 'Acrílico sobre lienzo', medidas: '30 × 45 cm', precio: null, img: 'img/obra-01.jpg', descripcion: 'Serie de pequeños formatos sobre el movimiento del color.' },
-  { id: 'o3', n: '03', titulo: 'Vórtice II', artistaId: 'a1', categoria: 'pintura', tecnica: 'Acrílico sobre lienzo', medidas: '30 × 45 cm', precio: null, img: 'img/obra-02.jpg', descripcion: 'Segunda pieza de la serie Vórtice.' },
-  { id: 'o4', n: '04', titulo: 'Marea', artistaId: 'a2', categoria: 'ilustracion', tecnica: 'Ilustración digital, impresión giclée', medidas: '30 × 45 cm', precio: null, img: 'img/obra-03.jpg', destacada: true, descripcion: 'Ilustración psicodélica impresa en papel de algodón.' },
-  { id: 'o5', n: '05', titulo: 'Sala de colores', artistaId: 'a2', categoria: 'ilustracion', tecnica: 'Serie de ilustraciones', medidas: 'Varias medidas', precio: null, img: 'img/obras-pared.jpg', descripcion: 'Conjunto de piezas colgadas en la pared blanca de la galería.' },
-  { id: 'o6', n: '06', titulo: 'Lámpara hongo', artistaId: 'a3', categoria: 'diseno', tecnica: 'Objeto de diseño · cerámica y luz', medidas: '35 cm de alto', precio: null, img: 'img/objeto-lampara-hongo.jpg', destacada: true, descripcion: 'La lámpara roja con puntos blancos que ilumina la repisa de la casa.' },
-  { id: 'o7', n: '07', titulo: 'Repisa de la casa', artistaId: 'a3', categoria: 'diseno', tecnica: 'Objetos hechos a mano', medidas: 'Varias medidas', precio: null, img: 'img/interior.jpg', descripcion: 'Objetos, materas y piezas pequeñas de creadores locales.' },
-  { id: 'o8', n: '08', titulo: 'Rhipsalis colgante', artistaId: 'a4', categoria: 'plantas', tecnica: 'Planta viva · matera artesanal', medidas: 'Matera de 15 cm', precio: null, img: 'img/plantas.jpg', destacada: true, descripcion: 'Cactus colgante de bosque. Fácil de cuidar, perfecto para interiores con luz suave.' },
+  { id: 'o1', n: '01', titulo: 'Lámpara hongo', artistaId: 'a1', categoria: 'diseno', tecnica: 'Objeto de diseño', medidas: null, precio: null, img: 'img/lampara-hongo.jpg', destacada: true, descripcion: 'La lámpara roja de puntos blancos que ilumina la repisa de la casa: un objeto funcional con mirada experimental.' },
+  { id: 'o2', n: '02', titulo: 'Luna con habitante', artistaId: 'a0', categoria: 'diseno', tecnica: 'Objeto decorativo', medidas: null, precio: null, img: 'img/luna.jpg', descripcion: 'Una luna blanca con una pequeña figura sentada. Vive en la madera de la casa, junto a la luz cálida.' },
+  { id: 'o3', n: '03', titulo: 'Ilustraciones enmarcadas', artistaId: 'a0', categoria: 'arte', tecnica: 'Dibujo enmarcado', medidas: null, precio: null, img: 'img/ilustraciones.jpg', destacada: true, descripcion: 'Dibujos de animales en marcos de madera, colgados en la pared blanca de la sala.' },
+  { id: 'o4', n: '04', titulo: 'Camisetas teñidas', artistaId: 'a3', categoria: 'moda', tecnica: 'Textil teñido', medidas: null, precio: null, img: 'img/camisetas.jpg', destacada: true, descripcion: 'Prendas rebeldes con toques artísticos y pictóricos, de un laboratorio textil.' },
+  { id: 'o5', n: '05', titulo: 'Bolsos y prendas patchwork', artistaId: 'a4', categoria: 'moda', tecnica: 'Arte textil con materiales recuperados', medidas: null, precio: null, img: 'img/patchwork.jpg', descripcion: 'Piezas únicas hechas con bordado, costura y técnicas manuales a partir de materiales recuperados.' },
+  { id: 'o6', n: '06', titulo: 'Camiseta estampada', artistaId: 'a2', categoria: 'moda', tecnica: 'Estampado intervenido', medidas: null, precio: null, img: 'img/ec-rhipsalis.jpg', descripcion: 'Arte que se transforma en materia para habitar el cuerpo: color, textura y movimiento.' },
+  { id: 'o7', n: '07', titulo: 'Cosmética natural de montaña', artistaId: 'a5', categoria: 'bienestar', tecnica: 'Cosmética natural', medidas: null, precio: null, img: 'img/cosmetica.jpg', destacada: true, descripcion: 'Alquimia de montaña: productos de cuidado natural de ALIMA, en la repisa de la sala.' },
+  { id: 'o8', n: '08', titulo: 'Viche del Pacífico', artistaId: 'a6', categoria: 'bienestar', tecnica: 'Bebida tradicional del Pacífico', medidas: null, precio: null, img: 'img/viche.jpg', descripcion: 'De Puerto Saija, Timbiquí: sabor y espíritu del territorio llevados a nuevos lugares.' },
 ]
 
-/** [PONER ARTISTAS] Los retratos actuales vienen de los afiches de eventos: confirmar nombres y permisos. */
+/** Marcas y artistas de la feria (datos de las ecards). [PONER] Instagram de cada uno y confirmar permiso de uso de imagen. */
 export const ARTISTAS = [
-  { id: 'a1', nombre: 'Artista 01', disciplina: 'Pintura', instagram: null, foto: 'img/artista-1.jpg' },
-  { id: 'a2', nombre: 'Artista 02', disciplina: 'Ilustración', instagram: null, foto: 'img/artista-2.jpg' },
-  { id: 'a3', nombre: 'Artista 03', disciplina: 'Diseño y objetos', instagram: null, foto: null },
-  { id: 'a4', nombre: 'Casa Amiga', disciplina: 'Plantas y jardín', instagram: INSTAGRAM, foto: null },
+  { id: 'a1', nombre: 'Artilugio', disciplina: 'Diseño y objetos', bio: 'Estudio-laboratorio de diseño y fabricación de objetos funcionales con una mirada experimental.', instagram: null, foto: 'img/ec-artilugio.jpg' },
+  { id: 'a2', nombre: 'Rhipsalis', disciplina: 'Arte, diseño y ropa', bio: 'Marca donde el arte se transforma en materia para habitar el cuerpo: objetos, pinturas e imágenes intervenidas.', instagram: null, foto: 'img/ec-rhipsalis.jpg' },
+  { id: 'a3', nombre: 'Arcoíris Negro', disciplina: 'Laboratorio textil', bio: 'Prendas rebeldes con toques artísticos y pictóricos.', instagram: null, foto: 'img/ec-arcoiris-negro.jpg' },
+  { id: 'a4', nombre: 'UpCycled Galería', disciplina: 'Arte textil', bio: 'Materiales recuperados convertidos en piezas únicas con bordado, costura y técnicas manuales.', instagram: null, foto: 'img/ec-upcycled.jpg' },
+  { id: 'a5', nombre: 'ALIMA', disciplina: 'Cosmética natural', bio: 'Alquimia de montaña: cuidado natural para el cuerpo, hecho desde el territorio.', instagram: null, foto: 'img/ec-alima.jpg' },
+  { id: 'a6', nombre: 'Pargo Viche', disciplina: 'Sabores del Pacífico', bio: 'Nace en Puerto Saija, Timbiquí. Lleva el sabor y el espíritu del territorio a nuevos lugares.', instagram: null, foto: 'img/ec-pargo-viche.jpg' },
+  { id: 'a7', nombre: 'Diego Pérez Osorno', disciplina: 'Sensopia · audiovisual y arte', bio: 'Comunicador audiovisual, artista y docente. Creador de Sensopia, experiencias inmersivas mediadas por la tecnología.', instagram: null, foto: 'img/ec-sensopia.jpg' },
+  { id: 'a8', nombre: 'Marae Pineda', disciplina: 'Música en vivo', bio: 'Cantautora colombiana que interpreta la sensibilidad femenina y las experiencias de las mujeres.', instagram: null, foto: 'img/ec-marae-pineda.jpg' },
+  { id: 'a0', nombre: 'Casa Amiga', disciplina: 'Obras de la casa', oculto: true, instagram: INSTAGRAM, foto: null },
 ]
 
-/* ---------- Talleres y eventos [CONFIRMAR FECHAS, PRECIOS Y CUPOS] ----------
-   inicio: fecha ISO con zona horaria de Bogotá (-05:00). */
+/* ---------- Talleres y eventos: programa real de la Feria Casa Amiga (20 de septiembre) ----------
+   Hoy no hay una fecha futura confirmada: se muestra la edición pasada. Cuando haya eventos nuevos,
+   agrégalos aquí con pasado: false (y cupos / precio) y el más cercano mostrará "PRÓXIMO" y la cuenta regresiva. */
+export const EDICION = {
+  nombre: 'Feria Casa Amiga',
+  fecha: '20 de septiembre de 2026', // [CONFIRMAR año]
+  horario: '10:00 a. m. a 7:00 p. m.',
+  lugar: 'Sector Amor y Amistad · Vereda El Placer, Santa Elena',
+  apoyo: 'Proyecto beneficiario de recursos del programa de Planeación del Desarrollo Local y Presupuesto Participativo — Cultura, Alcaldía de Medellín.',
+}
 export const EVENTOS = [
-  { id: 'e1', titulo: 'Taller cartográfico sensorial', tipo: 'Taller', inicio: '2026-11-22T11:00:00-05:00', hora: '11:00 a. m. – 12:00 m.', cupos: 12, precio: null, guia: '[PONER]' },
-  { id: 'e2', titulo: 'Taller de ilustración infantil', tipo: 'Niños', inicio: '2026-11-22T14:00:00-05:00', hora: '2:00 – 2:30 p. m.', cupos: 10, precio: null, guia: '[PONER]' },
-  { id: 'e3', titulo: 'Música en vivo', tipo: 'Concierto', inicio: '2026-11-29T15:00:00-05:00', hora: '3:00 – 4:00 p. m.', cupos: 30, precio: 0, guia: '[PONER]' },
-  { id: 'e4', titulo: 'Taller de germinados', tipo: 'Taller', inicio: '2026-12-06T15:30:00-05:00', hora: '3:30 – 4:30 p. m.', cupos: 12, precio: null, guia: '[PONER]' },
-  { id: 'e5', titulo: 'Diagnóstico express para emprendimientos', tipo: 'Asesoría', inicio: '2026-12-13T15:00:00-05:00', hora: '3:00 – 5:00 p. m.', cupos: 8, precio: null, guia: '[PONER]' },
+  { id: 'e1', titulo: 'DJ set · Mr. Lino', tipo: 'DJ set', inicio: '2026-09-20T10:00:00-05:00', hora: '10:00 a. m. – 12:00 m.', cupos: null, precio: 0, pasado: true },
+  { id: 'e2', titulo: 'Taller cartográfico sensorial', tipo: 'Taller', inicio: '2026-09-20T11:00:00-05:00', hora: '11:00 a. m. – 12:00 m.', cupos: null, precio: 0, pasado: true },
+  { id: 'e3', titulo: 'DJ set · Cristian Calle Busta', tipo: 'DJ set', inicio: '2026-09-20T13:00:00-05:00', hora: '1:00 – 2:00 p. m.', cupos: null, precio: 0, pasado: true },
+  { id: 'e4', titulo: 'Ilustración infantil: Espíritus del bosque', tipo: 'Niños', inicio: '2026-09-20T14:00:00-05:00', hora: '2:00 – 3:00 p. m.', cupos: null, precio: 0, pasado: true }, // [CONFIRMAR: la agenda dice 2:00–2:30]
+  { id: 'e5', titulo: 'Música en vivo · Marae Pineda', tipo: 'Concierto', inicio: '2026-09-20T15:00:00-05:00', hora: '3:00 – 4:00 p. m.', cupos: null, precio: 0, pasado: true },
+  { id: 'e6', titulo: 'Diagnóstico Express para emprendimientos', tipo: 'Asesoría', inicio: '2026-09-20T15:00:00-05:00', hora: '3:00 – 5:00 p. m.', cupos: null, precio: 0, pasado: true },
+  { id: 'e7', titulo: 'Taller de germinados', tipo: 'Taller', inicio: '2026-09-20T15:30:00-05:00', hora: '3:30 – 4:30 p. m.', cupos: null, precio: 0, pasado: true },
+  { id: 'e8', titulo: 'Música tradicional · Aleli + Sara Chacón', tipo: 'Concierto', inicio: '2026-09-20T17:00:00-05:00', hora: '5:00 – 7:00 p. m.', cupos: null, precio: 0, pasado: true },
 ]
 
-/* ---------- Cifras [PONER CIFRAS REALES]. value: null => no se muestra. ---------- */
+/** Fotos reales de la feria (carrusel "Así fue la feria"). */
+export const FERIA_FOTOS = [
+  { img: 'img/feria-024.jpg', alt: 'El letrero de Casa Amiga en la entrada de la feria' },
+  { img: 'img/feria-015.jpg', alt: 'Dos DJ en su mesa de sonido entre los pinos' },
+  { img: 'img/feria-025.jpg', alt: 'Música en vivo en el jardín, entre pinos' },
+  { img: 'img/feria-020.jpg', alt: 'Taller dentro de la cabaña, en la cocina de madera' },
+  { img: 'img/feria-021.jpg', alt: 'Carpa con textiles de colores' },
+  { img: 'img/feria-044.jpg', alt: 'Mesa de postres y mermeladas artesanales' },
+  { img: 'img/feria-083.jpg', alt: 'El jardín de la casa lleno de gente durante la feria' },
+  { img: 'img/feria-080.jpg', alt: 'La casa iluminada de noche durante la feria' },
+  { img: 'img/feria-092.jpg', alt: 'Público escuchando una charla bajo el techo' },
+  { img: 'img/feria-066.jpg', alt: 'Música al atardecer en el jardín' },
+  { img: 'img/feria-028.jpg', alt: 'Sales y condimentos artesanales' },
+  { img: 'img/feria-029.jpg', alt: 'Taller de cocina en la mesa de madera' },
+]
+
+/* ---------- Cifras (derivadas del programa de la feria) ---------- */
 export const CIFRAS = [
-  { value: null, label: 'artistas locales' },
-  { value: null, label: 'obras en sala' },
-  { value: null, label: 'talleres al año' },
-  { value: 6, label: 'paradas desde El Silletero hasta la puerta' },
+  { value: 14, label: 'marcas locales en la Feria Casa Amiga' },
+  { value: 8, label: 'actividades en un solo día' },
+  { value: 9, label: 'horas de feria, de 10 a. m. a 7 p. m.' },
   { value: 1, label: 'casa en la Vereda El Placer' },
 ]
 
@@ -108,7 +141,7 @@ export const VISITAS = [
 export const FAQ = [
   { q: '¿Cómo llego?', a: 'Sube a Santa Elena por la vía Medellín – Santa Elena hasta El Silletero y sigue las indicaciones hacia la Vereda El Placer, sector Amor y Amistad. Más arriba en esta página tienes el camino paso a paso y el botón para abrir Google Maps.' },
   { q: '¿Hay parqueadero?', a: 'Hay espacio para parquear cerca de la casa. Si vienes en grupo grande, escríbenos antes para organizarnos.' },
-  { q: '¿La entrada tiene costo?', a: 'La entrada a la galería es libre. Los talleres tienen su propio valor, que encuentras en la agenda.' },
+  { q: '¿La entrada tiene costo?', a: 'La entrada a la galería y a la Feria Casa Amiga fue gratuita. Si un taller futuro tiene valor, lo verás en la agenda.' },
   { q: '¿Puedo comprar las obras y las envían?', a: 'Sí. Todas las obras están a la venta. Escríbenos por WhatsApp con el título y te contamos precio, disponibilidad y opciones de envío dentro de Colombia.' },
   { q: '¿Soy artista, cómo expongo aquí?', a: 'Cuéntanos de tu trabajo en el formulario de esta página (opción "Soy artista y quiero exponer") con un enlace a tu portafolio. Revisamos cada propuesta con calma.' },
   { q: '¿Aceptan mascotas?', a: 'Sí, con correa y buena energía. En la casa vive un perro que recibe a todos en la puerta.' },

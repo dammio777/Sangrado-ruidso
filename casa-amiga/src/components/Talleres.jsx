@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { EVENTOS, wa } from '../data'
+import { EVENTOS, EDICION, FERIA_FOTOS, asset, wa } from '../data'
 import { gsap, useMM, MOTION } from '../lib/motion'
 import DragRail from './DragRail'
 import { WhatsAppIcon } from './Icons'
@@ -29,9 +29,12 @@ function Cuenta({ iso }) {
 
 function Boleta({ e, proximo }) {
   const f = bog(e.inicio)
-  const msg = `¡Hola Casa Amiga! Quiero reservar cupo para "${e.titulo}" (${DIAS[f.getUTCDay()]} ${f.getUTCDate()} de ${MESES[f.getUTCMonth()]}, ${e.hora}). ¿Cómo reservo?`
+  const fecha = `${DIAS[f.getUTCDay()]} ${f.getUTCDate()} de ${MESES[f.getUTCMonth()]}`
+  const msg = e.pasado
+    ? `¡Hola Casa Amiga! Me interesó "${e.titulo}" de la feria del ${fecha}. ¿Me avisan cuando haya una próxima fecha?`
+    : `¡Hola Casa Amiga! Quiero reservar cupo para "${e.titulo}" (${fecha}, ${e.hora}). ¿Cómo reservo?`
   return (
-    <article className="tk relative flex w-[min(84vw,560px)] flex-col sm:flex-row shrink-0 select-none rounded-[18px] bg-white text-tinta shadow-[0_24px_50px_-28px_rgba(43,26,18,.45)]">
+    <article className="tk relative flex w-[min(84vw,560px)] shrink-0 select-none flex-col rounded-[18px] bg-white text-tinta shadow-[0_24px_50px_-28px_rgba(43,26,18,.45)] sm:flex-row">
       {/* borde troquelado lateral */}
       <span aria-hidden="true" className="absolute inset-y-3 -left-[5px] w-[10px] bg-[radial-gradient(circle_at_center,var(--hueso)_4.5px,transparent_5px)] bg-[length:10px_16px] bg-repeat-y" />
       <div className="flex flex-1 gap-5 p-6 sm:p-7">
@@ -52,22 +55,24 @@ function Boleta({ e, proximo }) {
         <span aria-hidden="true" className="absolute -left-3 -top-[13px] h-6 w-6 rounded-full bg-hueso sm:-left-[13px] sm:-top-3" />
         <span aria-hidden="true" className="absolute -right-3 -top-[13px] h-6 w-6 rounded-full bg-hueso sm:-bottom-3 sm:-left-[13px] sm:right-auto sm:top-auto" />
         <div className="flex gap-6 sm:block">
+          {e.cupos != null && (
+            <div>
+              <p className="cedula text-tinta/60">Cupos</p>
+              <p className="titulo text-3xl">{e.cupos}</p>
+            </div>
+          )}
           <div>
-          <p className="cedula text-tinta/60">Cupos</p>
-          <p className="titulo text-3xl">{e.cupos}</p>
-          </div>
-          <div>
-          <p className="cedula text-tinta/60 sm:mt-2">Valor</p>
-          <p className="font-display text-lg font-bold">{precio(e.precio)}</p>
+            <p className="cedula text-tinta/60 sm:mt-2">Entrada</p>
+            <p className="font-display text-lg font-bold">{precio(e.precio)}</p>
           </div>
         </div>
         <a href={wa(msg)} target="_blank" rel="noreferrer" onPointerDownCapture={(ev) => ev.stopPropagation()} className="btn-ambar gap-1.5 whitespace-nowrap px-4 py-2.5 text-[0.8rem] sm:mt-4 sm:w-full sm:px-2">
-          <WhatsAppIcon className="h-4 w-4" /> Reservar cupo
+          <WhatsAppIcon className="h-4 w-4" /> {e.pasado ? 'Próxima fecha' : 'Reservar cupo'}
         </a>
       </div>
-      {proximo && (
-        <span className="absolute -right-2 -top-6 grid h-[4.6rem] sm:right-28 w-[4.6rem] rotate-12 place-items-center rounded-full border-2 border-dashed border-tinta/40 bg-ambar text-center font-display text-sm font-extrabold uppercase leading-none text-tinta shadow-lg">
-          Próximo
+      {(proximo || e.pasado) && (
+        <span className={`absolute -right-2 -top-6 grid h-[4.6rem] w-[4.6rem] rotate-12 place-items-center rounded-full border-2 border-dashed text-center font-display text-sm font-extrabold uppercase leading-none shadow-lg sm:right-28 ${proximo ? 'border-tinta/40 bg-ambar text-tinta' : 'border-ambar/60 bg-tinta text-ambar'}`}>
+          {proximo ? 'Próximo' : 'Así fue'}
         </span>
       )}
     </article>
@@ -77,7 +82,7 @@ function Boleta({ e, proximo }) {
 /* 08 — TALLERES Y EVENTOS */
 export default function Talleres() {
   const lista = useMemo(() => [...EVENTOS].sort((a, b) => new Date(a.inicio) - new Date(b.inicio)), [])
-  const futuros = lista.filter((e) => new Date(e.inicio) > new Date())
+  const futuros = lista.filter((e) => !e.pasado && new Date(e.inicio) > new Date())
   const proximoId = futuros[0]?.id
   const ref = useMM((mm) => {
     mm.add(MOTION, () => {
@@ -92,11 +97,33 @@ export default function Talleres() {
             <p className="eyebrow mb-4">08 — Talleres y eventos</p>
             <h2 className="titulo text-[clamp(3rem,7vw,7rem)] text-tinta">La agenda<br />de la casa</h2>
           </div>
-          <p className="max-w-md text-tinta/75 lg:justify-self-end">Talleres abiertos a todos, música en vivo y encuentros para emprender. Arrastra las boletas y reserva tu cupo por WhatsApp.</p>
+          <p className="max-w-md text-tinta/75 lg:justify-self-end">
+            {futuros.length
+              ? 'Talleres abiertos a todos, música en vivo y encuentros para emprender. Arrastra las boletas y reserva tu cupo por WhatsApp.'
+              : `Así fue el programa de la ${EDICION.nombre}, el ${EDICION.fecha}, con entrada gratis. Arrastra las boletas y escríbenos para enterarte de la próxima.`}
+          </p>
         </div>
         <DragRail label="Agenda de talleres y eventos" className="tk-rail pt-6">
           {(futuros.length ? futuros : lista).map((e) => <Boleta key={e.id} e={e} proximo={e.id === proximoId} />)}
         </DragRail>
+
+        <div className="mt-24">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow mb-3">Memoria</p>
+              <h3 className="titulo text-[clamp(2.4rem,5vw,4.6rem)] text-tinta">Así fue la feria</h3>
+            </div>
+            <p className="cedula max-w-xs text-tinta/60">{EDICION.nombre} · {EDICION.horario} · {EDICION.lugar}</p>
+          </div>
+          <DragRail label="Fotos de la Feria Casa Amiga">
+            {FERIA_FOTOS.map((f, i) => (
+              <figure key={f.img} className={`shrink-0 overflow-hidden rounded-[20px] bg-white p-2 shadow-[0_20px_40px_-28px_rgba(43,26,18,.5)] ${i % 2 ? 'mt-6' : ''}`}>
+                <img src={asset(f.img)} alt={f.alt} loading="lazy" draggable="false" className="h-[260px] w-auto rounded-[14px] object-cover sm:h-[360px]" />
+              </figure>
+            ))}
+          </DragRail>
+          <p className="mt-6 max-w-2xl text-sm text-tinta/60">{EDICION.apoyo}</p>
+        </div>
       </div>
     </section>
   )

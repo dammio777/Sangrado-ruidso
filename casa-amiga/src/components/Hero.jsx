@@ -115,20 +115,21 @@ export default function Hero({ ready }) {
       <div className="hero-card relative z-0 mx-4 mt-12 aspect-[4/5] overflow-hidden rounded-[28px] sm:mx-8 lg:absolute lg:bottom-[9vh] lg:right-[4vw] lg:top-[15vh] lg:mx-0 lg:mt-0 lg:aspect-auto lg:w-[38vw]">
         <div className="hero-card-in absolute inset-0 overflow-hidden rounded-[inherit] bg-tinta">
           <img
-            src={asset('img/fachada-noche.jpg')}
-            alt="Fachada de madera de Casa Amiga de noche, con luces cálidas y el perro de la casa en la entrada"
+            src={asset('img/hero-fachada.jpg')}
+            alt="Fachada de madera de Casa Amiga con su letrero y la puerta abierta"
             className="hero-noche absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: '50% 52%', transformOrigin: '50% 52%' }}
+            style={{ objectPosition: '48% 50%', transformOrigin: '48% 52%' }}
             fetchpriority="high"
           />
           <img
-            src={asset('img/interior.jpg')}
-            alt="Interior de la galería: repisas con plantas, objetos y la lámpara-hongo roja"
+            src={asset('img/hero-interior.jpg')}
+            alt="Interior de la galería: lámpara-hongo roja, ropa, plantas y repisas con productos"
             className="hero-dentro absolute inset-0 h-full w-full object-cover opacity-0 motion-reduce:hidden"
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-tinta/50 via-transparent to-transparent" />
           <p className="hero-tag cedula absolute bottom-4 left-4 rounded-full bg-white/90 px-3 py-1.5 text-canela">Fachada · Vereda El Placer</p>
-          <div className="hero-nota pointer-events-none absolute bottom-[14%] left-[8%] opacity-0 motion-reduce:hidden">
+          <div className="hero-nota pointer-events-none absolute bottom-[10%] left-[6%] opacity-0 motion-reduce:hidden">
+            <span aria-hidden="true" className="absolute -inset-x-10 -inset-y-12 -z-10 bg-[radial-gradient(closest-side,rgba(43,26,18,.7),transparent)]" />
             <p className="font-script text-[clamp(3rem,6vw,6rem)] leading-none text-white [text-shadow:0_2px_24px_rgba(43,26,18,.55)]">pasa, estás en casa</p>
             <svg className="hero-flecha ml-[40%] mt-2 h-20 w-40 text-ambar" viewBox="0 0 160 80" fill="none" aria-hidden="true">
               <path d="M6 8 C40 60 100 70 146 52" stroke="currentColor" strokeWidth="3" strokeLinecap="round" pathLength="1" className="draw" />

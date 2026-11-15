@@ -35,8 +35,9 @@ function Tarjeta({ a, i }) {
       </div>
       <div className="mt-5 flex items-start justify-between gap-3">
         <div>
-          <h3 className="titulo text-3xl text-tinta">{a.nombre}</h3>
+          <h3 className="titulo text-[1.7rem] text-tinta">{a.nombre}</h3>
           <p className="cedula mt-1 text-ambar-oscuro">{a.disciplina}</p>
+          {a.bio && <p className="mt-2 text-sm text-tinta/70">{a.bio}</p>}
         </div>
         {a.instagram && (
           <a href={`https://www.instagram.com/${a.instagram}/`} target="_blank" rel="noreferrer" aria-label={`Instagram de ${a.nombre}`} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-canela/25 text-canela transition-colors hover:bg-canela hover:text-white">
@@ -69,10 +70,10 @@ export default function Artistas() {
             <p className="eyebrow mb-4">07 — Artistas</p>
             <h2 className="titulo text-[clamp(3rem,7vw,7rem)] text-tinta">Quienes<br />hacen la casa</h2>
           </div>
-          <p className="max-w-md text-tinta/75 lg:justify-self-end">Creadores de Santa Elena y del Valle de Aburrá que exponen, venden y enseñan aquí. Pasa el cursor para verlos a color.</p>
+          <p className="max-w-md text-tinta/75 lg:justify-self-end">Marcas, artistas y músicos que han pasado por la casa: exponen, venden y comparten aquí. Pasa el cursor para verlos a color.</p>
         </div>
         <div className="art-grid grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {ARTISTAS.map((a, i) => <Tarjeta key={a.id} a={a} i={i} />)}
+          {ARTISTAS.filter((a) => !a.oculto).map((a, i) => <Tarjeta key={a.id} a={a} i={i} />)}
         </div>
       </div>
     </section>

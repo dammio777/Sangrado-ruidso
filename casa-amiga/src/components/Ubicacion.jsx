@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DIRECCION, HORARIO, HORARIO_NOTA, MAPS_EMBED, MAPS_DIR, asset } from '../data'
+import { DIRECCION, HORARIO, HORARIO_NOTA, HORARIO_CONFIRMADO, MAPS_EMBED, MAPS_DIR, asset, wa } from '../data'
 import { Arrow } from './Icons'
 
 const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
@@ -34,11 +34,22 @@ export default function Ubicacion() {
           <div className="mt-10 max-w-md border-l-2 border-canela pl-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="cedula text-canela">Obra permanente: nuestro horario</p>
-              <p className={`cedula inline-flex items-center gap-2 rounded-full px-3 py-1 ${e.abierto ? 'bg-ambar text-tinta' : 'bg-tinta text-white'}`} role="status">
-                <span className={`h-2 w-2 rounded-full ${e.abierto ? 'animate-pulse bg-tinta' : 'bg-white/60'}`} />
-                {e.abierto ? 'Abierto ahora' : 'Cerrado'}
-              </p>
+              {HORARIO_CONFIRMADO ? (
+                <p className={`cedula inline-flex items-center gap-2 rounded-full px-3 py-1 ${e.abierto ? 'bg-ambar text-tinta' : 'bg-tinta text-white'}`} role="status">
+                  <span className={`h-2 w-2 rounded-full ${e.abierto ? 'animate-pulse bg-tinta' : 'bg-white/60'}`} />
+                  {e.abierto ? 'Abierto ahora' : 'Cerrado'}
+                </p>
+              ) : (
+                <p className="cedula inline-flex items-center gap-2 rounded-full bg-hueso px-3 py-1 text-canela">Horario por confirmar</p>
+              )}
             </div>
+            {!HORARIO_CONFIRMADO && (
+              <p className="mt-4 text-tinta/75">
+                Escríbenos y te confirmamos cuándo está abierta la casa.{' '}
+                <a className="font-medium text-canela underline underline-offset-4" target="_blank" rel="noreferrer" href={wa('¡Hola Casa Amiga! ¿Qué días y a qué hora puedo visitarlos?')}>Preguntar por WhatsApp</a>
+              </p>
+            )}
+            {HORARIO_CONFIRMADO && (
             <dl className="cedula mt-4 grid grid-cols-[1fr_auto] gap-y-1.5 text-tinta/75">
               {orden.map((d) => (
                 <div key={d} className={`contents ${d === e.dia ? 'font-medium text-tinta' : ''}`}>
@@ -47,7 +58,8 @@ export default function Ubicacion() {
                 </div>
               ))}
             </dl>
-            <p className="cedula mt-3 text-tinta/50">{HORARIO_NOTA} · Hora de Bogotá</p>
+            )}
+            {HORARIO_CONFIRMADO && <p className="cedula mt-3 text-tinta/50">{HORARIO_NOTA} · Hora de Bogotá</p>}
           </div>
 
           <a href={MAPS_DIR} target="_blank" rel="noreferrer" className="btn-ambar mt-10 px-7 py-4">Cómo llegar <Arrow /></a>

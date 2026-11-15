@@ -16,8 +16,8 @@ function Cedula({ o, abierta }) {
       <p className="mt-0.5 font-display text-xl font-bold leading-tight text-tinta">{o.titulo}</p>
       <div className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(.22,1,.36,1)] [@media(hover:none)]:grid-rows-[1fr] [@media(hover:none)]:opacity-100 ${abierta ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 group-hover:grid-rows-[1fr] group-hover:opacity-100 group-focus-visible:grid-rows-[1fr] group-focus-visible:opacity-100'}`}>
         <p className="cedula overflow-hidden text-tinta/70">
-          <span className="block pt-1.5">{o.tecnica}</span>
-          <span className="block">{o.medidas} · {precio(o)}</span>
+          {o.tecnica && <span className="block pt-1.5">{o.tecnica}</span>}
+          <span className="block">{[o.medidas, precio(o)].filter(Boolean).join(' · ')}</span>
         </p>
       </div>
     </div>
@@ -59,7 +59,7 @@ function Modal({ o, onClose }) {
               <motion.img
                 layoutId={`obra-${o.id}`}
                 src={asset(o.img)}
-                alt={`${o.titulo}, ${o.tecnica}`}
+                alt={o.titulo}
                 className="mx-auto max-h-[80vh] w-full object-contain"
               />
             </div>
@@ -72,8 +72,8 @@ function Modal({ o, onClose }) {
           <p className="mt-2 text-lg text-canela">{a?.nombre} — {a?.disciplina}</p>
           <dl className="cedula mt-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-y border-canela/20 py-5 text-tinta/80">
             <dt className="text-canela">Artista</dt><dd>{a?.nombre}</dd>
-            <dt className="text-canela">Técnica</dt><dd>{o.tecnica}</dd>
-            <dt className="text-canela">Medidas</dt><dd>{o.medidas}</dd>
+            {o.tecnica && <><dt className="text-canela">Técnica</dt><dd>{o.tecnica}</dd></>}
+            {o.medidas && <><dt className="text-canela">Medidas</dt><dd>{o.medidas}</dd></>}
             <dt className="text-canela">Precio</dt><dd>{precio(o)}</dd>
           </dl>
           <p className="mt-6 text-tinta/80">{o.descripcion}</p>
@@ -170,7 +170,7 @@ export default function Galeria() {
                       className="block bg-white p-3 transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(.22,1,.36,1)] [box-shadow:calc(var(--lx)*-16px)_calc(14px+var(--ly)*-8px)_34px_-14px_rgba(43,26,18,.38)] group-hover:scale-[1.03] group-hover:[box-shadow:calc(var(--lx)*-28px)_calc(26px+var(--ly)*-12px)_60px_-18px_rgba(43,26,18,.5)]"
                     >
                       <span className="block aspect-[4/5] overflow-hidden bg-hueso">
-                        <motion.img layoutId={`obra-${o.id}`} src={asset(o.img)} alt={`${o.titulo} — ${o.tecnica}`} loading="lazy" className="h-full w-full object-cover" />
+                        <motion.img layoutId={`obra-${o.id}`} src={asset(o.img)} alt={o.titulo} loading="lazy" className="h-full w-full object-cover" />
                       </span>
                     </span>
                     <Cedula o={o} />
