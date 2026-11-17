@@ -60,7 +60,7 @@ export default function Artistas() {
     })
   }, [])
   return (
-    <section ref={ref} id="artistas" className="bg-hueso py-24 sm:py-32">
+    <section ref={ref} id="artistas" className="overflow-x-clip bg-hueso py-24 sm:py-32">
       <div className="wrap">
         <div className="mb-14 grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>

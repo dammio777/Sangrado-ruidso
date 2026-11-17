@@ -70,12 +70,12 @@ export default function Navbar() {
           } ${scrolled ? 'mx-3' : ''}`}
         >
           <a href="#inicio" onClick={(e) => go(e, '#inicio')} aria-label="Casa Amiga — inicio">
-            <Marca claro={open && !scrolled} />
+            <Marca claro={!scrolled} />
           </a>
           <ul className="hidden items-center gap-1 lg:flex">
             {LINKS.map((l) => (
               <li key={l.href}>
-                <a href={l.href} onClick={(e) => go(e, l.href)} className="group relative px-4 py-2 font-medium text-tinta">
+                <a href={l.href} onClick={(e) => go(e, l.href)} className={`group relative px-4 py-2 font-medium transition-colors ${scrolled ? 'text-tinta' : 'text-white'}`}>
                   {l.label}
                   <svg className="hover-line absolute inset-x-3 -bottom-0.5 h-2 w-[calc(100%-1.5rem)] text-ambar" viewBox="0 0 100 8" preserveAspectRatio="none" fill="none" aria-hidden="true">
                     <path d="M2 5 C30 1 70 7 98 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" pathLength="1" className="draw" />
