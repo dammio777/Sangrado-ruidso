@@ -1,0 +1,18 @@
+{
+  "breakdownMs": {
+    "cpuSubmit": 141.4,
+    "gpuAndRead": 1181.7,
+    "post": 124.4,
+    "evaluateWall": 2287.4
+  },
+  "mode": "final",
+  "fps": 60,
+  "framesTotal": 2130,
+  "sampled": 126,
+  "avgSubframes": 1.84,
+  "avgMsPerFrame": 1323,
+  "workers": 3,
+  "estimatedSeconds": 1052,
+  "estimatedMinutes": 17.5,
+  "peakRSSMB": 4062
+}

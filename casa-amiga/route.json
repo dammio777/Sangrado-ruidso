@@ -1,11 +1,7 @@
 {
-  "_ayuda": "Puntos del recorrido (del mapa ilustrado de Casa Amiga). 'nombre' se escribe a mano en el mapa; 'pos' es la posición a lo largo de la vía, de 0 (inicio) a 1 (llegada). Confirma los nombres.",
-  "hitos": [
-    { "n": 1, "nombre": "El Silletero", "pos": 0.0 },
-    { "n": 2, "nombre": "Finca silletera Óscar Londoño", "pos": 0.19 },
-    { "n": 3, "nombre": "Panchocha Santa Elena", "pos": 0.38 },
-    { "n": 4, "nombre": "Restaurante Artesano", "pos": 0.56 },
-    { "n": 5, "nombre": "La Samaria", "pos": 0.76 },
-    { "n": 6, "nombre": "Casa Amiga · Vereda El Placer", "pos": 1.0 }
+  "_ayuda": "La ruta tiene dos etapas. Empieza en un punto genérico (sin nombre) de la vía principal, llega al Sector Amor y Amistad y baja hasta Casa Amiga. Sólo se rotula la etapa 1 (en un chip de vidrio) y el pin de Casa Amiga.",
+  "etapas": [
+    { "n": 1, "nombre": "Sector Amor y Amistad", "corto": "Amor y Amistad", "detalle": "Vereda El Placer, Santa Elena" },
+    { "n": 2, "nombre": "Casa Amiga", "corto": "Casa Amiga", "detalle": "Galería de arte y diseño" }
   ]
 }

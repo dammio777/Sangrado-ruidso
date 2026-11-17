@@ -1,11 +1,20 @@
 {
-  "name": "casa-amiga",
+  "name": "casa-amiga-film",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npx --yes hyperframes@0.9.64 preview",
-    "check": "npx --yes hyperframes@0.9.64 check",
-    "render": "npx --yes hyperframes@0.9.64 render",
-    "publish": "npx --yes hyperframes@0.9.64 publish"
+    "dev": "node tools/build.mjs && vite",
+    "typecheck": "tsc --noEmit",
+    "bundle": "tsc --noEmit && vite build",
+    "draft": "node tools/render.mjs --draft",
+    "final": "node tools/render.mjs --final",
+    "test:determinism": "node tools/determinism.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/inter": "5.1.0",
+    "@types/three": "0.170.0",
+    "three": "0.170.0",
+    "typescript": "5.6.3",
+    "vite": "5.4.11"
   }
 }

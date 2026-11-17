@@ -1,45 +1,62 @@
-# Casa Amiga · «¿Quieres llegar a casa?»
+# Casa Amiga · «¿Quieres llegar a casa?» (v2)
 
-Película vertical 1080×1920 para Reels/TikTok. Una persona abre una app de mapas en su celular, busca «Casa Amiga Santa Elena», toca el resultado y se abre una **ventana emergente con el video de cómo llegar**. Ese video crece a pantalla completa y al final vuelve al teléfono: «Llegaste a casa.»
+Película vertical 1080×1920 para Reels y TikTok, en estilo Apple: capas de vidrio esmerilado sobre la luz cálida de la cabaña.
 
-La app de mapas es un diseño original, con la paleta de Casa Amiga: fondo blanco, textos en negro y acentos en el naranja del logo. No usa nada de Google, ni su logo, ni su interfaz, ni sus colores.
+Alguien abre una app de mapas, busca «Casa Amiga Santa Elena» y toca el resultado. Se abre una ventana con el video de cómo llegar, que crece a pantalla completa:
+
+1. **Video 1:** llegar al Sector Amor y Amistad.
+2. **Video 2:** bajar hasta Casa Amiga.
+
+Al final todo vuelve al teléfono: «Llegaste a casa.»
+
+La app de mapas es un diseño original: no usa logo, interfaz ni colores de Google. El único negocio que aparece es Casa Amiga.
 
 ## Duración
 
-`16,5 s (intro) + suma de los videos + 3,0 s (cierre)`. Con los 3 videos de reemplazo de 6 s dura 37,5 s.
+`16,5 s (intro) + video 1 + video 2 + 3,0 s (cierre)`. Con dos tarjetas de reemplazo de 8 s, la película dura 35,5 s.
 
 ## Qué tienes que poner y dónde
 
-| Qué | Archivo / carpeta | Notas |
+| Qué | Dónde | Notas |
 | --- | --- | --- |
-| **Videos del recorrido** | `assets/videos/video1.mp4`, `video2.mp4`, `video3.mp4` | Verticales u horizontales (los horizontales se recortan al centro sin deformarse). Cualquier fps. |
-| Lista de videos | `clips.json` | Orden, `inicio` / `fin` de cada clip, titular (`antetitulo` + `titulo`), punto del mapa (`hito`), audio. |
-| Música (opcional) | `assets/audio/musica.mp3` | Folk acústico o lo-fi cálido, ~100 BPM. Se repite sola hasta cubrir la película, baja de volumen durante los videos y cierra con un fundido. |
-| Fotos reales (opcional) | `assets/fotos/` | Reemplaza `cabana.svg`, `obra.svg`, `ceramica.svg`, `taller.svg` y `hongo.svg` por fotos con el **mismo nombre** (o cambia la extensión en `compositions/app.html`). Hoy son ilustraciones originales. |
-| Puntos del recorrido | `route.json` | Nombres de los hitos del mapa dibujado y su posición en la vía (0 = inicio, 1 = llegada). |
-| Textos de marca | `datos.json` | Usuario, lema, dirección, tiempo de viaje (si lo dejas vacío, no se muestra). |
+| **Video 1**: llegando a Amor y Amistad | `assets/videos/video1.mp4` | Vertical u horizontal, cualquier fps y cualquier duración. |
+| **Video 2**: bajando a Casa Amiga | `assets/videos/video2.mp4` | Igual. |
+| Recortes y textos de los videos | `clips.json` | `inicio` y `fin` dentro del archivo; titulares; texto del banner de ruta. |
+| Música (opcional) | `assets/audio/musica.mp3` | Acústica, cálida y con aire. Se repite sola, baja durante los videos y cierra con fundido. |
+| Fotos reales (opcional) | `assets/fotos/` | Reemplaza `cabana.svg`, `obra.svg`, `ceramica.svg`, `taller.svg` y `hongo.svg` (mismo nombre; si cambias la extensión, avísame). |
+| Textos de marca | `datos.json` | Usuario, lema, dirección, tiempo de viaje (vacío = no se muestra). |
+| Etapas de la ruta | `route.json` | Dos etapas: Sector Amor y Amistad → Casa Amiga. |
 
-Puedes agregar más videos o quitar alguno: agrega o borra entradas en `clips.json`. **Nunca hay que tocar el código de animación.** Todo se reacomoda solo: los tiempos, los barridos entre clips, los titulares, el mini-mapa y la barra de progreso.
+Nunca hay que tocar el código de animación: los tiempos, la transición entre videos, los titulares, el mini-mapa y la barra de progreso salen de `clips.json`.
 
-## Cómo renderizar
+## Comandos
 
 ```bash
 cd casa-amiga
-./render.sh          # borrador 30 fps  → renders/casa-amiga-borrador.mp4
-./render.sh final    # final 60 fps     → renders/casa-amiga-final.mp4
+npm install                         # sólo la primera vez
+npm run dev                         # vista previa en el navegador con barra de tiempo
+node tools/render.mjs --draft       # borrador 30 fps → renders/casa-amiga-draft.mp4
+node tools/render.mjs --final --estimate   # estima cuánto tardará el final (sin renderizar)
+node tools/render.mjs --final       # final 60 fps → renders/casa-amiga-final.mp4
+node tools/determinism.mjs          # prueba de determinismo (30 instantes, dos órdenes)
+node tools/sheets.mjs               # hojas antes/después y de calidad del mapa
 ```
 
-`tools/build.mjs` lee los tres JSON, mide cada video con `ffprobe`, ajusta su duración y regenera los tiempos y la mezcla de audio. Después se renderiza.
+## Cómo funciona
 
-## Estructura
-
-- `index.html`: raíz. Monta las dos escenas y el audio (el bloque de audio lo genera `build.mjs`).
-- `compositions/app.html`: el teléfono, la app de mapas (mapa digital y mapa dibujado a mano, los dos generados en SVG), la búsqueda, la tarjeta del lugar, los momentos de marca y el cierre.
-- `compositions/ruta.html`: la ventana emergente con los videos, el mini-mapa, los titulares sobre el video y el regreso al teléfono.
-- `assets/img/icono.png` y `firma.png`: el ícono y la firma, extraídos del logo naranja oficial.
-
-## Pendiente de confirmar
-
-- Usuario de Instagram: el brief dice **@galeria.casaamiga** y el letrero dice **@galeriacasaamiga**. Corrígelo en `datos.json` si hace falta.
-- Nombres de los hitos en `route.json` (tomados del mapa ilustrado).
-- Música y efectos: hoy suenan los efectos básicos incluidos (toques, teclado, «tok» del pin, campanita). Todavía no hay música.
+- **Stack:** TypeScript (modo estricto) + Vite + Three.js (WebGL2).
+- **Diseño:** todos los valores de estilo viven en `src/tokens.ts`.
+- **Escena:** `src/scene.ts` es la función pura `state(t)`, que describe cada cuadro sin tocar la GPU.
+- **Render** (`src/film.ts`):
+  1. Mide la velocidad de cada elemento evaluando el instante en la apertura y en el cierre del obturador (180°).
+  2. Elige los subcuadros: 1 si el cuadro está quieto, 6 a 16 si hay movimiento rápido. Debajo de ese umbral usa un solo subcuadro con blur direccional según la velocidad de cada elemento.
+  3. Reutiliza las capas que no cambiaron.
+  4. Acumula los subcuadros en un búfer de punto flotante.
+  5. Saca el cuadro final con un dither mínimo para evitar bandas.
+- **Vidrio:** un único material en shader. Hace un blur dual-Kawase del fondo a 1/4 de resolución y le añade tinte cálido, saturación, borde de 1 px en degradé, brillo especular y una refracción sutil.
+- **Mapa:** un solo mapa vectorial continuo, sin teselas. Usa el mismo campo de ruido con semilla para el sombreado y las curvas de nivel. Las vías son curvas Bézier de grosor constante en pantalla, las etiquetas se mantienen derechas y el vuelo de la cámara usa la interpolación de zoom de van Wijk.
+- **Captura** (`tools/render.mjs`):
+  1. Chromium headless vía Playwright, con N−1 workers en paralelo, cada uno con su propio navegador.
+  2. Cada cuadro se lee como RGBA crudo y va directo al stdin de ffmpeg.
+  3. Los tramos se concatenan sin pérdida y luego se agrega el audio (AAC 320k, −14 LUFS) y `+faststart`.
+- **Video real:** ffmpeg extrae los cuadros exactos a los fps del render, sin deformar ni cambiar la velocidad. Nunca se usa `<video>.currentTime`.

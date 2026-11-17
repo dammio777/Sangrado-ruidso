@@ -1,0 +1,23 @@
+{
+  "mode": "draft",
+  "file": "renders/casa-amiga-draft.mp4",
+  "fps": 30,
+  "frames": 1065,
+  "expectedFrames": 1065,
+  "duration": 35.5,
+  "expectedDuration": 35.5,
+  "frameStepMin": 0.033333,
+  "frameStepMax": 0.033334,
+  "rFrameRate": "30/1",
+  "size": "1080x1920",
+  "pixFmt": "yuv420p",
+  "profile": "High",
+  "colorPrimaries": "bt709",
+  "wallSeconds": 857.1,
+  "secondsPerVideoSecond": 24.15,
+  "avgSubframes": 1.94,
+  "framesWithMotionBlur": 192,
+  "avgMsPerFramePerWorker": 1073,
+  "workers": 3,
+  "peakRSSMB": 8125
+}

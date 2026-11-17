@@ -2,42 +2,20 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1080, height=1920" />
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Casa Amiga</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #FBF7F1; }
-      #root { position: relative; width: 1080px; height: 1920px; }
+      html, body { margin: 0; background: #120c09; height: 100%; overflow: hidden; font-family: system-ui, sans-serif; }
+      #c { width: 1080px; height: 1920px; display: block; }
+      body.preview #c { height: calc(100vh - 56px); width: auto; aspect-ratio: 9 / 16; margin: 0 auto; }
+      #ui { display: none; position: fixed; left: 0; right: 0; bottom: 0; height: 56px; align-items: center; gap: 12px; padding: 0 16px; background: #1d1410; color: #f6efe6; }
+      #ui input { flex: 1; } #ui button { background: #f28c1e; border: 0; border-radius: 10px; padding: 8px 14px; font-weight: 600; }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="37.5" data-width="1080" data-height="1920" data-motion-blur="off">
-      <div id="app" data-composition-id="app" data-composition-src="compositions/app.html" data-start="0" data-duration="37.5"
-        data-track-index="0" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:1"></div>
-      <div id="ruta" data-composition-id="ruta" data-composition-src="compositions/ruta.html" data-start="15.6" data-duration="18"
-        data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:2"></div>
-    <!--AUDIO:BEGIN-->
-    <audio id="s-tap1" class="clip" src="assets/audio/sfx-click.mp3" data-start="2.56" data-duration="0.4" data-track-index="4" data-volume="0.55"></audio>
-    <audio id="s-key0" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.13" data-duration="0.4" data-track-index="5" data-volume="0.22"></audio>
-    <audio id="s-key3" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.225" data-duration="0.4" data-track-index="6" data-volume="0.22"></audio>
-    <audio id="s-key6" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.321" data-duration="0.4" data-track-index="7" data-volume="0.22"></audio>
-    <audio id="s-key9" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.416" data-duration="0.4" data-track-index="4" data-volume="0.22"></audio>
-    <audio id="s-key12" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.512" data-duration="0.4" data-track-index="5" data-volume="0.22"></audio>
-    <audio id="s-key15" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.607" data-duration="0.4" data-track-index="6" data-volume="0.22"></audio>
-    <audio id="s-key18" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.703" data-duration="0.4" data-track-index="7" data-volume="0.22"></audio>
-    <audio id="s-key21" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.798" data-duration="0.4" data-track-index="4" data-volume="0.22"></audio>
-    <audio id="s-tap2" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.99" data-duration="0.4" data-track-index="5" data-volume="0.55"></audio>
-    <audio id="s-tok1" class="clip" src="assets/audio/sfx-tok.mp3" data-start="5.13" data-duration="0.4" data-track-index="6" data-volume="0.9"></audio>
-    <audio id="s-tok2" class="clip" src="assets/audio/sfx-tok.mp3" data-start="14.47" data-duration="0.4" data-track-index="7" data-volume="0.55"></audio>
-    <audio id="s-tap3" class="clip" src="assets/audio/sfx-click.mp3" data-start="15.47" data-duration="0.4" data-track-index="4" data-volume="0.55"></audio>
-    <audio id="s-chime1" class="clip" src="assets/audio/sfx-chime-bundled.mp3" data-start="15.52" data-duration="2.5" data-track-index="5" data-volume="0.22"></audio>
-    <audio id="s-tok3" class="clip" src="assets/audio/sfx-tok.mp3" data-start="33.87" data-duration="0.4" data-track-index="6" data-volume="0.9"></audio>
-    <audio id="s-chime2" class="clip" src="assets/audio/sfx-chime-bundled.mp3" data-start="34.91" data-duration="2.5" data-track-index="7" data-volume="0.5"></audio>
-    <!--AUDIO:END-->
-    </div>
-    <script>
-      window.__timelines = window.__timelines || {};
-      window.__timelines["main"] = gsap.timeline({ paused: true });
-    </script>
+    <canvas id="c" width="1080" height="1920"></canvas>
+    <div id="ui"><button id="play">▶︎</button><input id="t" type="range" min="0" value="0" /><span id="lab"></span></div>
+    <script>if (!location.search.includes('mode=draft') && !location.search.includes('mode=final')) document.body.classList.add('preview');</script>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
