@@ -64,19 +64,15 @@ export const OBRAS = [
   { id: 'o1', n: '01', titulo: 'Lámpara hongo', artistaId: 'a1', categoria: 'diseno', tecnica: 'Objeto de diseño', medidas: null, precio: null, img: 'img/lampara-hongo.jpg', destacada: true, descripcion: 'La lámpara roja de puntos blancos que ilumina la repisa de la casa: un objeto funcional con mirada experimental.' },
   { id: 'o2', n: '02', titulo: 'Luna con habitante', artistaId: 'a0', categoria: 'diseno', tecnica: 'Objeto decorativo', medidas: null, precio: null, img: 'img/luna.jpg', descripcion: 'Una luna blanca con una pequeña figura sentada. Vive en la madera de la casa, junto a la luz cálida.' },
   { id: 'o3', n: '03', titulo: 'Ilustraciones enmarcadas', artistaId: 'a0', categoria: 'arte', tecnica: 'Dibujo enmarcado', medidas: null, precio: null, img: 'img/ilustraciones.jpg', destacada: true, descripcion: 'Dibujos de animales en marcos de madera, colgados en la pared blanca de la sala.' },
-  { id: 'o4', n: '04', titulo: 'Camisetas teñidas', artistaId: 'a3', categoria: 'moda', tecnica: 'Textil teñido', medidas: null, precio: null, img: 'img/camisetas.jpg', destacada: true, descripcion: 'Prendas rebeldes con toques artísticos y pictóricos, de un laboratorio textil.' },
-  { id: 'o5', n: '05', titulo: 'Bolsos y prendas patchwork', artistaId: 'a4', categoria: 'moda', tecnica: 'Arte textil con materiales recuperados', medidas: null, precio: null, img: 'img/patchwork.jpg', descripcion: 'Piezas únicas hechas con bordado, costura y técnicas manuales a partir de materiales recuperados.' },
-  { id: 'o6', n: '06', titulo: 'Camiseta estampada', artistaId: 'a2', categoria: 'moda', tecnica: 'Estampado intervenido', medidas: null, precio: null, img: 'img/ec-rhipsalis.jpg', descripcion: 'Arte que se transforma en materia para habitar el cuerpo: color, textura y movimiento.' },
-  { id: 'o7', n: '07', titulo: 'Cosmética natural de montaña', artistaId: 'a5', categoria: 'bienestar', tecnica: 'Cosmética natural', medidas: null, precio: null, img: 'img/cosmetica.jpg', destacada: true, descripcion: 'Alquimia de montaña: productos de cuidado natural de ALIMA, en la repisa de la sala.' },
-  { id: 'o8', n: '08', titulo: 'Viche del Pacífico', artistaId: 'a6', categoria: 'bienestar', tecnica: 'Bebida tradicional del Pacífico', medidas: null, precio: null, img: 'img/viche.jpg', descripcion: 'De Puerto Saija, Timbiquí: sabor y espíritu del territorio llevados a nuevos lugares.' },
+  { id: 'o6', n: '04', titulo: 'Camiseta estampada', artistaId: 'a2', categoria: 'moda', destacada: true, tecnica: 'Estampado intervenido', medidas: null, precio: null, img: 'img/ec-rhipsalis.jpg', descripcion: 'Arte que se transforma en materia para habitar el cuerpo: color, textura y movimiento.' },
+  { id: 'o7', n: '05', titulo: 'Cosmética natural de montaña', artistaId: 'a5', categoria: 'bienestar', tecnica: 'Cosmética natural', medidas: null, precio: null, img: 'img/cosmetica.jpg', destacada: true, descripcion: 'Alquimia de montaña: productos de cuidado natural de ALIMA, en la repisa de la sala.' },
+  { id: 'o8', n: '06', titulo: 'Viche del Pacífico', artistaId: 'a6', categoria: 'bienestar', tecnica: 'Bebida tradicional del Pacífico', medidas: null, precio: null, img: 'img/viche.jpg', descripcion: 'De Puerto Saija, Timbiquí: sabor y espíritu del territorio llevados a nuevos lugares.' },
 ]
 
 /** Marcas y artistas de la feria (datos de las ecards). [PONER] Instagram de cada uno y confirmar permiso de uso de imagen. */
 export const ARTISTAS = [
   { id: 'a1', nombre: 'Artilugio', disciplina: 'Diseño y objetos', bio: 'Estudio-laboratorio de diseño y fabricación de objetos funcionales con una mirada experimental.', instagram: null, foto: 'img/ec-artilugio.jpg' },
   { id: 'a2', nombre: 'Rhipsalis', disciplina: 'Arte, diseño y ropa', bio: 'Marca donde el arte se transforma en materia para habitar el cuerpo: objetos, pinturas e imágenes intervenidas.', instagram: null, foto: 'img/ec-rhipsalis.jpg' },
-  { id: 'a3', nombre: 'Arcoíris Negro', disciplina: 'Laboratorio textil', bio: 'Prendas rebeldes con toques artísticos y pictóricos.', instagram: null, foto: 'img/ec-arcoiris-negro.jpg' },
-  { id: 'a4', nombre: 'UpCycled Galería', disciplina: 'Arte textil', bio: 'Materiales recuperados convertidos en piezas únicas con bordado, costura y técnicas manuales.', instagram: null, foto: 'img/ec-upcycled.jpg' },
   { id: 'a5', nombre: 'ALIMA', disciplina: 'Cosmética natural', bio: 'Alquimia de montaña: cuidado natural para el cuerpo, hecho desde el territorio.', instagram: null, foto: 'img/ec-alima.jpg' },
   { id: 'a6', nombre: 'Pargo Viche', disciplina: 'Sabores del Pacífico', bio: 'Nace en Puerto Saija, Timbiquí. Lleva el sabor y el espíritu del territorio a nuevos lugares.', instagram: null, foto: 'img/ec-pargo-viche.jpg' },
   { id: 'a7', nombre: 'Diego Pérez Osorno', disciplina: 'Sensopia · audiovisual y arte', bio: 'Comunicador audiovisual, artista y docente. Creador de Sensopia, experiencias inmersivas mediadas por la tecnología.', instagram: null, foto: 'img/ec-sensopia.jpg' },
@@ -123,7 +119,6 @@ export const FERIA_FOTOS = [
 
 /* ---------- Cifras (derivadas del programa de la feria) ---------- */
 export const CIFRAS = [
-  { value: 14, label: 'marcas locales en la Feria Casa Amiga' },
   { value: 8, label: 'actividades en un solo día' },
   { value: 9, label: 'horas de feria, de 10 a. m. a 7 p. m.' },
   { value: 1, label: 'casa en la Vereda El Placer' },
