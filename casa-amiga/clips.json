@@ -24,7 +24,11 @@
       "titulo": "Baja hacia Casa Amiga",
       "navegacion": "Baja hacia Casa Amiga",
       "texto_en": 0.45,
-      "final": { "antetitulo": "¿QUIERES LLEGAR A CASA?", "titulo": "Ya llegaste.", "segundos_antes_del_fin": 3.4 },
+      "final": {
+        "antetitulo": "¿QUIERES LLEGAR A CASA AMIGA?",
+        "titulo": "Ya llegaste.",
+        "segundos_antes_del_fin": 3.4
+      },
       "audio": "auto",
       "volumen": 0.35
     }

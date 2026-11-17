@@ -160,7 +160,7 @@ export function state(t: number, A: Assets, opts: { screenSS: number; footT?: nu
     b.sprite('stBase', { tex: 'SCREEN', flip: true, x: pcx, y: pcy, w: W, h: H, radius: RAD.phone, rotX: phoneRot, opacity: phoneOp, dof: dofPhone }, 'phone');
   }
 
-  // ═════════ intro: pin en círculo de vidrio + "¿Quieres llegar / a casa?" ═════════
+  // ═════════ intro: pin en círculo de vidrio + "¿Quieres llegar / a Casa Amiga?" ═════════
   if (t < 1.75) {
     const grow = spring(seg(t, 0, 0.62), 12);
     const up = inOut(seg(t, 0.6, 1.02));
@@ -174,7 +174,7 @@ export function state(t: number, A: Assets, opts: { screenSS: number; footT?: nu
     b.sprite('stTop', { color: C.orange, alpha: 0.18, x: 540, y: cy, w: D0 * 1.9, h: D0 * 1.9, radius: D0 * 0.95, feather: D0 * 0.8, opacity: o }, 'introGlow');
     b.sprite('stTop', { tex: A.pin, x: 540, y: cy - 4 * s, w: 104 * s, h: 133 * s, opacity: o, blur: (1 - grow) * 12 }, 'introPin');
     b.title('stTop', '¿Quieres llegar', sty.hero(CREAM), 540, 772, 0.72, 1.36, [0, -16], 'it1');
-    b.title('stTop', 'a casa?', sty.hero(ORANGE), 540, 772 + 123, 0.8, 1.4, [0, -16], 'it2');
+    b.title('stTop', 'a Casa Amiga?', sty.hero(ORANGE), 540, 772 + 123, 0.8, 1.4, [0, -16], 'it2');
   }
 
   // ═════════ PANTALLA ═════════
@@ -386,8 +386,9 @@ export function state(t: number, A: Assets, opts: { screenSS: number; footT?: nu
     b.sprite('sTop', { tex: A.firma.tex, tint: true, color: CREAM, alpha: 1, x: SW / 2, y: 820 + a.dy, w: fw, h: fh, opacity: a.o, blur: a.blur, dir: [0, -10 * a.outU] }, 'firma');
     const e = textAnim(t, 7.08, 7.5);
     b.text('sTop', dat.eyebrow || '', sty.label(SOFT_ORANGE), SW / 2, 914, { align: 'center', opacity: e.o, blur: e.blur, dy: e.dy, dir: [0, -10 * e.outU] });
-    const lema = (dat.lema || 'Arte que se siente en casa.').split(' ');
-    const last = lema.pop() ?? '';
+    const lema = (dat.lema || 'Arte que se siente en Casa Amiga.').split(' ');
+    // la frase enfatizada en naranja: "Casa Amiga." completo si el lema termina así
+    const last = lema.length >= 2 && /^casa$/i.test(lema[lema.length - 2]) ? lema.splice(-2).join(' ') : lema.pop() ?? '';
     const l1 = lema.slice(0, Math.max(1, lema.length - 1)).join(' ');
     const l2pre = lema.slice(Math.max(1, lema.length - 1)).join(' ');
     b.title('sTop', l1, sty.headline(CREAM), SW / 2, 960, 7.14, 7.5, [0, -10], 'h1');
@@ -428,9 +429,9 @@ export function state(t: number, A: Assets, opts: { screenSS: number; footT?: nu
     b.sprite('sTop', { color: ORANGE, alpha: 1, x: 72 + (680 * prog) / 2, y: y + 44, w: 680 * prog, h: 3, radius: 1.5, opacity: pOp }, 'pProg');
   }
 
-  // ── "Esta también / es tu casa." ──
-  b.title('sTop', 'Esta también', sty.statement(CREAM), SW / 2, 540, 10.0, 10.98, [0, -14], 'st1');
-  b.title('sTop', 'es tu casa.', sty.statement(ORANGE), SW / 2, 540 + 110, 10.08, 11.02, [0, -14], 'st2');
+  // ── "Esta también es tu / Casa Amiga." ──
+  b.title('sTop', 'Esta también es tu', ST({ ...font.statement, size: 80 }, CREAM), SW / 2, 548, 10.0, 10.98, [0, -14], 'st1');
+  b.title('sTop', 'Casa Amiga.', sty.statement(ORANGE), SW / 2, 548 + 100, 10.08, 11.02, [0, -14], 'st2');
 
   // ── galería: imágenes en marcos de vidrio con profundidad ──
   if (t >= 11.15 && t < 14.6) {
@@ -515,7 +516,7 @@ export function state(t: number, A: Assets, opts: { screenSS: number; footT?: nu
     const lx = SW / 2, ly = 820;
     drawPin(lerp(sx, lx, mv), lerp(sy, ly + 118, mv), lerp(1.05, 1.5, mv), clamp(seg(t, T.C1 + 0.02, T.C1 + 0.06) * 3) * (1 - k(t, T.C1 + 1.3, T.C1 + 1.5)), (1 - u) * -320 * (1 - mv), clamp(u * 1.2) * (1 - mv), 'cpin');
     b.title('sTop', 'Llegaste a', sty.statement(CREAM), SW / 2, 290, T.C1 + 0.8, 1e9, [0, -10], 'c1');
-    b.title('sTop', 'casa.', sty.statement(ORANGE), SW / 2, 290 + 110, T.C1 + 0.9, 1e9, [0, -10], 'c2');
+    b.title('sTop', 'Casa Amiga.', sty.statement(ORANGE), SW / 2, 290 + 110, T.C1 + 0.9, 1e9, [0, -10], 'c2');
     const lg = out(seg(t, T.C1 + 1.28, T.C1 + 1.8));
     b.sprite('sTop', { color: ORANGE, alpha: 0.3, x: lx, y: ly, w: 520, h: 520, radius: 260, feather: 220, opacity: lg }, 'logoGlow');
     b.sprite('sTop', { tex: A.logo, x: lx, y: ly, w: 280 * lerp(0.9, 1, lg), h: 280 * lerp(0.9, 1, lg), opacity: lg, blur: (1 - lg) * 10 }, 'logo');
