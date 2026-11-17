@@ -18,6 +18,16 @@ npm run preview
 
 `dist/` está versionado: se puede subir tal cual a cualquier hosting (Netlify, Vercel, cPanel, GitHub Pages).
 
+## Publicar en Vercel (evita la pantalla en blanco)
+
+El `index.html` de esta carpeta es el código fuente: **no se puede subir tal cual**, porque apunta a `/src/main.jsx` y queda en blanco. Usa una de estas opciones:
+
+1. **Con compilación (recomendada):** en Vercel, *Root Directory* = `casa-amiga`, framework Vite (ya lo define `vercel.json`: `npm run build` → `dist`).
+2. **Sin compilar:** *Root Directory* = `casa-amiga/dist` (framework "Other", sin build command). `dist/` ya viene compilado.
+3. **Un solo archivo:** `standalone/index.html` (13 MB, con las imágenes incluidas) funciona suelto en cualquier hosting.
+
+El repositorio también tiene en la raíz otro proyecto (`index.html` + `audio/`): por eso el Root Directory es obligatorio.
+
 ## Contenido pendiente (todo está en `src/data.js`)
 
 | Qué | Dónde |
