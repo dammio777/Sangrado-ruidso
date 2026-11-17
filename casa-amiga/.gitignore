@@ -5,3 +5,4 @@ renders/.chunks/
 renders/*.mp4
 !renders/v1-borrador.mp4
 !renders/casa-amiga-draft.mp4
+!renders/casa-amiga-final.mp4
