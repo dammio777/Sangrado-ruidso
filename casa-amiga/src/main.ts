@@ -65,8 +65,8 @@ async function boot() {
   if (mode !== 'preview') Q.fps = cfg.fps;
   const T = times(cfg);
   const [icono, firma, logo, letrero, obra, ceramica, taller, cabana, hongo] = await Promise.all([
-    loadImage('/img/icono.png'), loadImage('/img/firma.png'), loadImage('/logo.png'), loadImage('/fotos/letrero.jpg'),
-    loadImage('/fotos/obra.svg'), loadImage('/fotos/ceramica.svg'), loadImage('/fotos/taller.svg'), loadImage('/fotos/cabana.svg'), loadImage('/fotos/hongo.svg'),
+    loadImage('/img/icono.png'), loadImage('/img/firma.png'), loadImage('/logo.png'), loadImage('/fotos/casa-puerta.jpg'),
+    loadImage('/fotos/obra.jpg'), loadImage('/fotos/artesania.jpg'), loadImage('/fotos/taller.jpg'), loadImage('/fotos/cabana-noche.jpg'), loadImage('/fotos/hongo.jpg'),
   ]);
   const gfx = new Gfx(canvas);
   A = {
@@ -74,6 +74,16 @@ async function boot() {
     mapD: new DigitalMap(stage.screen.w, stage.screen.h, Q.mapSS),
     mapS: new SketchMap(stage.screen.w, stage.screen.h, Q.mapSS),
     pin: pinTexture(icono.el), logo: logo.tex, firma, icono,
+    backdrop: (() => {
+      // fondo: la cabaña de noche, muy desenfocada, oscurecida y 15 % menos saturada
+      const c = document.createElement('canvas'); c.width = 360; c.height = 640;
+      const g = c.getContext('2d')!;
+      g.fillStyle = '#2A1A14'; g.fillRect(0, 0, 360, 640);
+      g.filter = 'blur(26px) saturate(0.85) brightness(0.62)';
+      const im = cabana.el, s = Math.max(420 / im.naturalWidth, 700 / im.naturalHeight);
+      g.drawImage(im, 180 - (im.naturalWidth * s) / 2, 300 - (im.naturalHeight * s) / 2, im.naturalWidth * s, im.naturalHeight * s);
+      return canvasTexture(c, false);
+    })(),
     photos: { letrero, obra, ceramica, taller, cabana, hongo },
     ring: ringTexture('AMOR Y AMISTAD · ARTE · DISEÑO ·', 200, C.cream),
     keyboard: keyboardTexture(stage.screen.w, 568),
@@ -85,7 +95,6 @@ async function boot() {
   film.toCanvas = mode === 'preview' || params.has('canvas');
   // calentar: compila shaders y sube texturas antes del primer cuadro medido
   await ensureFootage(0); film.render(0, 0);
-  void canvasTexture;
 }
 
 const ready = boot();

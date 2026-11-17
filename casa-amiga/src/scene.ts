@@ -32,7 +32,7 @@ export interface Frame {
 export interface Assets {
   cfg: FilmConfig; T: Times;
   mapD: DigitalMap; mapS: SketchMap;
-  pin: THREE.Texture; logo: THREE.Texture; firma: { tex: THREE.Texture; w: number; h: number }; icono: { tex: THREE.Texture; w: number; h: number };
+  pin: THREE.Texture; backdrop: THREE.Texture; logo: THREE.Texture; firma: { tex: THREE.Texture; w: number; h: number }; icono: { tex: THREE.Texture; w: number; h: number };
   photos: Record<string, { tex: THREE.Texture; w: number; h: number }>;
   ring: THREE.Texture; keyboard: THREE.Texture;
   placeholders: THREE.Texture[];
@@ -135,7 +135,8 @@ export function state(t: number, A: Assets, opts: { screenSS: number; footT?: nu
   const D = stage.camDist, depth = stage.bgDepth, sc = ((D + depth) / D) * 1.12;
   const brand = k(t, 7.5, 7.9) * (1 - k(t, 8.18, 8.42));
   const coveredByFootage = t >= T.HO + 0.9 && t < T.C0; // el video cubre todo el cuadro: no se dibuja lo que queda debajo
-  if (!coveredByFootage) b.ambient('stBase', { x: stage.w / 2, y: stage.h / 2, z: depth, w: stage.w * sc, h: stage.h * sc, t, glow: 0.18 + brand * 0.35, glowX: stage.w * sc * 0.5, glowY: stage.h * sc * 0.36, lift: 0, opacity: 1, travel: motion.orbTravel, palette: AMB_PAL });
+  if (!coveredByFootage) b.sprite('stBase', { tex: A.backdrop, x: stage.w / 2, y: stage.h / 2, z: depth, w: stage.w * sc, h: stage.h * sc });
+  if (!coveredByFootage) b.ambient('stBase', { x: stage.w / 2, y: stage.h / 2, z: depth, w: stage.w * sc, h: stage.h * sc, t, glow: 0.18 + brand * 0.35, glowX: stage.w * sc * 0.5, glowY: stage.h * sc * 0.36, lift: 0, opacity: 0.62, travel: motion.orbTravel, palette: AMB_PAL });
 
   // ═════════ cámara 2.5D ═════════
   const push = k(t, 2.4, 2.95) * (1 - k(t, 4.1, 4.75));
@@ -364,7 +365,7 @@ export function state(t: number, A: Assets, opts: { screenSS: number; footT?: nu
     // recorte "cover" centrado en el letrero
     const ar = w / h, ia = hero.w / hero.h;
     const uw = ar > ia ? 1 : ar / ia, uh = ar > ia ? ia / ar : 1;
-    b.sprite('sTop', { tex: hero.tex, x, y, w, h, radius: r, uvRect: [(1 - uw) / 2, (1 - uh) * 0.46, uw, uh], opacity: o, blur }, 'hero');
+    b.sprite('sTop', { tex: hero.tex, x, y, w, h, radius: r, uvRect: [(1 - uw) / 2, (1 - uh) * 0.1, uw, uh], opacity: o, blur }, 'hero');
   };
   if (t >= 5.8 && t < 6.62 && Ty < SH) heroDraw(heroAtSheet.x, heroAtSheet.y, heroAtSheet.w, heroAtSheet.h, RAD.card, placeOp);
   if (t >= 6.62 && t < 8.45) {
