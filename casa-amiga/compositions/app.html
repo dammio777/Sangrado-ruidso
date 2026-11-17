@@ -1,0 +1,671 @@
+<template>
+  <style>
+    @font-face { font-family: "Caveat"; src: url("assets/fonts/caveat-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+    @font-face { font-family: "Caveat"; src: url("assets/fonts/caveat-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+    #root {
+      position: absolute; inset: 0; overflow: hidden;
+      --naranja: #F29021; --oxido: #7D2E12; --tinta: #16110E; --tinta2: #6B625B;
+      --papel: #FBF7F1; --naranjaT: #C9650C; --crema: #F4EEE4; --linea: #E9DFD3; --dorado: #FFC874;
+      font-family: "Inter", sans-serif; color: var(--tinta);
+    }
+    #root * { box-sizing: border-box; }
+    .abs { position: absolute; }
+
+    /* ---------- escenario (afuera del teléfono) ---------- */
+    #a-bg { position: absolute; inset: 0;
+      background:
+        radial-gradient(900px 700px at 8% 6%, rgba(242,144,33,.16), rgba(242,144,33,0) 70%),
+        radial-gradient(700px 500px at 100% 0%, rgba(255,200,116,.12), rgba(255,200,116,0) 70%),
+        linear-gradient(180deg, #FFFCF8 0%, #FBF6EF 55%, #F3ECE3 100%);
+    }
+    .bokeh { position: absolute; border-radius: 50%; background: var(--dorado); filter: blur(18px); }
+    #a-grain { position: absolute; inset: 0; opacity: .05; mix-blend-mode: multiply; }
+
+    #a-heroWrap { position: absolute; left: 540px; top: 900px; width: 0; height: 0; }
+    #a-heroGlow { position: absolute; left: -330px; top: -330px; width: 660px; height: 660px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,200,116,.85) 0%, rgba(242,144,33,.25) 38%, rgba(242,144,33,0) 70%); }
+    #a-heroPin { position: absolute; left: -143px; top: -365px; width: 286px; height: 365px; transform-origin: 50% 100%; }
+
+    .intro-line { position: absolute; left: 0; width: 1080px; text-align: center; overflow: hidden;
+      font-family: "Oswald", sans-serif; font-weight: 600; font-size: 132px; line-height: 1.08; letter-spacing: -.01em; }
+    .intro-line span { display: inline-block; }
+    #a-in1 { top: 760px; color: var(--tinta); }
+    #a-in2 { top: 905px; color: var(--naranjaT); }
+
+    /* ---------- teléfono ---------- */
+    #a-stage3d { position: absolute; inset: 0; perspective: 2400px; perspective-origin: 50% 40%; }
+    #a-phone { position: absolute; left: 97px; top: 251px; width: 886px; height: 1498px; border-radius: 86px;
+      background: linear-gradient(145deg, #2B2522, #0F0C0B 40%, #1D1917);
+      box-shadow: 0 60px 120px rgba(60,30,10,.28), 0 18px 40px rgba(60,30,10,.18), inset 0 0 0 2px rgba(255,255,255,.08); }
+    #a-screen { position: absolute; left: 16px; top: 16px; width: 854px; height: 1466px; border-radius: 70px; overflow: hidden;
+      background: var(--crema); isolation: isolate; }
+    #a-island { position: absolute; left: 357px; top: 18px; width: 140px; height: 40px; border-radius: 20px; background: #0B0908; z-index: 40; }
+
+    /* mapas */
+    #a-mapD, #a-mapS { position: absolute; left: 0; top: 0; width: 854px; height: 1466px; }
+    #a-mapD { z-index: 1; }
+    #a-sketchWrap { position: absolute; inset: 0; z-index: 2; opacity: 0; }
+    #a-mapS { background: #FBF5EA; }
+    .lm-label { font-family: "Caveat", cursive; font-weight: 700; }
+
+    #a-pin { position: absolute; left: 0; top: 0; width: 130px; height: 166px; z-index: 12; transform-origin: 65px 162px; opacity: 0; }
+    #a-pinShadow { position: absolute; left: 0; top: 0; width: 90px; height: 24px; border-radius: 50%; z-index: 11;
+      background: radial-gradient(closest-side, rgba(40,20,8,.38), rgba(40,20,8,0)); opacity: 0; }
+    #a-pinLabel { position: absolute; z-index: 12; left: 0; top: 0; padding: 10px 20px; border-radius: 16px; background: #fff;
+      font-weight: 700; font-size: 30px; box-shadow: 0 6px 18px rgba(60,30,10,.16); white-space: nowrap; opacity: 0; }
+
+    /* capas */
+    #a-white { position: absolute; inset: 0; background: var(--papel); z-index: 8; opacity: 0; }
+    #a-flood { position: absolute; inset: 0; background: var(--naranja); z-index: 9; clip-path: circle(0px at 427px 480px); }
+
+    /* status bar */
+    #a-status { position: absolute; left: 0; top: 0; width: 854px; height: 76px; z-index: 39; display: flex; align-items: center;
+      justify-content: space-between; padding: 6px 64px 0; font-weight: 700; font-size: 28px; }
+    #a-status .icons { display: flex; gap: 10px; align-items: center; }
+
+    /* buscador */
+    #a-search { position: absolute; left: 28px; top: 92px; width: 798px; height: 104px; border-radius: 52px; background: #fff; z-index: 22;
+      box-shadow: 0 8px 28px rgba(60,30,10,.14), 0 1px 3px rgba(60,30,10,.12); display: flex; align-items: center; padding: 0 30px; gap: 22px; }
+    #a-sIcon { width: 46px; height: 46px; flex: none; position: relative; }
+    #a-sIcon > * { position: absolute; inset: 0; }
+    #a-q { font-size: 34px; color: var(--tinta2); white-space: nowrap; flex: 1; display: flex; align-items: center; overflow: hidden; }
+    #a-qTyped { color: var(--tinta); font-weight: 500; }
+    #a-caret { display: inline-block; width: 3px; height: 40px; background: var(--naranja); margin-left: 2px; }
+    #a-mic { width: 40px; height: 40px; flex: none; }
+    #a-chips { position: absolute; left: 28px; top: 218px; z-index: 21; display: flex; gap: 10px; }
+    .chip { height: 66px; padding: 0 20px; border-radius: 33px; background: #fff; display: flex; align-items: center; gap: 12px;
+      font-size: 27px; font-weight: 600; box-shadow: 0 4px 14px rgba(60,30,10,.12); white-space: nowrap; }
+    .chip svg { width: 30px; height: 30px; }
+
+    #a-sPage { position: absolute; inset: 0; background: #fff; z-index: 20; opacity: 0; }
+    #a-sugg { position: absolute; left: 0; top: 226px; width: 854px; z-index: 21; }
+    .row { height: 132px; display: flex; align-items: center; gap: 26px; padding: 0 40px; border-bottom: 1px solid var(--linea); position: relative; }
+    .row .ic { width: 64px; height: 64px; border-radius: 32px; background: #F6EDE2; flex: none; display: flex; align-items: center; justify-content: center; }
+    .row .ic svg { width: 34px; height: 34px; }
+    .row .tx { flex: 1; min-width: 0; }
+    .row .t1 { font-size: 34px; font-weight: 700; }
+    .row .t2 { font-size: 28px; color: var(--tinta2); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row .ar { width: 34px; height: 34px; flex: none; }
+    #a-row1hl { position: absolute; inset: 0; background: rgba(242,144,33,.12); opacity: 0; }
+
+    #a-kbd { position: absolute; left: 0; top: 906px; width: 854px; height: 560px; background: #EFE8DF; z-index: 25; padding: 22px 10px 0; }
+    .krow { display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; }
+    .key { width: 72px; height: 96px; border-radius: 14px; background: #fff; box-shadow: 0 2px 0 rgba(60,30,10,.18);
+      display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 500; }
+    .key.w { width: 112px; background: #E2D8CC; font-size: 26px; }
+    .key.sp { width: 400px; font-size: 26px; color: var(--tinta2); }
+    .key.go { width: 170px; background: var(--naranja); font-size: 28px; font-weight: 700; }
+
+    /* tarjeta del lugar */
+    #a-card { position: absolute; left: 0; top: 784px; width: 854px; height: 700px; background: #fff; border-radius: 48px 48px 0 0; z-index: 24;
+      box-shadow: 0 -10px 40px rgba(60,30,10,.16); }
+    #a-card .grab { position: absolute; left: 387px; top: 14px; width: 80px; height: 10px; border-radius: 5px; background: #E2D8CC; }
+    #a-cardPhotoSlot { position: absolute; left: 28px; top: 40px; width: 798px; height: 270px; border-radius: 28px; background: #EEE5D9; }
+    #a-cTitle { position: absolute; left: 32px; top: 334px; font-size: 52px; font-weight: 700; letter-spacing: -.01em; }
+    #a-cSub { position: absolute; left: 32px; top: 402px; font-size: 32px; color: var(--tinta2); }
+    #a-cLoc { position: absolute; left: 32px; top: 448px; font-size: 30px; color: var(--tinta); display: flex; gap: 10px; align-items: center; font-weight: 600; }
+    #a-cLoc svg { width: 30px; height: 30px; }
+    #a-btns { position: absolute; left: 28px; top: 520px; display: flex; gap: 10px; }
+    .btn { height: 80px; border-radius: 40px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 28px; font-weight: 700;
+      border: 2px solid #E2D8CC; background: #fff; white-space: nowrap; position: relative; overflow: hidden; }
+    .btn svg { width: 30px; height: 30px; }
+    .btn.pri { background: var(--naranja); border-color: var(--naranja); }
+    .btn.sec { border-color: var(--naranja); }
+    #a-iniFill { position: absolute; inset: 0; background: var(--naranja); opacity: 0; }
+    .btn > span, .btn > svg { position: relative; }
+
+    #a-photo { position: absolute; z-index: 26; overflow: hidden; border-radius: 28px; background: #ddd; opacity: 0;
+      left: 28px; top: 824px; width: 798px; height: 270px; box-shadow: 0 20px 50px rgba(60,30,10,.22); }
+    #a-photo img { position: absolute; left: 50%; top: 50%; width: 900px; height: 891px; object-fit: cover; }
+
+    /* marca */
+    #a-firma { position: absolute; left: 167px; top: 852px; width: 520px; z-index: 27; opacity: 0; }
+    .mono { font-family: "JetBrains Mono", monospace; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--naranjaT); }
+    #a-eyebrow { position: absolute; left: 0; width: 854px; top: 1036px; text-align: center; font-size: 25px; z-index: 27; opacity: 0; }
+    #a-head { position: absolute; left: 0; width: 854px; top: 1088px; text-align: center; z-index: 27;
+      font-family: "Oswald", sans-serif; font-weight: 700; font-size: 84px; line-height: 1.02; text-transform: uppercase; }
+    #a-head .hm { overflow: hidden; }
+    #a-head span { display: block; }
+
+    #a-badge { position: absolute; left: 167px; top: 560px; width: 520px; height: 520px; z-index: 27; opacity: 0; }
+    #a-badgeRing { position: absolute; inset: 0; }
+    #a-badgeDisc { position: absolute; left: 100px; top: 100px; width: 320px; height: 320px; border-radius: 50%; background: #FBF5EA;
+      box-shadow: 0 16px 40px rgba(90,40,10,.25); display: flex; align-items: center; justify-content: center; }
+    #a-badgeDisc img { width: 230px; }
+
+    /* barra persistente */
+    #a-persist { position: absolute; left: 28px; top: 1334px; width: 798px; height: 104px; border-radius: 30px; z-index: 30;
+      background: rgba(255,255,255,.92); border: 1.5px solid #EADBC8; box-shadow: 0 10px 30px rgba(60,30,10,.14);
+      display: flex; align-items: center; gap: 18px; padding: 0 16px; overflow: hidden; opacity: 0; }
+    #a-persist .th { width: 72px; height: 72px; border-radius: 18px; overflow: hidden; flex: none; position: relative; }
+    #a-persist .th img { position: absolute; left: -30px; top: -14px; width: 150px; }
+    #a-persist .pt { flex: 1; }
+    #a-persist .p1 { font-size: 30px; font-weight: 700; }
+    #a-persist .p2 { font-size: 26px; color: var(--tinta2); }
+    #a-pTime { display: flex; align-items: center; gap: 8px; font-size: 28px; font-weight: 700; }
+    #a-pNav { width: 72px; height: 72px; border-radius: 36px; background: var(--naranja); flex: none; display: flex; align-items: center; justify-content: center; }
+    #a-pNav svg { width: 34px; height: 34px; }
+    #a-pProg { position: absolute; left: 0; bottom: 0; height: 5px; width: 798px; background: var(--naranja); transform-origin: 0 50%; }
+
+    /* frases */
+    .big2 { position: absolute; left: 0; width: 854px; text-align: center; overflow: hidden; z-index: 27;
+      font-family: "Oswald", sans-serif; font-weight: 600; font-size: 118px; line-height: 1.1; }
+    .big2 span { display: inline-block; }
+    #a-st1 { top: 520px; } #a-st2 { top: 650px; color: var(--naranjaT); }
+
+    /* galería */
+    #a-eb2 { position: absolute; left: 0; width: 854px; top: 196px; text-align: center; font-size: 27px; z-index: 27; opacity: 0; }
+    #a-tiles { position: absolute; inset: 0; z-index: 27; perspective: 1400px; }
+    .tile { position: absolute; left: 0; top: 0; width: 300px; height: 380px; border-radius: 26px; overflow: hidden; opacity: 0;
+      box-shadow: 0 18px 44px rgba(60,30,10,.25); background: #ddd; }
+    .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #a-support { position: absolute; left: 70px; width: 714px; top: 1130px; text-align: center; z-index: 27; font-size: 40px; font-weight: 700; line-height: 1.25; opacity: 0; }
+    #a-chipSector { position: absolute; left: 0; width: 854px; top: 850px; z-index: 27; display: flex; justify-content: center; opacity: 0; }
+    #a-chipSector div { padding: 16px 30px; border-radius: 40px; background: #fff; border: 2px solid var(--naranja); font-size: 29px; font-weight: 700;
+      box-shadow: 0 8px 24px rgba(60,30,10,.12); white-space: nowrap; }
+
+    /* navegación */
+    #a-nav { position: absolute; left: 20px; top: 84px; width: 814px; height: 170px; border-radius: 34px; background: var(--oxido); z-index: 33;
+      color: #FFF6EC; display: flex; align-items: center; gap: 24px; padding: 0 30px; opacity: 0; }
+    #a-nav svg { width: 84px; height: 84px; flex: none; }
+    #a-nav .n1 { font-size: 26px; opacity: .85; font-family: "JetBrains Mono", monospace; letter-spacing: .12em; font-weight: 700; }
+    #a-nav .n2 { font-size: 36px; font-weight: 700; line-height: 1.15; margin-top: 4px; }
+    #a-chev { position: absolute; left: 0; top: 0; width: 76px; height: 76px; z-index: 13; opacity: 0; }
+
+    #a-tap { position: absolute; left: 0; top: 0; width: 86px; height: 86px; margin: -43px 0 0 -43px; border-radius: 50%; z-index: 45;
+      background: radial-gradient(circle, rgba(22,17,14,.32) 0%, rgba(22,17,14,.18) 55%, rgba(22,17,14,0) 72%); opacity: 0; }
+
+    /* cierre */
+    #a-cl1 { top: 300px; } #a-cl2 { top: 432px; color: var(--naranjaT); }
+    #a-clLogo { position: absolute; left: 257px; top: 640px; width: 340px; height: 340px; z-index: 27; opacity: 0; }
+    #a-clHandle { position: absolute; left: 0; width: 854px; top: 1020px; text-align: center; font-size: 44px; font-weight: 700; z-index: 27; opacity: 0; }
+    #a-clMono { position: absolute; left: 0; width: 854px; top: 1092px; text-align: center; font-size: 25px; z-index: 27; opacity: 0; }
+  </style>
+
+  <div id="root" data-composition-id="app" data-width="1080" data-height="1920" data-duration="37.5" data-layout-allow-overflow data-layout-allow-overlap>
+    <div id="a-bg"></div>
+    <div id="a-bokeh" data-layout-ignore></div>
+    <svg id="a-grain" width="1080" height="1920" data-layout-ignore><filter id="a-gf"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/></filter><rect width="1080" height="1920" filter="url(#a-gf)"/></svg>
+
+    <div id="a-heroWrap">
+      <div id="a-heroGlow"></div>
+      <svg id="a-heroPin" viewBox="0 0 130 166"></svg>
+    </div>
+    <div id="a-in1" class="intro-line"><span>¿Quieres llegar</span></div>
+    <div id="a-in2" class="intro-line"><span>a casa?</span></div>
+
+    <div id="a-stage3d">
+      <div id="a-phone">
+        <div id="a-screen">
+          <svg id="a-mapD" data-layout-ignore width="854" height="1466" viewBox="0 0 854 1466"></svg>
+          <div id="a-sketchWrap" data-layout-ignore><svg id="a-mapS" width="854" height="1466" viewBox="0 0 854 1466"></svg></div>
+
+          <div id="a-pinShadow"></div>
+          <svg id="a-pin" viewBox="0 0 130 166"></svg>
+          <div id="a-pinLabel">Casa Amiga</div>
+          <svg id="a-chev" viewBox="0 0 76 76"><circle cx="38" cy="38" r="34" fill="#fff"/><circle cx="38" cy="38" r="34" fill="none" stroke="#E2D8CC" stroke-width="2"/><path d="M38 14 L56 56 L38 46 L20 56 Z" fill="#F29021" stroke="#7D2E12" stroke-width="3" stroke-linejoin="round"/></svg>
+
+          <div id="a-white"></div>
+          <div id="a-flood"></div>
+
+          <div id="a-photo"><img src="assets/fotos/letrero.jpg" alt=""></div>
+          <img id="a-firma" src="assets/img/firma.png" alt="Casa Amiga">
+          <div id="a-eyebrow" class="mono" data-dato="eyebrow">GALERÍA DE ARTE Y DISEÑO · SANTA ELENA</div>
+          <div id="a-head"><div class="hm"><span id="a-head1">ARTE QUE SE SIENTE</span></div><div class="hm"><span id="a-head2">EN CASA.</span></div></div>
+
+          <div id="a-badge">
+            <svg id="a-badgeRing" viewBox="0 0 520 520">
+              <defs><path id="a-circ" d="M260 260 m-218 0 a218 218 0 1 1 436 0 a218 218 0 1 1 -436 0"/></defs>
+              <circle cx="260" cy="260" r="250" fill="none" stroke="#7D2E12" stroke-width="2.5"/>
+              <circle cx="260" cy="260" r="186" fill="none" stroke="#7D2E12" stroke-width="2.5"/>
+              <text font-family="JetBrains Mono" font-weight="700" font-size="31" letter-spacing="6.5" fill="#16110E"><textPath href="#a-circ">AMOR Y AMISTAD · ARTE · DISEÑO · AMOR Y AMISTAD · ARTE · DISEÑO ·</textPath></text>
+            </svg>
+            <div id="a-badgeDisc"><img src="assets/img/icono.png" alt=""></div>
+          </div>
+
+          <div id="a-st1" class="big2"><span>Esta también</span></div>
+          <div id="a-st2" class="big2"><span>es tu casa.</span></div>
+
+          <div id="a-eb2" class="mono">ADENTRO TE ESPERA</div>
+          <div id="a-tiles">
+            <div class="tile" id="a-t0"><img src="assets/fotos/obra.svg" alt=""></div>
+            <div class="tile" id="a-t1"><img src="assets/fotos/ceramica.svg" alt=""></div>
+            <div class="tile" id="a-t2"><img src="assets/fotos/taller.svg" alt=""></div>
+            <div class="tile" id="a-t3"><img src="assets/fotos/cabana.svg" alt=""></div>
+            <div class="tile" id="a-t4"><img src="assets/fotos/hongo.svg" alt=""></div>
+            <div class="tile" id="a-t5"><img src="assets/fotos/letrero.jpg" alt=""></div>
+          </div>
+          <div id="a-support">Obras, objetos y talleres<br>de artistas locales</div>
+          <div id="a-chipSector"><div data-dato="sector">Vereda El Placer · Sector Amor y Amistad</div></div>
+
+          <div id="a-cl1" class="big2"><span>Llegaste a</span></div>
+          <div id="a-cl2" class="big2"><span>casa.</span></div>
+          <img id="a-clLogo" src="assets/logo.png" alt="Casa Amiga">
+          <div id="a-clHandle" data-dato="usuario">@galeria.casaamiga</div>
+          <div id="a-clMono" class="mono" data-dato="cierre_mono">VEREDA EL PLACER · SANTA ELENA</div>
+
+          <!-- UI -->
+          <div id="a-sPage"></div>
+          <div id="a-search">
+            <div id="a-sIcon">
+              <svg id="a-sPinIc" viewBox="0 0 130 166"></svg>
+              <svg id="a-sBack" viewBox="0 0 46 46" style="opacity:0"><path d="M30 10 L16 23 L30 36" fill="none" stroke="#16110E" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div id="a-q"><span id="a-qPh">Busca aquí</span><span id="a-qTyped"></span><span id="a-caret" style="opacity:0"></span></div>
+            <svg id="a-mic" viewBox="0 0 40 40"><rect x="13" y="4" width="14" height="22" rx="7" fill="none" stroke="#7D2E12" stroke-width="3.5"/><path d="M7 19 a13 13 0 0 0 26 0 M20 32 v5" fill="none" stroke="#7D2E12" stroke-width="3.5" stroke-linecap="round"/></svg>
+          </div>
+          <div id="a-chips">
+            <div class="chip"><svg viewBox="0 0 30 30"><rect x="4" y="5" width="22" height="18" rx="3" fill="none" stroke="#F29021" stroke-width="3"/><path d="M7 20 l6 -7 l5 5 l3 -3 l3 5" fill="none" stroke="#F29021" stroke-width="2.6"/></svg>Galerías</div>
+            <div class="chip"><svg viewBox="0 0 30 30"><path d="M5 11 h16 v7 a7 7 0 0 1 -7 7 h-2 a7 7 0 0 1 -7 -7z M21 13 h3 a3 3 0 0 1 0 6 h-3" fill="none" stroke="#7D2E12" stroke-width="2.8"/></svg>Cafés</div>
+            <div class="chip"><svg viewBox="0 0 30 30"><path d="M3 24 L11 10 L16 17 L20 12 L27 24 Z" fill="none" stroke="#7D2E12" stroke-width="2.8" stroke-linejoin="round"/></svg>Miradores</div>
+            <div class="chip"><svg viewBox="0 0 30 30"><path d="M6 24 L18 12 M17 6 l7 7 l-4 4 l-7 -7z" fill="none" stroke="#7D2E12" stroke-width="2.8" stroke-linecap="round"/></svg>Talleres</div>
+          </div>
+
+          <div id="a-sugg">
+            <div class="row" id="a-r0"><div id="a-row1hl"></div><div class="ic"><svg viewBox="0 0 130 166" class="pinmini"></svg></div><div class="tx"><div class="t1">Casa Amiga</div><div class="t2">Galería de arte y diseño · Santa Elena</div></div><svg class="ar" viewBox="0 0 34 34"><path d="M9 25 L25 9 M12 9 H25 V22" fill="none" stroke="#6B625B" stroke-width="3" stroke-linecap="round"/></svg></div>
+            <div class="row" id="a-r1"><div class="ic"><svg viewBox="0 0 34 34"><circle cx="15" cy="15" r="9" fill="none" stroke="#6B625B" stroke-width="3"/><path d="M22 22 L29 29" stroke="#6B625B" stroke-width="3" stroke-linecap="round"/></svg></div><div class="tx"><div class="t1">Casa Amiga Santa Elena</div><div class="t2">Buscar</div></div><svg class="ar" viewBox="0 0 34 34"><path d="M9 25 L25 9 M12 9 H25 V22" fill="none" stroke="#6B625B" stroke-width="3" stroke-linecap="round"/></svg></div>
+            <div class="row" id="a-r2"><div class="ic"><svg viewBox="0 0 34 34"><circle cx="15" cy="15" r="9" fill="none" stroke="#6B625B" stroke-width="3"/><path d="M22 22 L29 29" stroke="#6B625B" stroke-width="3" stroke-linecap="round"/></svg></div><div class="tx"><div class="t1">Galerías en Santa Elena</div><div class="t2">Buscar cerca de Santa Elena</div></div><svg class="ar" viewBox="0 0 34 34"><path d="M9 25 L25 9 M12 9 H25 V22" fill="none" stroke="#6B625B" stroke-width="3" stroke-linecap="round"/></svg></div>
+            <div class="row" id="a-r3"><div class="ic"><svg viewBox="0 0 34 34"><path d="M17 31 C17 31 6 20 6 13 a11 11 0 0 1 22 0 c0 7 -11 18 -11 18z" fill="none" stroke="#6B625B" stroke-width="3"/><circle cx="17" cy="13" r="3.5" fill="#6B625B"/></svg></div><div class="tx"><div class="t1">Santa Elena</div><div class="t2">Corregimiento de Medellín, Antioquia</div></div><svg class="ar" viewBox="0 0 34 34"><path d="M9 25 L25 9 M12 9 H25 V22" fill="none" stroke="#6B625B" stroke-width="3" stroke-linecap="round"/></svg></div>
+          </div>
+
+          <div id="a-kbd"></div>
+
+          <div id="a-card">
+            <div class="grab"></div>
+            <div id="a-cardPhotoSlot"></div>
+            <div id="a-cTitle" data-dato="nombre">Casa Amiga</div>
+            <div id="a-cSub" data-dato="tipo">Galería de arte y diseño</div>
+            <div id="a-cLoc"><svg viewBox="0 0 34 34"><path d="M17 31 C17 31 6 20 6 13 a11 11 0 0 1 22 0 c0 7 -11 18 -11 18z" fill="#F29021"/><circle cx="17" cy="13" r="4" fill="#fff"/></svg><span data-dato="lugar">Vereda El Placer · Santa Elena</span></div>
+            <div id="a-btns">
+              <div class="btn pri" style="width:236px"><svg viewBox="0 0 30 30"><path d="M15 3 L27 15 L15 27 L3 15 Z" fill="#16110E"/><path d="M11 18 v-4 h7 M15 11 l3 3 l-3 3" fill="none" stroke="#F29021" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Cómo llegar</span></div>
+              <div class="btn sec" id="a-ini" style="width:170px"><div id="a-iniFill"></div><svg viewBox="0 0 30 30"><path d="M15 3 L25 26 L15 20 L5 26 Z" fill="#F29021" stroke="#7D2E12" stroke-width="2" stroke-linejoin="round"/></svg><span>Iniciar</span></div>
+              <div class="btn" style="width:182px"><svg viewBox="0 0 30 30"><path d="M8 4 h14 v22 l-7 -5 l-7 5 z" fill="none" stroke="#16110E" stroke-width="2.6" stroke-linejoin="round"/></svg><span>Guardar</span></div>
+              <div class="btn" style="width:190px"><svg viewBox="0 0 30 30"><circle cx="22" cy="7" r="3.5" fill="none" stroke="#16110E" stroke-width="2.4"/><circle cx="8" cy="15" r="3.5" fill="none" stroke="#16110E" stroke-width="2.4"/><circle cx="22" cy="23" r="3.5" fill="none" stroke="#16110E" stroke-width="2.4"/><path d="M11 13.5 L19 8.5 M11 16.5 L19 21.5" stroke="#16110E" stroke-width="2.4"/></svg><span>Compartir</span></div>
+            </div>
+          </div>
+
+          <div id="a-persist">
+            <div class="th"><img src="assets/fotos/letrero.jpg" alt=""></div>
+            <div class="pt"><div class="p1" data-dato="nombre">Casa Amiga</div><div class="p2">Santa Elena</div></div>
+            <div id="a-pTime"><svg viewBox="0 0 34 34" width="34" height="34"><path d="M6 21 l3 -8 a3 3 0 0 1 3 -2 h10 a3 3 0 0 1 3 2 l3 8 v6 h-4 v-3 h-14 v3 h-4z" fill="none" stroke="#16110E" stroke-width="2.6" stroke-linejoin="round"/></svg><span id="a-pTimeTx"></span></div>
+            <div id="a-pNav"><svg viewBox="0 0 34 34"><path d="M17 4 L28 30 L17 23 L6 30 Z" fill="#16110E"/></svg></div>
+            <div id="a-pProg"></div>
+          </div>
+
+          <div id="a-nav">
+            <svg viewBox="0 0 84 84"><path d="M24 70 V40 a10 10 0 0 1 10 -10 H58" fill="none" stroke="#FFF6EC" stroke-width="9" stroke-linecap="round"/><path d="M50 16 L66 30 L50 44" fill="none" stroke="#FFF6EC" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div><div class="n1">EN RUTA</div><div class="n2">Desde El Silletero hacia<br>Vereda El Placer</div></div>
+          </div>
+
+          <div id="a-status"><span>5:48</span><span class="icons">
+            <svg width="34" height="22" viewBox="0 0 34 22"><rect x="0" y="14" width="6" height="8" rx="1.5" fill="#16110E"/><rect x="9" y="10" width="6" height="12" rx="1.5" fill="#16110E"/><rect x="18" y="5" width="6" height="17" rx="1.5" fill="#16110E"/><rect x="27" y="0" width="6" height="22" rx="1.5" fill="#16110E"/></svg>
+            <svg width="48" height="24" viewBox="0 0 48 24"><rect x="1" y="1" width="40" height="22" rx="6" fill="none" stroke="#16110E" stroke-width="2"/><rect x="4" y="4" width="30" height="16" rx="3.5" fill="#16110E"/><rect x="43" y="8" width="4" height="8" rx="2" fill="#16110E"/></svg></span></div>
+          <div id="a-island"></div>
+          <div id="a-tap"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    /*CONFIG:BEGIN*/
+    const CONFIG = {"footage":18,"handoff":15.6,"hitos":[{"n":1,"nombre":"El Silletero","pos":0},{"n":2,"nombre":"Finca silletera Óscar Londoño","pos":0.19},{"n":3,"nombre":"Panchocha Santa Elena","pos":0.38},{"n":4,"nombre":"Restaurante Artesano","pos":0.56},{"n":5,"nombre":"La Samaria","pos":0.76},{"n":6,"nombre":"Casa Amiga · Vereda El Placer","pos":1}],"datos":{"usuario":"@galeria.casaamiga","nombre":"Casa Amiga","tipo":"Galería de arte y diseño","lugar":"Vereda El Placer · Santa Elena","sector":"Vereda El Placer · Sector Amor y Amistad","lema":"ARTE QUE SE SIENTE EN CASA.","eyebrow":"GALERÍA DE ARTE Y DISEÑO · SANTA ELENA","cierre_mono":"VEREDA EL PLACER · SANTA ELENA","tiempo":""}};
+    
+/*CONFIG:END*/
+
+    const R = document.querySelector('[data-composition-id="app"]');
+    const $ = (id) => R.querySelector('#' + id);
+    const NS = 'http://www.w3.org/2000/svg';
+    const F = CONFIG.footage, HO = CONFIG.handoff;
+    const C0 = HO + F - 0.9, C1 = HO + F, END = C1 + 3.9; // total = 16.5 + metraje + 3.0
+    R.setAttribute('data-duration', String(END));
+
+    // ---------- datos de marca ----------
+    R.querySelectorAll('[data-dato]').forEach((el) => { const v = CONFIG.datos[el.getAttribute('data-dato')]; if (v) el.textContent = v; });
+    if (CONFIG.datos.tiempo) { $('a-pTimeTx').textContent = CONFIG.datos.tiempo; } else { $('a-pTime').style.display = 'none'; }
+    const lema = (CONFIG.datos.lema || '').trim(); if (lema) { const w = lema.split(' '); const cut = Math.max(1, w.length - 2); $('a-head1').textContent = w.slice(0, cut).join(' '); $('a-head2').textContent = w.slice(cut).join(' '); }
+
+    // ---------- utilidades deterministas ----------
+    const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+    const seg = (t, a, b) => clamp((t - a) / (b - a));
+    const lerp = (a, b, u) => a + (b - a) * u;
+    const ioc = (u) => (u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+    const ios = (u) => -(Math.cos(Math.PI * u) - 1) / 2;
+    const eo3 = (u) => 1 - Math.pow(1 - u, 3);
+    const ei3 = (u) => u * u * u;
+    const expoOut = (u) => (u >= 1 ? 1 : 1 - Math.pow(2, -10 * u));
+    function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+    function catmull(pts, n = 16) { const out = []; for (let i = 0; i < pts.length - 1; i++) { const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)]; for (let k = 0; k < n; k++) { const t = k / n, t2 = t * t, t3 = t2 * t; out.push([0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3), 0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3)]); } } out.push(pts[pts.length - 1]); return out; }
+    function polyInfo(pl) { const L = [0]; for (let i = 1; i < pl.length; i++) L.push(L[i - 1] + Math.hypot(pl[i][0] - pl[i - 1][0], pl[i][1] - pl[i - 1][1])); return { pl, L, total: L[L.length - 1] }; }
+    function pointAt(info, f) { const d = clamp(f) * info.total; let i = 1; while (i < info.L.length - 1 && info.L[i] < d) i++; const a = info.pl[i - 1], b = info.pl[i]; const u = (d - info.L[i - 1]) / Math.max(1e-6, info.L[i] - info.L[i - 1]); return [lerp(a[0], b[0], u), lerp(a[1], b[1], u), Math.atan2(b[1] - a[1], b[0] - a[0])]; }
+    const dOf = (pl) => 'M' + pl.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+    function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+    function noisyLoop(cx, cy, rx, ry, rnd, amp, n = 48) { const pts = []; const ph = rnd() * 6.28, ph2 = rnd() * 6.28; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; const k = 1 + amp * Math.sin(a * 3 + ph) + amp * .6 * Math.sin(a * 5 + ph2); pts.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k]); } return 'M' + pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L') + 'Z'; }
+
+    // ---------- pin de marca ----------
+    const PIN = '<path d="M65 163 C65 163 9 101 9 62 A56 56 0 1 1 121 62 C121 101 65 163 65 163Z" fill="#F29021"/>' +
+      '<path d="M65 163 C65 163 9 101 9 62 A56 56 0 1 1 121 62 C121 101 65 163 65 163Z" fill="none" stroke="#7D2E12" stroke-opacity=".35" stroke-width="2"/>' +
+      '<circle cx="65" cy="62" r="45" fill="#FFF8EF"/>' +
+      '<image href="assets/img/icono.png" x="27" y="25" width="76" height="71"/>';
+    ['a-heroPin', 'a-pin', 'a-sPinIc'].forEach((id) => { $(id).innerHTML = PIN; });
+    R.querySelectorAll('.pinmini').forEach((s) => { s.innerHTML = PIN; });
+
+    // ---------- bokeh estático ----------
+    (function () { const rnd = mulberry32(11); const b = $('a-bokeh'); for (let i = 0; i < 9; i++) { const d = document.createElement('div'); d.className = 'bokeh'; const s = 40 + rnd() * 70; d.style.cssText = `left:${40 + i * 118 + rnd() * 40}px;top:${20 + rnd() * 120}px;width:${s}px;height:${s}px;opacity:${(0.10 + rnd() * 0.10).toFixed(2)}`; b.appendChild(d); } })();
+
+    // ---------- teclado ----------
+    (function () { const rows = ['qwertyuiop', 'asdfghjklñ', 'zxcvbnm']; const k = $('a-kbd'); let h = '';
+      rows.forEach((r, i) => { h += '<div class="krow">' + (i === 2 ? '<div class="key w">⇧</div>' : '') + r.split('').map((c) => `<div class="key">${c}</div>`).join('') + (i === 2 ? '<div class="key w">⌫</div>' : '') + '</div>'; });
+      h += '<div class="krow"><div class="key w">123</div><div class="key w">☺</div><div class="key sp">espacio</div><div class="key go">Buscar</div></div>'; k.innerHTML = h; })();
+
+    // ================= MAPA DIGITAL (mundo 3000×3000) =================
+    const mapD = $('a-mapD');
+    const defsD = el('defs', {}, mapD);
+    defsD.innerHTML = '<filter id="a-hillBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40"/></filter>';
+    const camD = el('g', {}, mapD);
+    el('rect', { x: -2000, y: -2000, width: 7000, height: 7000, fill: '#F3EDE3' }, camD);
+    const rndD = mulberry32(42);
+    const hills = el('g', { filter: 'url(#a-hillBlur)' }, camD);
+    for (let i = 0; i < 70; i++) { const x = 1250 + rndD() * 1900, y = 200 + rndD() * 2600; el('ellipse', { cx: x, cy: y, rx: 120 + rndD() * 220, ry: 90 + rndD() * 180, fill: rndD() < .5 ? '#C9CFA6' : '#B7C092', opacity: (0.45 + rndD() * .35).toFixed(2) }, hills); }
+    for (let i = 0; i < 18; i++) { const x = 200 + rndD() * 500, y = 300 + rndD() * 2600; el('ellipse', { cx: x, cy: y, rx: 140 + rndD() * 160, ry: 120 + rndD() * 140, fill: '#CBD0A9', opacity: .45 }, hills); }
+    const cont = el('g', { fill: 'none', stroke: '#9EA27A', 'stroke-opacity': '.33', 'stroke-width': 2.2 }, camD);
+    [[1700, 900, 300, 240], [2300, 700, 360, 260], [2700, 1500, 300, 380], [1900, 2200, 380, 300], [2600, 2400, 300, 260], [2200, 1700, 260, 180], [350, 900, 200, 260]].forEach(([cx, cy, rx, ry]) => { for (let k = 1; k <= 6; k++) el('path', { d: noisyLoop(cx, cy, rx * k / 6, ry * k / 6, rndD, .08) }, cont); });
+    // valle y ciudad
+    el('path', { d: noisyLoop(820, 1700, 470, 1000, rndD, .04), fill: '#F8F3EA' }, camD);
+    el('path', { d: dOf(catmull([[560, 200], [640, 700], [700, 1200], [780, 1700], [820, 2200], [900, 2900]], 12)), fill: 'none', stroke: '#C7D3C2', 'stroke-width': 30, 'stroke-linecap': 'round' }, camD);
+    const city = el('g', { transform: 'rotate(8 820 1700)' }, camD);
+    for (let gx = 420; gx < 1220; gx += 58) for (let gy = 760; gy < 2660; gy += 58) { const dx = (gx - 820) / 430, dy = (gy - 1700) / 950; if (dx * dx + dy * dy > 1 || rndD() < .1) continue; el('rect', { x: gx, y: gy, width: 46, height: 46, rx: 4, fill: rndD() < .12 ? '#E3DDC6' : '#EAE2D5' }, city); }
+    const roadsD = el('g', { fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, camD);
+    const roadPaths = [];
+    roadPaths.push([[650, 300], [700, 900], [760, 1500], [800, 2100], [860, 2800]]);
+    roadPaths.push([[420, 1200], [820, 1240], [1250, 1300]]);
+    roadPaths.push([[400, 2000], [820, 2040], [1240, 2080]]);
+    roadPaths.push([[520, 1600], [930, 1640]]);
+    roadPaths.push([[1600, 1500], [1650, 1200], [1820, 1000], [2050, 900], [2400, 860], [2700, 760]]);
+    roadPaths.push([[2180, 1400], [2250, 1650], [2420, 1900], [2600, 2050], [2900, 2100]]);
+    roadPaths.push([[2400, 1300], [2650, 1360], [2900, 1300]]);
+    roadPaths.forEach((p) => { const d = dOf(catmull(p, 14)); el('path', { d, stroke: '#E0D3C1', 'stroke-width': 20 }, roadsD); el('path', { d, stroke: '#FFFFFF', 'stroke-width': 13 }, roadsD); });
+    const mainPts = [[930, 1640], [1080, 1600], [1200, 1520], [1330, 1560], [1480, 1600], [1600, 1500], [1720, 1380], [1880, 1420], [2030, 1470], [2180, 1400], [2300, 1340], [2400, 1300], [2480, 1240], [2560, 1180]];
+    const mainInfo = polyInfo(catmull(mainPts, 18));
+    const mainD = dOf(mainInfo.pl);
+    el('path', { d: mainD, stroke: '#E0D3C1', 'stroke-width': 26 }, roadsD);
+    el('path', { d: mainD, stroke: '#FFFDF8', 'stroke-width': 18 }, roadsD);
+    const routeD = el('path', { d: mainD, fill: 'none', stroke: '#F29021', 'stroke-width': 14, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1000, 'stroke-dasharray': '1000 1400', 'stroke-dashoffset': 1000, opacity: 0 }, camD);
+    // pinos
+    const pinesD = el('g', {}, camD);
+    for (let i = 0; i < 340; i++) { const x = 1300 + rndD() * 1750, y = 150 + rndD() * 2700; const s = .8 + rndD() * .7; el('path', { d: `M${x} ${y - 18 * s} L${x + 10 * s} ${y + 4 * s} L${x - 10 * s} ${y + 4 * s}Z`, fill: rndD() < .5 ? '#7E8A57' : '#93A06A', opacity: .9 }, pinesD); }
+    // etiquetas
+    const lab = (x, y, txt, size, w, fill, ls = 0) => { const t = el('text', { x, y, 'font-family': 'Inter', 'font-size': size, 'font-weight': w, fill, 'text-anchor': 'middle', 'letter-spacing': ls, 'paint-order': 'stroke', stroke: '#F6F0E6', 'stroke-width': size * .18 }, camD); t.textContent = txt; return t; };
+    lab(800, 1460, 'MEDELLÍN', 70, 800, '#7A6E64', 14);
+    lab(1000, 2120, 'El Poblado', 34, 600, '#857A70');
+    lab(2010, 1330, 'Santa Elena', 20, 700, '#4E463F');
+    lab(2420, 830, 'Parque Arví', 17, 600, '#5E6B44');
+    lab(2575, 1232, 'Vereda El Placer', 11, 700, '#4E463F');
+    // casita destino
+    el('circle', { cx: 2560, cy: 1180, r: 6, fill: '#7D2E12' }, camD);
+
+    function camApply(g, cx, cy, z) { g.setAttribute('transform', `translate(427 733) scale(${z.toFixed(5)}) translate(${(-cx).toFixed(3)} ${(-cy).toFixed(3)})`); }
+    const DA = { cx: 1150, cy: 1650, z: 0.62 };
+    const DB = { cx: 2560, cy: 1180 + (733 - 560) / 2.6, z: 2.6 };
+    const CASA_D = [2560, 1180];
+    function camDigital(t) {
+      if (t < 4.15) { const u = seg(t, 1.6, 4.15); return { cx: DA.cx + 40 * u, cy: DA.cy - 20 * u, z: DA.z }; }
+      const u = ioc(seg(t, 4.15, 4.92)); const A = { cx: DA.cx + 40, cy: DA.cy - 20, z: DA.z };
+      const lz = lerp(Math.log(A.z), Math.log(DB.z), u) - 0.55 * Math.sin(Math.PI * u);
+      return { cx: lerp(A.cx, DB.cx, u), cy: lerp(A.cy, DB.cy, u), z: Math.exp(lz) };
+    }
+
+    // ================= MAPA DIBUJADO (mundo 1000×1700) =================
+    const mapS = $('a-mapS');
+    const defsS = el('defs', {}, mapS);
+    defsS.innerHTML = '<filter id="a-wob" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5"/></filter>' +
+      '<filter id="a-paper"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="3" seed="9"/><feColorMatrix type="matrix" values="0 0 0 0 .45  0 0 0 0 .35  0 0 0 0 .25  0 0 0 .09 0"/></filter>';
+    const camS = el('g', {}, mapS);
+    el('rect', { x: -1500, y: -1500, width: 4000, height: 4700, fill: '#FBF5EA' }, camS);
+    el('rect', { x: -1500, y: -1500, width: 4000, height: 4700, filter: 'url(#a-paper)' }, camS);
+    const ink = el('g', { filter: 'url(#a-wob)', fill: 'none', stroke: '#2B1D17', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, camS);
+    const rndS = mulberry32(77);
+    const routePts = [[470, 1580], [600, 1480], [610, 1360], [420, 1270], [360, 1150], [520, 1050], [620, 930], [520, 820], [390, 720], [440, 600], [610, 500], [620, 400], [520, 320], [540, 232]];
+    const routeInfo = polyInfo(catmull(routePts, 20));
+    const routeSd = dOf(routeInfo.pl);
+    const nearRoute = (x, y, r) => { for (let i = 0; i < routeInfo.pl.length; i += 3) { const p = routeInfo.pl[i]; if (Math.hypot(p[0] - x, p[1] - y) < r) return true; } return false; };
+    // montañas
+    const mount = (x0, y0, w, h, n) => { let d = `M${x0} ${y0}`; const pk = []; for (let i = 0; i < n; i++) { const xa = x0 + (i + .5) * w / n, ya = y0 - h * (.55 + rndS() * .45); pk.push([xa, ya]); d += ` L${xa.toFixed(1)} ${ya.toFixed(1)} L${(x0 + (i + 1) * w / n).toFixed(1)} ${(y0 - h * .15 * rndS()).toFixed(1)}`; } el('path', { d, 'stroke-width': 3.2 }, ink); pk.forEach(([px, py]) => { for (let k = 0; k < 4; k++) el('path', { d: `M${px + 6 + k * 9} ${py + 14 + k * 12} l${14 + k * 3} ${18 + k * 4}`, 'stroke-width': 1.6 }, ink); }); };
+    mount(-200, 180, 520, 170, 4); mount(640, 160, 560, 150, 4); mount(-260, 620, 360, 150, 3); mount(760, 760, 420, 160, 3); mount(-240, 1180, 380, 140, 3); mount(760, 1330, 420, 150, 3); mount(-100, 1720, 500, 110, 4); mount(650, 1760, 500, 120, 4);
+    // pinos
+    const tree = (x, y, s) => el('path', { d: `M${x} ${y} V${y - 42 * s} M${x} ${y - 42 * s} L${x - 11 * s} ${y - 27 * s} M${x} ${y - 42 * s} L${x + 11 * s} ${y - 27 * s} M${x} ${y - 31 * s} L${x - 16 * s} ${y - 14 * s} M${x} ${y - 31 * s} L${x + 16 * s} ${y - 14 * s} M${x} ${y - 19 * s} L${x - 21 * s} ${y - 1 * s} M${x} ${y - 19 * s} L${x + 21 * s} ${y - 1 * s}`, 'stroke-width': 2.2 }, ink);
+    let placed = 0; for (let i = 0; i < 900 && placed < 150; i++) { const x = -150 + rndS() * 1300, y = 120 + rndS() * 1650; if (nearRoute(x, y, 70)) continue; tree(x, y, .7 + rndS() * .6); placed++; }
+    // casitas
+    const house = (x, y, s) => { el('path', { d: `M${x - 17 * s} ${y} V${y - 20 * s} L${x} ${y - 36 * s} L${x + 17 * s} ${y - 20 * s} V${y} Z M${x - 5 * s} ${y} V${y - 11 * s} H${x + 5 * s} V${y}`, 'stroke-width': 2.4, fill: '#FBF5EA' }, ink); };
+    // vía (doble línea)
+    el('path', { d: routeSd, 'stroke-width': 30, stroke: '#2B1D17' }, ink);
+    el('path', { d: routeSd, 'stroke-width': 23, stroke: '#FBF5EA' }, ink);
+    el('path', { d: routeSd, 'stroke-width': 2, stroke: '#2B1D17', 'stroke-dasharray': '10 14', 'stroke-opacity': .55 }, ink);
+    // título y norte
+    const tS = el('text', { x: 40, y: 110, 'font-family': 'Caveat', 'font-weight': 700, 'font-size': 58, fill: '#2B1D17' }, camS); tS.textContent = '¿Cómo llegar a Casa Amiga?';
+    el('path', { d: 'M40 128 Q300 140 600 124', stroke: '#F29021', 'stroke-width': 5, fill: 'none', 'stroke-linecap': 'round' }, camS);
+    const nG = el('g', { transform: 'translate(905 300)' }, camS); el('path', { d: 'M0 -40 L12 10 L0 2 L-12 10 Z', fill: '#2B1D17' }, nG); const nT = el('text', { x: 0, y: -48, 'text-anchor': 'middle', 'font-family': 'Caveat', 'font-weight': 700, 'font-size': 34, fill: '#2B1D17' }, nG); nT.textContent = 'N';
+    // ruta naranja
+    const routeS = el('path', { d: routeSd, fill: 'none', stroke: '#F29021', 'stroke-width': 11, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: 1000, 'stroke-dasharray': '1000 1400', 'stroke-dashoffset': 1000 }, camS);
+    const head = el('circle', { r: 13, fill: '#F29021', stroke: '#FBF5EA', 'stroke-width': 5, opacity: 0 }, camS);
+    // hitos
+    const lmG = el('g', {}, camS);
+    const LM = CONFIG.hitos.map((h, i) => {
+      const [x, y] = pointAt(routeInfo, h.pos); const side = (i % 2 === 0) ? 1 : -1; const last = i === CONFIG.hitos.length - 1;
+      if (!last) house(x + side * 70, y + 10, .9);
+      const g = el('g', { opacity: 0 }, lmG);
+      const inner = el('g', {}, g);
+      el('circle', { cx: 0, cy: 0, r: 22, fill: last ? '#F29021' : '#FBF5EA', stroke: '#2B1D17', 'stroke-width': 3 }, inner);
+      const nn = el('text', { x: 0, y: 11, 'text-anchor': 'middle', 'font-family': 'Caveat', 'font-weight': 700, 'font-size': 34, fill: '#2B1D17' }, inner); nn.textContent = h.n;
+      const lx = side * 38, anchor = side > 0 ? 'start' : 'end';
+      const words = h.nombre.split(' '); const lines = []; let cur = ''; words.forEach((w) => { if ((cur + ' ' + w).trim().length > 16) { lines.push(cur.trim()); cur = w; } else cur += ' ' + w; }); lines.push(cur.trim());
+      lines.forEach((ln, k) => { const tt = el('text', { x: lx, y: 12 + (k - (lines.length - 1) / 2) * 34, 'text-anchor': anchor, 'font-family': 'Caveat', 'font-weight': 700, 'font-size': 36, fill: '#2B1D17', 'paint-order': 'stroke', stroke: '#FBF5EA', 'stroke-width': 7 }, inner); tt.textContent = ln; });
+      return { g, inner, x, y, pos: h.pos };
+    });
+    const CASA_S = pointAt(routeInfo, 1);
+    const SO = { cx: 500, cy: 900, z: 0.84 };
+    const S0 = { cx: CASA_S[0], cy: CASA_S[1] + (733 - 560) / 2.6, z: 2.6 };
+    const ZF = 3.3;
+    function followCam(p) { const [hx, hy] = pointAt(routeInfo, p); const z = lerp(SO.z, ZF, Math.pow(p, 2.1)); const m = ios(clamp(p * 1.15)); return { cx: lerp(SO.cx, hx, m), cy: lerp(SO.cy, hy + (733 - 600) / z, m), z }; }
+    const SC = { cx: CASA_S[0] + 10, cy: CASA_S[1] + (733 - 820) / 1.45, z: 1.45 };
+    function camSketch(t) {
+      if (t >= C0) return SC;
+      if (t < 8.85) return S0;
+      if (t < 9.12) { const u = ioc(seg(t, 8.85, 9.12)); return { cx: lerp(S0.cx, SO.cx, u), cy: lerp(S0.cy, SO.cy, u), z: Math.exp(lerp(Math.log(S0.z), Math.log(SO.z), u)) }; }
+      return followCam(routeP(t));
+    }
+    const routeP = (t) => (t >= C0 ? 1 : ios(seg(t, 9.12, 9.78)));
+
+    // ---------- proyección ----------
+    const proj = (cam, w) => [(w[0] - cam.cx) * cam.z + 427, (w[1] - cam.cy) * cam.z + 733];
+
+    // ================= RENDER (todo depende sólo de t) =================
+    const pinEl = $('a-pin'), pinSh = $('a-pinShadow'), pinLab = $('a-pinLabel'), chev = $('a-chev');
+    const sketchWrap = $('a-sketchWrap');
+    const typedEl = $('a-qTyped'), phEl = $('a-qPh'), caret = $('a-caret');
+    const QUERY = 'Casa Amiga Santa Elena';
+    const badgeRing = $('a-badgeRing'), pProg = $('a-pProg');
+    function render(t) {
+      // cámaras
+      const cd = camDigital(t); camApply(camD, cd.cx, cd.cy, cd.z);
+      const cs = camSketch(t); camApply(camS, cs.cx, cs.cy, cs.z);
+      // filtro del mapa digital durante la transformación
+      const mu = seg(t, 8.35, 8.85); const flyBlur = Math.sin(Math.PI * seg(t, 4.15, 4.92)) * 2.2;
+      mapD.style.filter = (t > 8.3 && t < 9.2) ? `sepia(${(mu * .5).toFixed(3)}) saturate(${(1 - mu * .4).toFixed(3)})` : (flyBlur > .05 ? `blur(${flyBlur.toFixed(2)}px)` : 'none');
+      // máscara del mapa dibujado (morph radial desde el pin)
+      let R0 = 0, show = 0;
+      if (t >= 8.35 && t < 9.95) { R0 = lerp(0, 1800, ioc(seg(t, 8.35, 8.88))); show = 1; }
+      if (t >= C0 - 0.05) { R0 = 2400; show = 1; }
+      sketchWrap.style.opacity = show;
+      const mk = `radial-gradient(circle at 427px 560px, #000 ${Math.max(0, R0 - 140).toFixed(1)}px, transparent ${R0.toFixed(1)}px)`;
+      sketchWrap.style.webkitMaskImage = mk; sketchWrap.style.maskImage = mk;
+      const sb = Math.sin(Math.PI * seg(t, 9.2, 9.78)) * 1.6; mapS.style.filter = sb > .05 && t < C0 ? `blur(${sb.toFixed(2)}px)` : 'none';
+      // ruta dibujada
+      const p = routeP(t);
+      routeS.setAttribute('stroke-dashoffset', (1000 * (1 - p)).toFixed(2));
+      routeS.setAttribute('opacity', p > 0.002 ? 1 : 0);
+      const hp = pointAt(routeInfo, p); head.setAttribute('cx', hp[0]); head.setAttribute('cy', hp[1]); head.setAttribute('opacity', (t > 9.1 && t < 9.8) ? 1 : 0);
+      LM.forEach((m, i) => { const s = (t >= C0) ? 1 : clamp((p - m.pos + 0.02) / 0.07) * (p > 0 ? 1 : 0); const k = expoOut(s); m.g.setAttribute('opacity', s.toFixed(3)); m.g.setAttribute('transform', `translate(${m.x} ${m.y}) scale(${(0.6 + 0.4 * k).toFixed(3)})`); });
+      // ruta digital (navegación)
+      const rd = ioc(seg(t, 15.4, 15.85)); routeD.setAttribute('stroke-dashoffset', (1000 * (1 - rd)).toFixed(2)); routeD.setAttribute('opacity', rd > 0.002 && t < C0 ? 1 : 0);
+      const chu = expoOut(seg(t, 15.62, 15.9)); const cp = pointAt(mainInfo, 0.86); const cps = proj(cd, cp);
+      chev.style.opacity = (t < C0 ? chu : 0).toFixed(3); chev.style.transform = `translate(${(cps[0] - 38).toFixed(1)}px, ${(cps[1] - 38).toFixed(1)}px) rotate(${(cp[2] * 180 / Math.PI + 90).toFixed(1)}deg) scale(${(0.6 + 0.4 * chu).toFixed(3)})`;
+
+      // ---------- pin ----------
+      let px = 427, py = 560, ps = 1, po = 0, drop = 0, sh = 0;
+      const dPin = proj(cd, CASA_D), sPin = proj(cs, CASA_S);
+      if (t >= 4.9 && t < 8.4) { [px, py] = dPin; const u = seg(t, 4.9, 5.12); drop = (1 - u * u) * -300; po = u > 0 ? 1 : 0; po *= 1 - seg(t, 6.62, 6.82); const land = seg(t, 5.12, 5.3); ps = 1 + 0.06 * Math.sin(Math.PI * land) ; sh = u; }
+      else if (t >= 8.4 && t < 9.95) { [px, py] = (t < 8.88 ? dPin : sPin); ps = cs.z / 2.6; if (t < 8.88) ps = 1; po = (t < 8.5 ? seg(t, 8.3, 8.5) : 1) * (1 - seg(t, 9.8, 9.95)); sh = 1; }
+      else if (t >= 14.38 && t < C0) {
+        const cx0 = 427, cy0 = 740; const back = ioc(seg(t, 15.15, 15.5));
+        px = lerp(cx0, dPin[0], back); py = lerp(cy0, dPin[1], back);
+        const e = expoOut(seg(t, 14.4, 14.85)); ps = lerp(.2, 1.35, e) * lerp(1, 1 / 1.35, back); po = seg(t, 14.4, 14.5); sh = back;
+      }
+      else if (t >= C1 - 0.02) {
+        const u = seg(t, C1 + 0.02, C1 + 0.26); const mv = ioc(seg(t, C1 + 1.1, C1 + 1.5));
+        const [sx, sy] = sPin; px = lerp(sx, 427, mv); py = lerp(sy, 935, mv); drop = (1 - u * u) * -320 * (1 - mv);
+        po = (u > 0 ? 1 : 0) * (1 - seg(t, C1 + 1.3, C1 + 1.5)); ps = lerp(1.1, 1.6, mv); sh = u * (1 - mv);
+      }
+      pinEl.style.opacity = po.toFixed(3);
+      pinEl.style.transform = `translate(${(px - 65).toFixed(1)}px, ${(py - 162 + drop).toFixed(1)}px) scale(${ps.toFixed(4)})`;
+      pinSh.style.opacity = (po * sh * .9).toFixed(3);
+      pinSh.style.transform = `translate(${(px - 45).toFixed(1)}px, ${(py - 12).toFixed(1)}px) scale(${(0.4 + 0.6 * sh) * ps})`;
+      const lo = clamp(seg(t, 5.18, 5.4) * (1 - seg(t, 5.75, 5.9)));
+      pinLab.style.opacity = lo.toFixed(3); pinLab.style.filter = lo < 1 ? `blur(${((1 - lo) * 6).toFixed(2)}px)` : 'none';
+      pinLab.style.transform = `translate(${(dPin[0] + 70).toFixed(1)}px, ${(dPin[1] - 150).toFixed(1)}px)`;
+
+      // ---------- tipeo ----------
+      const n = Math.floor(seg(t, 3.12, 3.82) * QUERY.length + 1e-6);
+      let typed = QUERY.slice(0, n);
+      if (t >= 4.1 && t < 4.9) typed = 'Casa Amiga';
+      if (t >= 4.9 && t < C0) typed = 'Casa Amiga';
+      typedEl.textContent = typed; phEl.style.display = (t >= 2.68) ? 'none' : 'inline';
+      const blinkOn = Math.floor((t - 2.7) / 0.5) % 2 === 0 || (t > 3.12 && t < 3.86);
+      caret.style.opacity = (t >= 2.7 && t < 4.05 && blinkOn) ? 1 : 0;
+
+      // ---------- insignia y progreso ----------
+      badgeRing.style.transform = `rotate(${(t * 22).toFixed(2)}deg)`;
+      pProg.style.transform = `scaleX(${(0.04 + 0.96 * seg(t, 6.6, 15.15)).toFixed(4)})`;
+    }
+
+    // ================= LÍNEA DE TIEMPO (GSAP) =================
+    const tl = gsap.timeline({ paused: true, onUpdate: () => render(tl.time()) });
+    const S = (sel) => R.querySelector(sel);
+    const tap = (x, y, at) => { tl.set('#a-tap', { x, y }, at); tl.fromTo('#a-tap', { opacity: 0, scale: .55 }, { opacity: 1, scale: 1, duration: .12, ease: 'power2.out' }, at); tl.to('#a-tap', { opacity: 0, scale: 1.1, duration: .22, ease: 'power2.in' }, at + .16); };
+
+    tl.set('#a-photo img', { xPercent: -50, yPercent: -46 }, 0);
+    // 0.0–0.6 llega el pin
+    tl.fromTo('#a-heroPin', { scale: .34, y: 0 }, { scale: 1, duration: .6, ease: 'back.out(1.15)' }, 0);
+    tl.fromTo('#a-heroGlow', { opacity: .15, scale: .6 }, { opacity: .55, scale: 1, duration: .6, ease: 'power2.out' }, 0);
+    // 0.6–1.5 pin pequeño + frase
+    tl.to('#a-heroPin', { scale: .42, y: -205, duration: .45, ease: 'power3.inOut' }, .6);
+    tl.to('#a-heroGlow', { scale: .35, y: -300, opacity: .45, duration: .45, ease: 'power3.inOut' }, .6);
+    tl.fromTo('#a-in1 span', { yPercent: 110 }, { yPercent: 0, duration: .5, ease: 'power4.out' }, .74);
+    tl.fromTo('#a-in2 span', { yPercent: 110 }, { yPercent: 0, duration: .5, ease: 'power4.out' }, .84);
+    tl.to(['#a-in1 span', '#a-in2 span'], { yPercent: -112, duration: .2, ease: 'power3.in', stagger: .04 }, 1.4);
+    tl.set(['#a-in1', '#a-in2'], { opacity: 0 }, 1.66);
+    tl.to('#a-heroPin', { y: -380, scale: .2, opacity: 0, filter: 'blur(6px)', duration: .26, ease: 'power3.in' }, 1.42);
+    tl.to('#a-heroGlow', { opacity: 0, duration: .25 }, 1.42);
+    // 1.5–2.4 el teléfono sube
+    tl.fromTo('#a-phone', { y: 1720, rotationX: 24, scale: .9, transformOrigin: '50% 0%' }, { y: 0, rotationX: 0, scale: 1, duration: .95, ease: 'expo.out' }, 1.45);
+    tl.fromTo('#a-search', { y: -30, opacity: 0 }, { y: 0, opacity: 1, duration: .45, ease: 'power3.out' }, 1.75);
+    tl.fromTo('#a-chips .chip', { y: -16, opacity: 0 }, { y: 0, opacity: 1, duration: .4, ease: 'power3.out', stagger: .05 }, 1.85);
+    // 2.4–3.2 acercamiento al buscador + teclado
+    tl.to('#a-phone', { scale: 1.07, y: 40, transformOrigin: '50% 8%', duration: .55, ease: 'power2.inOut' }, 2.4);
+    tap(240, 144, 2.55);
+    tl.to('#a-sPage', { opacity: 1, duration: .2, ease: 'power1.out' }, 2.66);
+    tl.to('#a-chips', { opacity: 0, duration: .15 }, 2.66);
+    tl.to('#a-sPinIc', { opacity: 0, scale: .6, duration: .15 }, 2.66);
+    tl.fromTo('#a-sBack', { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: .2 }, 2.72);
+    tl.fromTo('#a-kbd', { yPercent: 100 }, { yPercent: 0, duration: .45, ease: 'expo.out' }, 2.74);
+    // 3.2–4.0 sugerencias
+    tl.fromTo('#a-sugg .row', { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .32, ease: 'power3.out', stagger: .07 }, 3.42);
+    // 4.0 toque en el primer resultado
+    tap(300, 292, 3.98);
+    tl.to('#a-row1hl', { opacity: 1, duration: .08 }, 4.02);
+    tl.to('#a-kbd', { yPercent: 100, duration: .26, ease: 'power3.in' }, 4.08);
+    tl.to('#a-sugg', { opacity: 0, duration: .18 }, 4.12);
+    tl.to('#a-sPage', { opacity: 0, duration: .22 }, 4.14);
+    tl.to('#a-sBack', { opacity: 0, duration: .15 }, 4.14);
+    tl.to('#a-sPinIc', { opacity: 1, scale: 1, duration: .2 }, 4.2);
+    tl.to('#a-phone', { scale: 1, y: 0, duration: .6, ease: 'power2.inOut' }, 4.1);
+    // 5.8–6.6 tarjeta del lugar
+    tl.fromTo('#a-card', { yPercent: 105 }, { yPercent: 0, duration: .6, ease: 'expo.out' }, 5.78);
+    tl.set('#a-photo', { opacity: 1 }, 5.78);
+    tl.fromTo('#a-photo', { y: 700, borderRadius: 28 }, { y: 0, duration: .6, ease: 'expo.out' }, 5.78);
+    // 6.6–7.5 la foto crece; marca
+    tl.fromTo('#a-white', { opacity: 0, clipPath: 'circle(2400px at 427px 600px)' }, { opacity: 1, duration: .35, ease: 'power2.inOut' }, 6.62);
+    tl.to('#a-card', { yPercent: 105, duration: .38, ease: 'power3.in' }, 6.62);
+    tl.to('#a-search', { y: -30, opacity: 0, duration: .25, ease: 'power3.in' }, 6.62);
+    tl.to('#a-photo', { x: 79, y: -674, width: 640, height: 640, borderRadius: 40, duration: .6, ease: 'power3.inOut' }, 6.6);
+    tl.fromTo('#a-persist', { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: .45, ease: 'expo.out' }, 6.85);
+    tl.fromTo('#a-firma', { opacity: 0, filter: 'blur(8px)', y: 10 }, { opacity: 1, filter: 'blur(0px)', y: 0, duration: .3, ease: 'power3.out' }, 6.98);
+    tl.fromTo('#a-eyebrow', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: .25, ease: 'power3.out' }, 7.08);
+    tl.fromTo(['#a-head1', '#a-head2'], { yPercent: 105 }, { yPercent: 0, duration: .38, ease: 'power4.out', stagger: .06 }, 7.12);
+    tl.to(['#a-firma', '#a-eyebrow', '#a-head'], { opacity: 0, filter: 'blur(6px)', duration: .16, ease: 'power2.in' }, 7.5);
+    // 7.5–8.3 inundación naranja + insignia
+    tl.fromTo('#a-flood', { clipPath: 'circle(0px at 427px 470px)' }, { clipPath: 'circle(1700px at 427px 470px)', duration: .5, ease: 'power2.inOut' }, 7.6);
+    tl.set('#a-photo', { zIndex: 28 }, 7.6);
+    tl.to('#a-photo', { x: 269, y: -654, width: 260, height: 260, borderRadius: 130, duration: .5, ease: 'power3.inOut' }, 7.62);
+    tl.fromTo('#a-photo img', { scale: 1, xPercent: -50, yPercent: -46 }, { scale: .4, duration: .5, ease: 'power3.inOut' }, 7.62);
+    tl.set('#a-photo img', { scale: 1, xPercent: -50, yPercent: -46 }, 15.2);
+    tl.to('#a-persist', { y: 40, opacity: 0, duration: .25, ease: 'power2.in' }, 7.6);
+    tl.fromTo('#a-badge', { opacity: 0, scale: .82 }, { opacity: 1, scale: 1, duration: .5, ease: 'expo.out' }, 7.82);
+    // 8.3–9.8 vuelta al mapa, se dibuja
+    tl.to(['#a-badge', '#a-photo'], { opacity: 0, scale: 1.12, filter: 'blur(8px)', duration: .22, ease: 'power2.in' }, 8.22);
+    tl.to('#a-flood', { opacity: 0, duration: .25, ease: 'power2.in' }, 8.26);
+    tl.to('#a-white', { opacity: 0, duration: .25, ease: 'power2.in' }, 8.26);
+    tl.to('#a-persist', { y: 0, opacity: 1, duration: .4, ease: 'expo.out' }, 8.6);
+    // 9.8–11.2 frase
+    tl.fromTo('#a-white', { opacity: 1, clipPath: 'circle(0px at 427px 600px)' }, { opacity: 1, clipPath: 'circle(1800px at 427px 600px)', duration: .42, ease: 'power2.inOut', immediateRender: false }, 9.76);
+    tl.fromTo('#a-st1 span', { yPercent: 110 }, { yPercent: 0, duration: .5, ease: 'power4.out' }, 9.98);
+    tl.fromTo('#a-st2 span', { yPercent: 110 }, { yPercent: 0, duration: .5, ease: 'power4.out' }, 10.08);
+    tl.to(['#a-st1 span', '#a-st2 span'], { yPercent: -112, duration: .2, ease: 'power3.in', stagger: .04 }, 11.0);
+    tl.set(['#a-st1', '#a-st2'], { opacity: 0 }, 11.26);
+    // 11.2–12.5 galería
+    tl.fromTo('#a-eb2', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: .25, ease: 'power3.out' }, 11.22);
+    const T = (i) => '#a-t' + i;
+    const A3 = [[T(0), 108, 470, -7, 22], [T(5), 277, 420, 0, 0], [T(1), 446, 470, 7, -22]];
+    A3.forEach(([s, x, y, r, ry], k) => { tl.fromTo(s, { x, y: y + 420, rotation: r * 2, rotationY: ry * 1.6, opacity: 0, width: 300, height: 380 }, { x, y, rotation: r, rotationY: ry, opacity: 1, duration: .55, ease: 'expo.out' }, 11.3 + k * .06); });
+    const G6 = [[T(3), 52, 300], [T(0), 312, 300], [T(4), 572, 300], [T(1), 52, 660], [T(5), 312, 660], [T(2), 572, 660]];
+    G6.forEach(([s, x, y], k) => { const isNew = [T(3), T(4), T(2)].includes(s); if (isNew) tl.fromTo(s, { x, y: y + 60, opacity: 0, width: 230, height: 300, rotation: 0, rotationY: 0, scale: .9 }, { x, y, opacity: 1, scale: 1, duration: .45, ease: 'expo.out' }, 11.95 + k * .04); else tl.to(s, { x, y, width: 230, height: 300, rotation: 0, rotationY: 0, duration: .5, ease: 'power3.inOut' }, 11.88); });
+    tl.fromTo('#a-support', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: .22, ease: 'power2.out' }, 12.0);
+    // 12.5–14.0 cuatro tarjetas flotantes
+    tl.to(['#a-support', '#a-eb2'], { opacity: 0, filter: 'blur(6px)', duration: .18, ease: 'power2.in' }, 12.48);
+    tl.to([T(4), T(2)], { opacity: 0, scale: .85, duration: .25, ease: 'power2.in' }, 12.5);
+    const C4 = [[T(0), 90, 330, -9, 0], [T(3), 470, 300, 8, 1], [T(1), 150, 790, 6, 2], [T(5), 252, 470, -3, 3]];
+    C4.forEach(([s, x, y, r, zi]) => { tl.set(s, { zIndex: zi }, 12.5); tl.to(s, { x, y, rotation: r, width: s === T(5) ? 350 : 290, height: s === T(5) ? 450 : 370, duration: .7, ease: 'power3.inOut' }, 12.55); tl.to(s, { y: '-=26', rotation: r * 0.8, duration: .75, ease: 'none' }, 13.25); });
+    // 14.0–15.2 convergencia al pin
+    C4.forEach(([s], k) => { tl.to(s, { x: 427 - (s === T(5) ? 175 : 145), y: 740 - (s === T(5) ? 225 : 185), rotation: 0, scale: .16, opacity: 0, duration: .45, ease: 'power3.in' }, 14.0 + k * .03); });
+    tl.fromTo('#a-chipSector', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .35, ease: 'expo.out' }, 14.66);
+    tl.to('#a-chipSector', { opacity: 0, y: -10, duration: .18, ease: 'power2.in' }, 15.08);
+    // 15.2–16.5 vuelve la tarjeta, Iniciar
+    tl.to('#a-white', { opacity: 0, duration: .3, ease: 'power2.inOut' }, 15.16);
+    tl.to('#a-persist', { y: 60, opacity: 0, duration: .22, ease: 'power2.in' }, 15.12);
+    tl.set('#a-photo', { x: 0, width: 798, height: 270, borderRadius: 28, scale: 1, filter: 'blur(0px)', zIndex: 26, opacity: 1, y: 700 }, 15.2);
+    tl.to('#a-search', { y: 0, opacity: 1, duration: .3, ease: 'power3.out' }, 15.2);
+    tl.to('#a-card', { yPercent: 0, duration: .45, ease: 'expo.out' }, 15.22);
+    tl.to('#a-photo', { y: 0, duration: .45, ease: 'expo.out' }, 15.22);
+    tap(352, 1342, 15.46);
+    tl.to('#a-iniFill', { opacity: 1, duration: .1 }, 15.5);
+    tl.fromTo('#a-nav', { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: .4, ease: 'expo.out' }, 15.55);
+    tl.to('#a-search', { opacity: 0, duration: .15 }, 15.55);
+
+    // ---------- cierre ----------
+    tl.set(['#a-nav', '#a-card', '#a-photo', '#a-persist', '#a-search', '#a-chips', '#a-tap'], { opacity: 0 }, C0);
+    tl.set('#a-phone', { scale: 1, y: 0, rotationX: 0 }, C0);
+    tl.set('#a-white', { opacity: 1, clipPath: 'circle(0px at 427px 750px)' }, C0);
+    tl.to('#a-white', { opacity: 1, clipPath: 'circle(1800px at 427px 750px)', duration: .5, ease: 'power2.inOut' }, C1 + .55);
+    tl.fromTo('#a-cl1 span', { yPercent: 110 }, { yPercent: 0, duration: .5, ease: 'power4.out' }, C1 + .8);
+    tl.fromTo('#a-cl2 span', { yPercent: 110 }, { yPercent: 0, duration: .5, ease: 'power4.out' }, C1 + .9);
+    tl.fromTo('#a-clLogo', { opacity: 0, scale: .55, filter: 'blur(6px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: .5, ease: 'expo.out' }, C1 + 1.3);
+    tl.fromTo('#a-clHandle', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: .22 }, C1 + 1.55);
+    tl.fromTo('#a-clMono', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: .25, ease: 'power3.out' }, C1 + 1.65);
+    tl.set({}, {}, END);
+
+    render(0);
+    window.__timelines['app'] = tl;
+  })();
+  </script>
+</template>

@@ -1,0 +1,44 @@
+{
+  "_ayuda": "Lista ordenada de videos. Cambia 'archivo', 'inicio' y 'fin' (segundos dentro del clip). Si el archivo no existe se muestra una tarjeta de reemplazo de 'duracion_placeholder' segundos. 'hito' = número del punto en route.json al que llega el puntito del mini-mapa. 'texto_en' = segundos desde el inicio del clip en que entra el titular. 'audio': 'auto' (ambiente bajito), 'si' o 'no'.",
+  "clips": [
+    {
+      "archivo": "assets/videos/video1.mp4",
+      "inicio": 0,
+      "fin": 6,
+      "duracion_placeholder": 6,
+      "etiqueta": "VIDEO 1 · Recorrido desde El Silletero",
+      "antetitulo": "PUNTO 1",
+      "titulo": "Desde El Silletero",
+      "hito": 2,
+      "texto_en": 0.35,
+      "audio": "auto",
+      "volumen": 0.35
+    },
+    {
+      "archivo": "assets/videos/video2.mp4",
+      "inicio": 0,
+      "fin": 6,
+      "duracion_placeholder": 6,
+      "etiqueta": "VIDEO 2 · Por la vía hacia La Samaria",
+      "antetitulo": "SIGUE LA VÍA",
+      "titulo": "Pasando por La Samaria",
+      "hito": 5,
+      "texto_en": 0.35,
+      "audio": "auto",
+      "volumen": 0.35
+    },
+    {
+      "archivo": "assets/videos/video3.mp4",
+      "inicio": 0,
+      "fin": 6,
+      "duracion_placeholder": 6,
+      "etiqueta": "VIDEO 3 · Llegada a Casa Amiga",
+      "antetitulo": "¿QUIERES LLEGAR A CASA?",
+      "titulo": "Ya llegaste.",
+      "hito": 6,
+      "texto_en": 2.2,
+      "audio": "auto",
+      "volumen": 0.35
+    }
+  ]
+}

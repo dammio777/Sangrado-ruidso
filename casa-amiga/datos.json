@@ -1,0 +1,13 @@
+{
+  "_ayuda": "Textos de marca. Deja 'tiempo' vacío si no lo sabes: el ícono de carro y el tiempo se ocultan. No inventes horarios, precios ni calificaciones.",
+  "usuario": "@galeria.casaamiga",
+  "nombre": "Casa Amiga",
+  "tipo": "Galería de arte y diseño",
+  "lugar": "Vereda El Placer · Santa Elena",
+  "sector": "Vereda El Placer · Sector Amor y Amistad",
+  "lema": "ARTE QUE SE SIENTE EN CASA.",
+  "eyebrow": "GALERÍA DE ARTE Y DISEÑO · SANTA ELENA",
+  "cierre_mono": "VEREDA EL PLACER · SANTA ELENA",
+  "tiempo": "",
+  "musica": "assets/audio/musica.mp3"
+}

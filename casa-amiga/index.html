@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #FBF7F1; }
+      #root { position: relative; width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="37.5" data-width="1080" data-height="1920" data-motion-blur="off">
+      <div id="app" data-composition-id="app" data-composition-src="compositions/app.html" data-start="0" data-duration="37.5"
+        data-track-index="0" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:1"></div>
+      <div id="ruta" data-composition-id="ruta" data-composition-src="compositions/ruta.html" data-start="15.6" data-duration="18"
+        data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:2"></div>
+    <!--AUDIO:BEGIN-->
+    <audio id="s-tap1" class="clip" src="assets/audio/sfx-click.mp3" data-start="2.56" data-duration="0.4" data-track-index="4" data-volume="0.55"></audio>
+    <audio id="s-key0" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.13" data-duration="0.4" data-track-index="5" data-volume="0.22"></audio>
+    <audio id="s-key3" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.225" data-duration="0.4" data-track-index="6" data-volume="0.22"></audio>
+    <audio id="s-key6" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.321" data-duration="0.4" data-track-index="7" data-volume="0.22"></audio>
+    <audio id="s-key9" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.416" data-duration="0.4" data-track-index="4" data-volume="0.22"></audio>
+    <audio id="s-key12" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.512" data-duration="0.4" data-track-index="5" data-volume="0.22"></audio>
+    <audio id="s-key15" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.607" data-duration="0.4" data-track-index="6" data-volume="0.22"></audio>
+    <audio id="s-key18" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.703" data-duration="0.4" data-track-index="7" data-volume="0.22"></audio>
+    <audio id="s-key21" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.798" data-duration="0.4" data-track-index="4" data-volume="0.22"></audio>
+    <audio id="s-tap2" class="clip" src="assets/audio/sfx-click.mp3" data-start="3.99" data-duration="0.4" data-track-index="5" data-volume="0.55"></audio>
+    <audio id="s-tok1" class="clip" src="assets/audio/sfx-tok.mp3" data-start="5.13" data-duration="0.4" data-track-index="6" data-volume="0.9"></audio>
+    <audio id="s-tok2" class="clip" src="assets/audio/sfx-tok.mp3" data-start="14.47" data-duration="0.4" data-track-index="7" data-volume="0.55"></audio>
+    <audio id="s-tap3" class="clip" src="assets/audio/sfx-click.mp3" data-start="15.47" data-duration="0.4" data-track-index="4" data-volume="0.55"></audio>
+    <audio id="s-chime1" class="clip" src="assets/audio/sfx-chime-bundled.mp3" data-start="15.52" data-duration="2.5" data-track-index="5" data-volume="0.22"></audio>
+    <audio id="s-tok3" class="clip" src="assets/audio/sfx-tok.mp3" data-start="33.87" data-duration="0.4" data-track-index="6" data-volume="0.9"></audio>
+    <audio id="s-chime2" class="clip" src="assets/audio/sfx-chime-bundled.mp3" data-start="34.91" data-duration="2.5" data-track-index="7" data-volume="0.5"></audio>
+    <!--AUDIO:END-->
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

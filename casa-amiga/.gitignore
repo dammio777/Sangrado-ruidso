@@ -1,0 +1,7 @@
+.hyperframes/
+renders/*.mp4
+!renders/casa-amiga-borrador.mp4
+assets/audio/_cama.m4a
+node_modules/
+renders/cuadros/
+.media/
