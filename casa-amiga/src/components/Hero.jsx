@@ -27,8 +27,7 @@ export default function Hero({ ready }) {
         .to({}, { duration: 0.12 })
     })
     mm.add(MOB, () => {
-      gsap.to('.hero-noche', { scale: 1.35, ease: 'none', scrollTrigger: { trigger: el, start: 'top top', end: 'bottom top', scrub: true } })
-      gsap.to('.hero-copy', { y: -40, opacity: 0.2, ease: 'none', scrollTrigger: { trigger: el, start: '30% top', end: 'bottom top', scrub: true } })
+      gsap.to('.hero-noche', { scale: 1.2, ease: 'none', scrollTrigger: { trigger: el, start: 'top top', end: 'bottom top', scrub: true } })
     })
   }, [])
 
@@ -47,14 +46,14 @@ export default function Hero({ ready }) {
   }, [ready, root])
 
   return (
-    <section id="inicio" ref={root} className="relative h-[100svh] min-h-[640px] overflow-hidden bg-tinta" aria-label="Inicio">
+    <section id="inicio" ref={root} className="relative overflow-hidden bg-tinta lg:h-[100svh] lg:min-h-[640px]" aria-label="Inicio">
       {/* Fachada → puerta → interior */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="relative h-[58svh] min-h-[360px] overflow-hidden lg:absolute lg:inset-0 lg:h-auto lg:min-h-0">
         <img
           src={asset('img/hero-noche.jpg')}
           alt="Casa Amiga al atardecer: cabaña de madera con luces cálidas, el letrero en la fachada, la puerta abierta y el husky de la casa recostado en la terraza"
-          className="hero-noche absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: '50% 55%', transformOrigin: PUERTA }}
+          className="hero-noche absolute inset-0 h-full w-full object-cover [--hero-pos:60%_58%] lg:[--hero-pos:50%_55%]"
+          style={{ objectPosition: 'var(--hero-pos)', transformOrigin: PUERTA }}
           fetchpriority="high"
         />
         <img
@@ -62,7 +61,8 @@ export default function Hero({ ready }) {
           alt="Interior de la galería: lámpara-hongo roja, ropa, plantas y repisas con productos"
           className="hero-dentro absolute inset-0 h-full w-full object-cover opacity-0 motion-reduce:hidden"
         />
-        <div className="hero-grad pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(43,26,18,.88)_0%,rgba(43,26,18,.45)_38%,rgba(43,26,18,0)_65%),linear-gradient(to_right,rgba(43,26,18,.55)_0%,rgba(43,26,18,0)_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(43,26,18,.55)_0%,rgba(43,26,18,0)_22%,rgba(43,26,18,0)_70%,rgba(43,26,18,1)_100%)] lg:hidden" />
+        <div className="hero-grad pointer-events-none absolute inset-0 hidden lg:block bg-[linear-gradient(to_top,rgba(43,26,18,.88)_0%,rgba(43,26,18,.45)_38%,rgba(43,26,18,0)_65%),linear-gradient(to_right,rgba(43,26,18,.55)_0%,rgba(43,26,18,0)_55%)]" />
         <div className="hero-nota pointer-events-none absolute bottom-[10%] left-[6%] opacity-0 motion-reduce:hidden">
           <span aria-hidden="true" className="absolute -inset-x-10 -inset-y-12 -z-10 bg-[radial-gradient(closest-side,rgba(43,26,18,.7),transparent)]" />
           <p className="font-script text-[clamp(3rem,6vw,6rem)] leading-none text-white [text-shadow:0_2px_24px_rgba(43,26,18,.55)]">pasa, estás en casa</p>
@@ -74,9 +74,9 @@ export default function Hero({ ready }) {
       </div>
 
       {/* Texto encima de la foto */}
-      <div className="wrap absolute inset-x-0 bottom-0 z-10 pb-24 sm:pb-20 lg:pb-[9vh]">
+      <div className="wrap relative z-10 -mt-6 pb-16 pt-2 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0 lg:pb-[9vh] lg:pt-0">
         <div className="hero-copy max-w-[44rem]">
-          <p className="hero-eyebrow eyebrow mb-5 !text-ambar">Galería de arte y diseño · Santa Elena</p>
+          <p className="hero-eyebrow eyebrow mb-5 !text-ambar !tracking-[0.08em] sm:!tracking-[0.14em]">Galería de arte y diseño · Santa Elena</p>
           <h1 className="titulo text-white" style={{ fontSize: FS }}>
             {LINEAS.map((linea, i) => (
               <span key={i} className="block overflow-hidden pb-[0.04em]">
@@ -95,7 +95,7 @@ export default function Hero({ ready }) {
               <path d="M250 18 C190 2 70 4 26 30 C-6 50 12 96 90 108 C170 118 280 104 292 66 C300 38 250 20 196 16" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" pathLength="1" className="draw" />
             </svg>
           </div>
-          <p className="hero-sub mt-8 max-w-[34rem] text-lg text-white/90 sm:text-xl">
+          <p className="hero-sub mt-6 max-w-[34rem] text-[1.05rem] text-white/85 sm:mt-8 sm:text-xl">
             Galería de arte y diseño en el corazón de Santa Elena. Obras, objetos y talleres de artistas locales, en una cabaña de madera en la Vereda El Placer.
           </p>
           <div className="hero-btns mt-8 flex flex-wrap items-center gap-3">
@@ -111,7 +111,7 @@ export default function Hero({ ready }) {
         </div>
       </div>
 
-      <p className="hero-hint cedula absolute bottom-5 right-4 z-10 text-white/85 sm:bottom-8 sm:right-8">
+      <p className="hero-hint cedula absolute bottom-8 right-8 z-10 hidden text-white/85 lg:block">
         Desliza para entrar <span aria-hidden="true">↓</span>
       </p>
     </section>
