@@ -34,9 +34,9 @@ function Boleta({ e, proximo }) {
     ? `¡Hola Casa Amiga! Me interesó "${e.titulo}" de la feria del ${fecha}. ¿Me avisan cuando haya una próxima fecha?`
     : `¡Hola Casa Amiga! Quiero reservar cupo para "${e.titulo}" (${fecha}, ${e.hora}). ¿Cómo reservo?`
   return (
-    <article className="tk relative flex w-[min(84vw,560px)] shrink-0 select-none flex-col rounded-[18px] bg-white text-tinta shadow-[0_24px_50px_-28px_rgba(43,26,18,.45)] sm:flex-row">
+    <article className="tk relative flex w-[min(84vw,560px)] shrink-0 select-none flex-col rounded-[18px] border border-canela/15 bg-white text-tinta shadow-[0_24px_50px_-28px_rgba(43,26,18,.45)] sm:flex-row">
       {/* borde troquelado lateral */}
-      <span aria-hidden="true" className="absolute inset-y-3 -left-[5px] w-[10px] bg-[radial-gradient(circle_at_center,var(--hueso)_4.5px,transparent_5px)] bg-[length:10px_16px] bg-repeat-y" />
+      <span aria-hidden="true" className="absolute inset-y-3 -left-[5px] w-[10px] bg-[radial-gradient(circle_at_center,var(--blanco)_4.5px,transparent_5px)] bg-[length:10px_16px] bg-repeat-y" />
       <div className="flex flex-1 gap-5 p-6 sm:p-7">
         <div className="w-16 shrink-0 text-center sm:w-20">
           <p className="cedula text-ambar-oscuro">{DIAS[f.getUTCDay()].slice(0, 3)}</p>
@@ -52,8 +52,8 @@ function Boleta({ e, proximo }) {
       </div>
       {/* talón */}
       <div className="relative flex shrink-0 items-center justify-between gap-4 border-t-2 border-dashed border-canela/25 px-6 py-5 text-left sm:w-36 sm:flex-col sm:border-l-2 sm:border-t-0 sm:px-3 sm:py-6 sm:text-center">
-        <span aria-hidden="true" className="absolute -left-3 -top-[13px] h-6 w-6 rounded-full bg-hueso sm:-left-[13px] sm:-top-3" />
-        <span aria-hidden="true" className="absolute -right-3 -top-[13px] h-6 w-6 rounded-full bg-hueso sm:-bottom-3 sm:-left-[13px] sm:right-auto sm:top-auto" />
+        <span aria-hidden="true" className="absolute -left-3 -top-[13px] h-6 w-6 rounded-full bg-blanco sm:-left-[13px] sm:-top-3" />
+        <span aria-hidden="true" className="absolute -right-3 -top-[13px] h-6 w-6 rounded-full bg-blanco sm:-bottom-3 sm:-left-[13px] sm:right-auto sm:top-auto" />
         <div className="flex gap-6 sm:block">
           {e.cupos != null && (
             <div>
@@ -90,7 +90,7 @@ export default function Talleres() {
     })
   }, [])
   return (
-    <section ref={ref} id="talleres" className="overflow-hidden bg-hueso py-24 sm:py-32">
+    <section ref={ref} id="talleres" className="overflow-hidden bg-blanco py-24 sm:py-32">
       <div className="wrap">
         <div className="mb-14 grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
@@ -117,7 +117,7 @@ export default function Talleres() {
           </div>
           <DragRail label="Fotos de la Feria Casa Amiga">
             {FERIA_FOTOS.map((f, i) => (
-              <figure key={f.img} className={`shrink-0 overflow-hidden rounded-[20px] bg-white p-2 shadow-[0_20px_40px_-28px_rgba(43,26,18,.5)] ${i % 2 ? 'mt-6' : ''}`}>
+              <figure key={f.img} data-reveal className={`shrink-0 overflow-hidden rounded-[20px] bg-white p-2 shadow-[0_20px_40px_-28px_rgba(43,26,18,.5)] ${i % 2 ? 'mt-6' : ''}`}>
                 <img src={asset(f.img)} alt={f.alt} loading="lazy" draggable="false" className="h-[260px] w-auto rounded-[14px] object-cover sm:h-[360px]" />
               </figure>
             ))}

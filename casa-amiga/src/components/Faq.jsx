@@ -6,7 +6,7 @@ import { FAQ } from '../data'
 export default function Faq() {
   const [open, setOpen] = useState(0)
   return (
-    <section id="faq" className="bg-hueso py-24 sm:py-32">
+    <section id="faq" className="bg-blanco py-24 sm:py-32">
       <div className="wrap grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <p className="eyebrow mb-4">12 — Antes de venir</p>

@@ -17,7 +17,7 @@ export default function Manifiesto() {
   }, [])
 
   return (
-    <section ref={ref} id="manifiesto" className="bg-hueso py-24 sm:py-32 lg:py-44">
+    <section ref={ref} id="manifiesto" className="bg-blanco py-24 sm:py-32 lg:py-44">
       <div className="wrap grid gap-14 lg:grid-cols-12 lg:items-center">
         <div className="lg:col-span-9">
           <p className="eyebrow mb-8">04 — Manifiesto</p>

@@ -20,7 +20,7 @@ export default function Ubicacion() {
   const orden = [1, 2, 3, 4, 5, 6, 0]
 
   return (
-    <section id="visitanos" className="bg-blanco py-24 sm:py-32">
+    <section id="visitanos" className="bg-hueso py-24 sm:py-32">
       <div className="wrap grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
           <p className="eyebrow mb-4">13 — Visítanos</p>
@@ -40,7 +40,7 @@ export default function Ubicacion() {
                   {e.abierto ? 'Abierto ahora' : 'Cerrado'}
                 </p>
               ) : (
-                <p className="cedula inline-flex items-center gap-2 rounded-full bg-hueso px-3 py-1 text-canela">Horario por confirmar</p>
+                <p className="cedula inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-canela">Horario por confirmar</p>
               )}
             </div>
             {!HORARIO_CONFIRMADO && (

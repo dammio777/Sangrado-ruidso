@@ -21,6 +21,9 @@ import CtaFinal from './components/CtaFinal'
 import Formulario from './components/Formulario'
 import Footer from './components/Footer'
 import WhatsAppFab from './components/WhatsAppFab'
+import Divider from './components/Divider'
+import ScrollProgress from './components/ScrollProgress'
+import { initEffects } from './lib/effects'
 
 export default function App() {
   const [revealed, setRevealed] = useState(false) // el iris empezó a abrir: arranca el hero
@@ -31,7 +34,14 @@ export default function App() {
     const refresh = () => ScrollTrigger.refresh()
     window.addEventListener('load', refresh)
     document.fonts?.ready.then(refresh)
-    return () => window.removeEventListener('load', refresh)
+    let off = () => {}
+    let t
+    const start = () => { off(); off = initEffects(); ScrollTrigger.refresh() }
+    const onResize = () => { clearTimeout(t); t = setTimeout(() => { if (window.__w !== innerWidth) { window.__w = innerWidth; start() } }, 350) }
+    window.__w = innerWidth
+    const boot = setTimeout(start, 80)
+    window.addEventListener('resize', onResize)
+    return () => { clearTimeout(boot); clearTimeout(t); off(); window.removeEventListener('resize', onResize); window.removeEventListener('load', refresh) }
   }, [])
 
   return (
@@ -41,19 +51,29 @@ export default function App() {
       </a>
       {loading && <Preloader onReveal={() => setRevealed(true)} onDone={() => setLoading(false)} />}
       <Cursor />
+      <ScrollProgress />
       <Navbar />
       <main>
         <Hero ready={revealed} />
         <Marquee />
         <Manifiesto />
+        <Divider />
         <Camino />
+        <Divider />
         <Galeria />
+        <Divider />
         <Artistas />
+        <Divider />
         <Talleres />
+        <Divider />
         <LaCasa />
+        <Divider />
         <Cifras />
+        <Divider />
         <LibroVisitas />
+        <Divider />
         <Faq />
+        <Divider />
         <Ubicacion />
         <CtaFinal />
         <Formulario />

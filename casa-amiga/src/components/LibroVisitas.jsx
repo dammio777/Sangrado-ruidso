@@ -4,7 +4,7 @@ import DragRail from './DragRail'
 /* 11 — LIBRO DE VISITAS. PLACEHOLDER: reemplazar en data.js por reseñas reales. */
 export default function LibroVisitas() {
   return (
-    <section id="visitas" className="overflow-hidden bg-blanco py-24 sm:py-32">
+    <section id="visitas" className="overflow-hidden bg-hueso py-24 sm:py-32">
       <div className="wrap">
         <div className="mb-12 grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>

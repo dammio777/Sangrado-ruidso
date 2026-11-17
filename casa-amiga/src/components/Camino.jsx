@@ -125,7 +125,7 @@ export default function Camino() {
 
 
   return (
-    <section ref={ref} id="camino" className="relative bg-blanco">
+    <section ref={ref} id="camino" className="relative bg-hueso">
       {/* DESKTOP: scroll horizontal fijado */}
       <div className="cm-pin relative hidden h-[100svh] overflow-hidden lg:block motion-reduce:h-auto motion-reduce:overflow-x-auto">
         <div className="absolute inset-x-0 top-0 z-20 h-1 bg-canela/10">
@@ -175,7 +175,7 @@ export default function Camino() {
           <span aria-hidden="true" className="cmv-linea absolute bottom-6 left-9 top-6 w-0 origin-top border-l-[3px] border-dotted border-canela" />
           {PARADAS.map((p, i) => (
             <li key={p.n} className="cmv-item relative flex items-center gap-6">
-              <div className="cm-pin-in relative z-10 flex w-16 shrink-0 justify-center bg-blanco py-1"><Pin p={p} i={i} vertical /></div>
+              <div className="cm-pin-in relative z-10 flex w-16 shrink-0 justify-center bg-hueso py-1"><Pin p={p} i={i} vertical /></div>
               <div>
                 <p className="cedula text-ambar-oscuro">Parada {p.n}</p>
                 <p className="titulo text-2xl text-canela">{p.nombre}</p>

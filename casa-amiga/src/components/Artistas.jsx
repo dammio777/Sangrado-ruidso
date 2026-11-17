@@ -23,30 +23,27 @@ function Tarjeta({ a, i }) {
 
   return (
     <article ref={card} onMouseMove={tilt} onMouseLeave={reset} className="art-card group relative [transform-style:preserve-3d]">
-      <div className="relative aspect-[3/4] overflow-hidden rounded-[22px] bg-hueso">
-        {a.foto ? (
-          <img src={asset(a.foto)} alt={`Retrato de ${a.nombre}`} loading="lazy" className="h-full w-full object-cover grayscale transition-[filter,transform] duration-700 group-hover:scale-105 group-hover:grayscale-0" />
-        ) : (
-          <div className="grid h-full w-full place-items-center border border-canela/10 bg-white text-canela/40 transition-colors duration-700 group-hover:bg-ambar group-hover:text-canela">
-            <LogoIcon className="h-1/2 w-1/2" strokeWidth={3} />
-          </div>
-        )}
-        <span className="cedula absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-canela">Artista {String(i + 1).padStart(2, '0')}</span>
-      </div>
-      <div className="mt-5 flex items-start justify-between gap-3">
-        <div>
-          <h3 className="titulo text-[1.7rem] text-tinta">{a.nombre}</h3>
-          <p className="cedula mt-1 text-ambar-oscuro">{a.disciplina}</p>
-          {a.bio && <p className="mt-2 text-sm text-tinta/70">{a.bio}</p>}
+      <div className="relative mx-auto aspect-square w-full max-w-[17rem]">
+        <span aria-hidden="true" className="absolute -inset-3 rounded-full border border-dashed border-canela/35 transition-colors duration-500 [animation:girar_40s_linear_infinite] group-hover:border-ambar" />
+        <div className="art-foto relative h-full w-full overflow-hidden rounded-full bg-white shadow-[0_24px_44px_-26px_rgba(43,26,18,.55)]">
+          {a.foto ? (
+            <img src={asset(a.foto)} alt={`Imagen de ${a.nombre}`} loading="lazy" className="h-full w-full scale-[1.04] object-cover grayscale transition-[filter,transform] duration-700 group-hover:scale-110 group-hover:grayscale-0" />
+          ) : (
+            <div className="grid h-full w-full place-items-center bg-white text-canela/40"><LogoIcon className="h-1/2 w-1/2" strokeWidth={3} /></div>
+          )}
         </div>
+        <span className="cedula absolute -left-1 top-2 rounded-full bg-ambar px-3 py-1 text-tinta">{String(i + 1).padStart(2, '0')}</span>
+      </div>
+      <div className="mt-7 text-center">
+        <h3 className="titulo text-[1.7rem] text-tinta">{a.nombre}</h3>
+        <p className="cedula mt-1 text-ambar-oscuro">{a.disciplina}</p>
+        {a.bio && <p className="mx-auto mt-2 max-w-[17rem] text-sm text-tinta/70">{a.bio}</p>}
         {a.instagram && (
-          <a href={`https://www.instagram.com/${a.instagram}/`} target="_blank" rel="noreferrer" aria-label={`Instagram de ${a.nombre}`} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-canela/25 text-canela transition-colors hover:bg-canela hover:text-white">
-            <InstagramIcon />
-          </a>
+          <a href={`https://www.instagram.com/${a.instagram}/`} target="_blank" rel="noreferrer" aria-label={`Instagram de ${a.nombre}`} className="mx-auto mt-3 grid h-10 w-10 place-items-center rounded-full border border-canela/25 text-canela transition-colors hover:bg-canela hover:text-white"><InstagramIcon /></a>
         )}
       </div>
       {nObras > 0 && (
-        <button type="button" onClick={verObras} className="group/b mt-3 inline-flex items-center gap-2 font-medium text-canela">
+        <button type="button" onClick={verObras} className="group/b mx-auto mt-3 flex items-center gap-2 font-medium text-canela">
           Ver sus obras <span className="cedula text-tinta/50">({nObras})</span>
           <Arrow className="h-4 w-4 transition-transform group-hover/b:translate-x-1" />
         </button>

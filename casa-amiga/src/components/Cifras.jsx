@@ -16,7 +16,7 @@ export default function Cifras() {
     })
   }, [])
   return (
-    <section ref={ref} aria-label="Casa Amiga en cifras" className="bg-hueso py-20 sm:py-28">
+    <section ref={ref} aria-label="Casa Amiga en cifras" className="bg-blanco py-20 sm:py-28">
       <div className="wrap">
         <p className="eyebrow mb-10">10 — En cifras</p>
         <div className="cf-grid grid sm:grid-flow-col sm:auto-cols-fr">

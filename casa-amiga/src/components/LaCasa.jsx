@@ -66,7 +66,7 @@ export default function LaCasa() {
     })
   }, [])
   return (
-    <section ref={ref} id="la-casa" className="bg-blanco py-24 sm:py-32">
+    <section ref={ref} id="la-casa" className="bg-hueso py-24 sm:py-32">
       <div className="wrap">
         <div className="mb-12 grid gap-6 lg:grid-cols-2 lg:items-end">
           <div>
@@ -78,7 +78,7 @@ export default function LaCasa() {
         <Comparador />
         <ul className="mini-grid mt-6 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
           {MINI.map((m) => (
-            <li key={m.img} className="mini group relative">
+            <li key={m.img} className="mini group relative" data-reveal>
               <div className="aspect-square overflow-hidden rounded-[20px] bg-hueso">
                 <img src={asset(m.img)} alt={m.alt} loading="lazy" className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${m.perro ? 'object-[62%_50%]' : ''}`} />
               </div>
