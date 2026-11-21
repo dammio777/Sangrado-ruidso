@@ -13,7 +13,7 @@ const MATCH={
   '1':{time:'17:30',a:'MINEIRO',b:'BOCA',tag:'LA FINAL',comp:'CONMEBOL SUDAMERICANA',accent:AMBER,tagFg:'#000',ca:['#111','#fff'],cb:['#123B8C','#F2C230'],
        photo:'../../01-local/frames/c1/0060.jpg',ay:0.18,line:'La final se vive aquí.',hour:'5:30 p.m.'},
   '2':{time:'20:15',a:'CALDAS',b:'NACIONAL',tag:'A TIEMPO',comp:'LIGA DIMAYOR · CLAUSURA',accent:'#00A859',tagFg:'#fff',ca:['#ffffff','#C8102E'],cb:['#00A859','#ffffff'],
-       photo:'../../01-local/frames/c4/0100.jpg',ay:0.45,line:'Vívelo en Aero Burger.',hour:'8:15 p.m.'},
+       photo:'../../01-local/frames/c6/0040.jpg',ay:0.15,alpha:0.85,line:'Vívelo en Aero Burger.',hour:'8:15 p.m.'},
 }[M];
 // ---------- Utilidades ----------
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -90,7 +90,7 @@ async function draw(){
   // foto de fondo (arriba) que se funde a negro
   ctx.fillStyle='#050506'; ctx.fillRect(0,0,W,H);
   const ph=S?1180:820; const sc=Math.max(W/photo.width,ph/photo.height); const dw=photo.width*sc, dh=photo.height*sc;
-  ctx.save(); ctx.beginPath(); ctx.rect(0,0,W,ph); ctx.clip(); ctx.globalAlpha=S?0.62:0.5; ctx.drawImage(photo,(W-dw)/2,(ph-dh)*MATCH.ay,dw,dh); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,W,ph); ctx.clip(); ctx.globalAlpha=MATCH.alpha??(S?0.62:0.5); ctx.drawImage(photo,(W-dw)/2,(ph-dh)*MATCH.ay,dw,dh); ctx.restore();
   let g=ctx.createLinearGradient(0,ph*0.35,0,ph); g.addColorStop(0,'rgba(5,5,6,0)'); g.addColorStop(1,'rgba(5,5,6,1)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,ph+2);
   g=ctx.createLinearGradient(0,0,0,S?420:300); g.addColorStop(0,'rgba(5,5,6,.85)'); g.addColorStop(1,'rgba(5,5,6,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,S?420:300);
   // cabecera
