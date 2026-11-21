@@ -42,3 +42,11 @@ Paleta cálida y terrosa: madera, luz cálida de bombillos, plantas.
 - Apertura o cierre con el logo y la **URL de la web** en pantalla, como llamada a la acción.
 - Titulares en mayúsculas blancas o naranjas con la palabra clave en óvalo, etiquetas mono en naranja y fondos café `#2B1A12`.
 - Ritmo cálido y acogedor: transiciones suaves, zoom lento (Ken Burns) sobre las obras.
+
+## Inventario de material recibido
+### Lote 1 (20 fotos, carpeta material/fotos-1)
+- **Espacio:** vista general con tapete de colores, techo de madera con lámpara de araña y el perro, entrada nocturna con el letrero iluminado.
+- **Arte:** retratos de perros a lápiz ("Adóptame 70 mil"), tríptico de ilustraciones abeja, orquídea y diente de león ("Lleva el territorio contigo"), vasija grabada, figura de cerámica.
+- **Diseño y objetos:** lámpara-hongo, materas impresas en 3D, tote bags "love".
+- **Marcas locales:** Montaña, Frío & Café; Café La Cabaña; Saboryarte (sales); Alima (alcohol para los dolores, bálsamo, crema dental); Pargo Viche.
+- **Descartar o usar poco:** 12-saboryarte-borrosa (desenfocada) y 10-pargo-viche-hongo-oscuro (subexpuesta).
