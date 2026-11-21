@@ -61,3 +61,11 @@ Fachada de día con gente (0–9 s), letrero de cerca (6–9 s), interior con so
 ## Videos producidos
 - `exports/casa-amiga-bienvenida.mp4`: Bienvenida, 40 s, 1080×1920, 30 fps, con música original. Fuente en `build/` (`video.html` = animación, `render.js` = render, `music.py` = música y efectos).
   - Para volver a renderizarlo, extrae los clips a `build/assets/clips/v1..v5` (comandos en el historial) y corre `node render.js video salida.mp4`.
+
+### Lote 3 (carpeta material/fotos-3)
+- 01 y 02: **macetas 3D**, una marca de la dueña de Casa Amiga (trío de animalitos y maceta luna con el Principito). Tienen escena propia en el video.
+- 03: **camisetas tie-dye** (vino, mostaza, oliva y negro). Etiqueta aparente "Arcoíris Negro", por confirmar el nombre y usuario. Escena propia en el video.
+- 04: cabaña al atardecer con el perro. Es el inicio del video (tema claro y cálido).
+
+## Estilo del video, versión actual (v4, claro)
+Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja sobre claro: `#C4570E`), cristal blanco translúcido. Archivo: `exports/casa-amiga-bienvenida-v4.mp4` (48,5 s). La versión oscura quedó en `build/video-oscuro.html`.

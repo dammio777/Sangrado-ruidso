@@ -5,7 +5,7 @@ import numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve
 
 SR = 44100
-DUR = 40.0
+DUR = 48.5
 N = int(SR * DUR)
 BPM = 100
 BEAT = 60 / BPM
@@ -124,7 +124,7 @@ for b in range(nb):
     for j, m in enumerate(ch[1:]):
         add(mus, rhodes(midi(m + 12), 1.2, .07), t0 + 2.5 * BEAT + j * .02)
     # melodía simple de campanitas en la segunda mitad
-    if t0 >= 11.5 and t0 < 30:
+    if t0 >= 11.5 and t0 < 38.5:
         mel = [ch[-1] + 12, ch[-2] + 12, ch[-1] + 12 + 2]
         for k, m in enumerate(mel):
             add(mus, chime(midi(m)) * .05, t0 + (1 + k * 1.5) * BEAT)
@@ -134,7 +134,7 @@ for b in range(nb):
         add(mus, bass(midi(roots[b % 4] + 7), .7) * .3, t0 + 3.5 * BEAT)
 
 # batería desde el logo (3.25s) con pausa en "Y mucho más" (30.0–32.1) y final suave
-DROP0, BRK0, BRK1, END = 3.25, 30.0, 32.1, 38.6
+DROP0, BRK0, BRK1, END = 3.25, 38.5, 40.6, 47.1
 beat_t = DROP0
 while beat_t < END:
     in_break = BRK0 <= beat_t < BRK1
@@ -161,16 +161,22 @@ for k in range(6):                          # cada tarjeta
     add(sfx, whoosh(.45, False) * .18, 11.6 + .7 + k * 1.18 + .62 * 1.18 - .1)
 add(sfx, whoosh(.8) * .4, 19.1)            # bento
 for i in range(7): add(sfx, tick() * .35, 19.45 + .25 + i * .11)
-add(sfx, whoosh(.7) * .4, 24.2)            # video experiencia
-for cc in (26.35, 28.1): add(sfx, whoosh(.45) * .3, cc - .2)
-for i in range(9): add(sfx, whoosh(.25, False) * .25, 30.05 + i * .17)  # pila de fotos
-add(sfx, riser(1.2) * .25, 31.0)
-add(sfx, impact() * .7, 32.15)             # CTA
+add(sfx, whoosh(.8) * .4, 24.2)            # macetas 3D
+for k,tt in enumerate((25.3,25.55,25.8)): add(sfx, chime(midi(86+k*2)) * .12, tt)
+add(sfx, whoosh(.5) * .3, 25.1)
+add(sfx, whoosh(.8) * .4, 28.6)            # camisetas
+for k,tt in enumerate((29.9,30.15,30.4,30.65)): add(sfx, tick() * .5, tt)
+add(sfx, chime(midi(88)) * .1, 30.0)
+add(sfx, whoosh(.7) * .4, 32.7)            # video experiencia
+for cc in (34.85, 36.6): add(sfx, whoosh(.45) * .3, cc - .2)
+for i in range(9): add(sfx, whoosh(.25, False) * .25, 38.55 + i * .17)  # pila de fotos
+add(sfx, riser(1.2) * .25, 39.5)
+add(sfx, impact() * .7, 40.65)             # CTA
 n_chars = 28
 for i in range(n_chars):                    # tecleo URL
-    add(sfx, tick() * .1, 32.1 + 1.7 + i * (1.2 / n_chars))
-add(sfx, click() * .7, 35.6)                # toque en el enlace
-add(sfx, chime(midi(86)) * .2, 35.65); add(sfx, chime(midi(90)) * .14, 35.8)
+    add(sfx, tick() * .1, 40.6 + 1.7 + i * (1.2 / n_chars))
+add(sfx, click() * .7, 44.1)                # toque en el enlace
+add(sfx, chime(midi(86)) * .2, 44.15); add(sfx, chime(midi(90)) * .14, 44.3)
 
 # reverb sencilla para la parte musical
 ir_n = int(1.8 * SR); ir = rng.normal(0, 1, ir_n) * np.exp(-np.arange(ir_n) / SR / .45); ir = lp(ir, 5000)
