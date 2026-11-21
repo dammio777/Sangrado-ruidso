@@ -74,5 +74,5 @@ Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja 
 
 ## Videos finales
 - `exports/casa-amiga-bienvenida-final.mp4` (40 s): bienvenida + marcas locales (Montaña, Frío & Café; Café La Cabaña; Alima; Saboryarte; Pargo Viche). Fuente: `build/video.html`, música `build/music_bienvenida.py`.
-- `exports/casa-amiga-marcas-originales.mp4` (25 s): "¡Conoce las marcas originales de Casa Amiga!" con Macetas 3D, Arcoíris Negro e Hizca. Fuente: `build/video-marcas.html`, música `build/music_marcas.py`.
+- `exports/casa-amiga-marcas-originales.mp4` (34 s, ritmo lento y suave): "¡Conoce las marcas originales de Casa Amiga!" con Macetas 3D, Arcoíris Negro e Hizca. Fuente: `build/video-marcas.html`, música `build/music_marcas.py`.
 - Render: `PAGE=video-marcas.html node render.js video salida.mp4 30` (necesita los clips extraídos en `build/assets/clips`).

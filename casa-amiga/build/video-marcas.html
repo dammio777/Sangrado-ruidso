@@ -216,10 +216,10 @@ const $=id=>document.getElementById(id);
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const lerp=(a,b,t)=>a+(b-a)*t;
 const p=(t,a,b)=>clamp((t-a)/(b-a));
-const eo=x=>1-Math.pow(1-x,3), eo5=x=>1-Math.pow(1-x,5), ei=x=>x*x*x;
+const eo=x=>1-Math.pow(1-x,3), eo5=x=>1-Math.pow(1-x,3), ei=x=>x*x*x;
 const eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 const expo=x=>x>=1?1:1-Math.pow(2,-10*x);
-const back=x=>{const c=1.70158,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const back=x=>{const c=.9,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
 const spring=(x,f=4.5,d=6)=>x<=0?0:1-Math.exp(-d*x)*Math.cos(f*Math.PI*x);
 const FPS=30;
 const S={m0:[0,3.6],s6b:[3.5,8.1],s6c:[8.0,12.6],m3:[12.5,17.1],s9:[17.0,25.0]};
@@ -233,11 +233,11 @@ function setSrc(img,src){if(img.getAttribute('src')!==src){img.setAttribute('src
 function show(id,t){const [a,b]=S[id];const on=t>=a&&t<b;$(id).style.display=on?'block':'none';return on?t-a:null}
 function rise(el,x,dist=110){el.style.transform=`translateY(${(1-eo5(x))*dist}%)`;}
 
-async function render(t){
+async function renderInner(t){
   pend.length=0;
   let u;
   if((u=show('m0',t))!==null){
-    $('m0logo').style.transform=`scale(${Math.max(0,spring(p(u,.05,1.4),2.2,5.2))}) rotate(${lerp(-14,0,eo(p(u,.05,1.0)))}deg)`;
+    $('m0logo').style.transform=`scale(${Math.max(0,spring(p(u,.05,1.4),1.4,6))}) rotate(${lerp(-14,0,eo(p(u,.05,1.0)))}deg)`;
     ['a1','a2','a3'].forEach((id,i)=>rise($(id),p(u,.5+i*.16,1.1+i*.16)));
     const sc=p(u,1.4,2.0);$('m0s').style.opacity=sc;$('m0s').style.transform=`translateY(${(1-eo(sc))*40}px) scale(${lerp(.85,1,eo(sc))})`;
     [...$('m0pics').children].forEach((d,i)=>{const k=p(u,1.9+i*.2,2.5+i*.2);d.style.opacity=k;d.style.transform=`translateY(${(1-eo5(k))*220+Math.sin(u*2.4+i*1.3)*7}px) scale(${lerp(.6,1,back(k))})`});
@@ -280,7 +280,7 @@ async function render(t){
   if((u=show('s9',t))!==null){
     setSrc($('s9v'),'assets/blur/v5.jpg');$('s9v').style.transform=`scale(${lerp(1.2,1.05,eo(p(u,0,7)))})`;
     $('s9').style.opacity=eo(p(u,0,.35));
-    const lx=spring(p(u,.1,1.6),2.2,5.2);$('s9logo').style.transform=`scale(${lx}) rotate(${lerp(-12,0,eo(p(u,.1,1.1)))}deg)`;
+    const lx=spring(p(u,.1,1.6),1.4,6);$('s9logo').style.transform=`scale(${lx}) rotate(${lerp(-12,0,eo(p(u,.1,1.1)))}deg)`;
     $('s9logo').style.filter=`drop-shadow(0 0 ${30+20*Math.sin(u*3)}px rgba(242,144,33,.45))`;
     ['q1','q2'].forEach((r,i)=>{const k=((u-.4+i*1.1)%2.2)/2.2;const s=lerp(400,900,eo(k));const e=$(r);Object.assign(e.style,{width:s+'px',height:s+'px',marginLeft:-s/2+'px',marginTop:-s/2+'px',top:'530px',opacity:u<.4?0:(1-k)*.8})});
     rise($('s9a'),p(u,.45,1.05));const m=p(u,.8,1.3);$('s9m').style.opacity=m;$('s9m').style.letterSpacing=lerp(.6,.32,eo(m))+'em';
@@ -299,5 +299,5 @@ async function render(t){
   $('grain').style.transform=`translate(${(Math.floor(t*FPS)*37)%200-100}px,${(Math.floor(t*FPS)*61)%200-100}px)`;
   await Promise.all(pend);
 }
-window.render=render;window.DUR=DUR;
+const K=1.35;window.render=t=>renderInner(t/K);window.DUR=DUR*K;
 </script></body></html>
