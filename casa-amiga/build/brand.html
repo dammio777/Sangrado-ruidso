@@ -20,7 +20,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--caBg)}
 /* badge Casa Amiga */
 #badge{position:absolute;left:50%;top:150px;z-index:55;display:flex;align-items:center;gap:16px;transform:translateX(-50%);padding:10px 26px 10px 10px;border-radius:999px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.45);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);white-space:nowrap;opacity:0}
 #badge img{width:84px;height:84px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25))}
-#badge span{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.22em;font-size:21px;font-weight:700}
+#badge span{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.12em;font-size:21px;font-weight:700}
 /* A: intro Casa Amiga */
 #A .logo{position:absolute;left:50%;top:560px;width:420px;height:420px;margin-left:-210px}
 #A .logo img{width:100%;height:100%;filter:drop-shadow(0 26px 46px rgba(122,46,23,.35))}
@@ -39,7 +39,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--caBg)}
 /* C: viajes / postales */
 #C{background:var(--bPaper)}
 #C .head{position:absolute;left:80px;right:80px;top:300px}
-#C .head .h1{font-size:96px;color:var(--bA);text-transform:uppercase}
+#C .head .h1{font-size:96px;color:var(--bHeadC);text-transform:uppercase}
 #C .head .h2{font-size:52px;color:var(--bB);font-style:italic;margin-top:10px}
 #C svg.route{position:absolute;inset:0;width:1080px;height:1920px}
 .pc{position:absolute;background:#fffdf6;padding:20px 20px 70px;box-shadow:0 26px 60px rgba(30,40,40,.35);border-radius:6px}
@@ -108,7 +108,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--caBg)}
     <div class="card" id="Ecard"><div class="url"><span id="Eurl"></span></div><div class="hs" id="Ehs"></div></div>
   </div>
   <div id="wipe"></div>
-  <div id="badge"><img src="assets/logo-circulo.png"><span id="badgeTxt">Casa Amiga presenta</span></div>
+  <div id="badge"><img src="assets/logo-circulo.png"><span id="badgeTxt">Esto lo puedes encontrar en Casa Amiga</span></div>
   <div id="vig"></div><div id="grain"></div>
 </div>
 <script>
@@ -120,12 +120,14 @@ const soft=x=>{const c=.8,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
 const rise=(el,x,d=110)=>{el.style.transform=`translateY(${(1-eo(x))*d}%)`};
 // --- aplicar configuración de marca
 const R=document.documentElement.style;
-for(const [k,v] of Object.entries({bA:B.colors.a,bB:B.colors.b,bB2:B.colors.b2||B.colors.b,bPaper:B.colors.paper,bInk:B.colors.ink,bCream:B.colors.cream,bHead:B.fonts.head,bBody:B.fonts.body,bMono:B.fonts.mono})) R.setProperty('--'+k,v);
+for(const [k,v] of Object.entries({bA:B.colors.a,bB:B.colors.b,bB2:B.colors.b2||B.colors.b,bPaper:B.colors.paper,bInk:B.colors.ink,bCream:B.colors.cream,bHead:B.fonts.head,bBody:B.fonts.body,bMono:B.fonts.mono,bHeadC:B.colors.headC||B.colors.a})) R.setProperty('--'+k,v);
 $('At3').textContent=B.introTag||'';
 $('BlogoImg').src=B.logo; $('Bname').innerHTML=B.name.map(l=>`<span class="mask"><span class="ch">${l}</span></span>`).join('<br>');
+if(B.nameFont){const n=$('Bname');n.style.fontFamily=B.nameFont;n.style.fontSize=(B.nameSize||104)+'px';n.style.textTransform=B.nameCase||'uppercase';n.style.lineHeight='1.1';}
+if(B.lightBg){$('Blogo').style.boxShadow='0 36px 80px rgba(90,40,30,.28),0 0 0 14px rgba(255,255,255,.8)';}
 $('Bhandle').textContent=B.handle; $('Btag').textContent=B.tagline;
 $('Ch1').textContent=B.travel.title; $('Ch2').textContent=B.travel.sub; $('route').setAttribute('stroke',B.colors.b);
-const CARD_POS=[{l:90,t:640,w:560,h:640,r:-5,s:{l:470,t:700,r:-14}},{l:430,t:1050,w:560,h:600,r:4,s:{l:120,t:1480,r:10}}];
+const CARD_POS=[{l:90,t:640,w:560,h:640,r:-5,s:{l:720,t:720,r:-14}},{l:430,t:1050,w:560,h:600,r:4,s:{l:120,t:1480,r:10}}];
 B.travel.cards.forEach((c,i)=>{const P=CARD_POS[i];const d=document.createElement('div');d.className='pc';Object.assign(d.style,{left:P.l+'px',top:P.t+'px',width:P.w+'px',height:(P.h+90)+'px'});
   d.innerHTML=`<div class="ph"><img src="${c.img}" style="object-position:${c.pos||'50% 50%'}"></div><div class="cap">${c.cap||''}</div>`;$('Cards').appendChild(d);
   const s=document.createElement('div');s.className='stamp';Object.assign(s.style,{left:P.s.l+'px',top:P.s.t+'px'});s.innerHTML=`<b>${c.stamp[0]}</b><i>${c.stamp[1]}</i>`;$('Cards').appendChild(s);});
@@ -133,10 +135,15 @@ $('Dh1').textContent=B.product.title; $('Dh2').textContent=B.product.sub; $('Dbi
 $('DbigImg').style.objectPosition=B.product.bigPos||'50% 50%'; $('DsmallImg').style.objectPosition=B.product.smallPos||'50% 50%';
 B.product.chips.forEach(c=>{const d=document.createElement('div');d.textContent=c;$('Dchips').appendChild(d)});
 $('Ek').textContent=B.cta||'Encuéntralo en'; $('El1').src=B.logo;
+$('El1').style.boxShadow='0 26px 60px rgba(0,0,0,.25),0 0 0 10px rgba(255,255,255,.85)';
 $('Ehs').innerHTML=`<span>${B.handle}</span> · <span>@galeria.casaamiga</span>`;
 // montañas de líneas (identidad de la marca)
 function ridges(svg,seed){let h='';for(let k=0;k<9;k++){let y=300+k*190,d=`M0 ${y}`;for(let x=0;x<=1280;x+=40){const v=Math.sin((x+seed*90+k*57)/170)*60+Math.sin((x*1.7+k*31)/90)*22-Math.abs(Math.sin((x+k*130)/420))*120;d+=` L${x} ${(y+v).toFixed(1)}`}h+=`<path d="${d}" fill="none" stroke="${B.colors.cream}" stroke-opacity="${.05+k*.008}" stroke-width="3"/>`}svg.innerHTML=h}
-ridges($('ridges'),1);ridges($('ridges2'),4);
+function brush(svg,seed){const cols=B.brushColors||[B.colors.b];let h='<defs><filter id="bl'+seed+'" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="22"/></filter></defs>';
+  for(let k=0;k<7;k++){const c=cols[(k+seed)%cols.length],x=((k*389+seed*211)%1100)-60,y=((k*577+seed*97)%1800)+40,w=380+((k*131)%260),r=-35+((k*53+seed*29)%70);
+    h+=`<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#bl${seed})" opacity="${.32+(k%3)*.06}"><rect x="${-w/2}" y="-60" width="${w}" height="120" rx="60" fill="${c}"/><rect x="${-w/2+40}" y="-30" width="${w*.7}" height="70" rx="35" fill="${c}"/></g>`}
+  svg.innerHTML=h}
+if(B.decor==='brush'){brush($('ridges'),1);brush($('ridges2'),4);}else{ridges($('ridges'),1);ridges($('ridges2'),4);}
 const URL='casa-amiga-henna.vercel.app';
 const S={A:[0,3.9],B:[3.6,9.2],C:[9.0,15.6],D:[15.4,21.4],E:[21.2,29.0]};const DUR=29.0;
 function show(id,t){const [a,b]=S[id];const on=t>=a&&t<b;$(id).style.display=on?'block':'none';return on?t-a:null}
@@ -185,9 +192,10 @@ async function render(t){let u;
     $('Eurl').textContent=URL.slice(0,Math.floor(clamp((u-3.0)/1.4)*URL.length));$('Ehs').style.opacity=p(u,4.4,5.0);
   }
   // badge Casa Amiga (arriba) durante la marca
-  const bv=p(t,4.6,5.4)*(1-p(t,20.8,21.4));const bd=$('badge');bd.style.opacity=bv;bd.style.transform=`translateX(-50%) translateY(${(1-eo(p(t,4.6,5.4)))*-30}px)`;
-  const onPaper=t>=S.C[0]&&t<S.C[1];bd.style.color=onPaper?B.colors.a:B.colors.cream;bd.style.background=onPaper?'rgba(255,255,255,.55)':'rgba(255,255,255,.14)';
-  $('badgeTxt').textContent=t<15.4?'Casa Amiga presenta':(B.badgeFind||'Encuéntralo en Casa Amiga');
+  // letrero fijo "Esto lo puedes encontrar en Casa Amiga" desde que aparece la marca hasta el final
+  const bv=p(t,4.4,5.2);const bd=$('badge');bd.style.opacity=bv;bd.style.transform=`translateX(-50%) translateY(${(1-eo(bv))*-30}px)`;
+  const light=B.lightBg||(t>=S.C[0]&&t<S.C[1])||t>=S.E[0];
+  bd.style.color=light?'#4A1F0E':B.colors.cream;bd.style.background=light?'rgba(255,255,255,.62)':'rgba(255,255,255,.14)';bd.style.borderColor=light?'rgba(122,46,23,.14)':'rgba(255,255,255,.45)';
   $('grain').style.transform=`translate(${(Math.floor(t*30)*37)%200-100}px,${(Math.floor(t*30)*61)%200-100}px)`;
   await Promise.all([...document.images].filter(i=>!i.complete).map(i=>i.decode().catch(()=>{})));
 }

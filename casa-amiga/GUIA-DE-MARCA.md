@@ -85,7 +85,7 @@ Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja 
 - Video de marcas originales (40 s, fondo blanco): Macetas 3D, Arcoíris Negro, Rhipsalis, Ilustración y retrato.
 
 ## Videos por marca (plantilla `build/brand.html`)
-Estructura (29 s): intro Casa Amiga ("Marcas que encuentras en Casa Amiga") → barrido al color de la marca → presentación de la marca (logo, nombre, @, lema) → escena de historia o fotos → producto en Casa Amiga → cierre "Encuéntralo en [marca] × Casa Amiga" con ubicación, web y cuentas. El logo de Casa Amiga queda arriba durante toda la parte de la marca.
+Estructura (29 s): intro Casa Amiga ("Marcas que encuentras en Casa Amiga") → barrido al color de la marca → presentación de la marca (logo, nombre, @, lema) → escena de historia o fotos → producto en Casa Amiga → cierre "Encuéntralo en [marca] × Casa Amiga" con ubicación, web y cuentas. Arriba queda fijo, desde que aparece la marca hasta el final, el logo de Casa Amiga con el letrero **"Esto lo puedes encontrar en Casa Amiga"** (pedido del cliente: debe ir en todos los videos de marca).
 - Cada marca tiene su archivo `build/brands/<id>.js` (colores, tipografías, logo, textos y fotos) y su material en `material/marcas/<id>/`.
 - Render: `PAGE='brand.html?b=<id>' node render.js video salida.mp4 30`. Música: `music_brand_bossa.py` (bossa nova vintage; se puede cambiar el estilo por marca).
 
@@ -94,3 +94,6 @@ Colores del logo: teal `#244147`, naranja `#B06234`, crema `#F3EAD3`. Tipografí
 
 ### 2. Alima | Alquimia de Montaña (@alimademontana), listo
 Colores del logo: vino `#6E3A46`, beige `#D9C4A3`, verde salvia `#6F7D4E` (de la etiqueta del alcohol). Tipografías: Cinzel y Cormorant Garamond (como sus etiquetas). Bio: "Cosmética Natural | Magia, Salud y Bienestar · Conexión Elemental · Medicinas a base de plantas". Productos: Alcohol para los dolores (60 ml), Bálsamo labial humectante (10 g), Crema dental. Música: `music_brand_mistica.py` (handpan, kalimba, tambor de marco). El logo venía tapado por el botón de Instagram y se reconstruyó esa esquina.
+
+### 3. SaboryArte | Mezcla de sales y especias Gourmet (@saboryarte.cocina), listo
+Colores del logo: rosa `#EAD3CB`, verde oscuro `#1F4A32`, terracota `#B5574F` (la "y"), pinceladas en malva, salvia y mostaza. Tipografías: Great Vibes (nombre), Bree Serif (como sus publicaciones) y Caveat. Fondo de pinceladas de acuarela (`decor: 'brush'`). Bio: "Mezclas de sales y especias que transforman tus comidas · El arte de crear, el arte de cocinar". Productos (de sus publicaciones): Sal de la vid (aliada de la parrilla), Sal Chilemon (ácida y picante), Sal de sol, Sal de oro, Sal de luna rosa. Música: `music_brand_ukelele.py` (ukelele, glockenspiel, chasquidos, madera).
