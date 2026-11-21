@@ -69,3 +69,5 @@ Fachada de día con gente (0–9 s), letrero de cerca (6–9 s), interior con so
 
 ## Estilo del video, versión actual (v4, claro)
 Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja sobre claro: `#C4570E`), cristal blanco translúcido. Archivo: `exports/casa-amiga-bienvenida-v4.mp4` (48,5 s). La versión oscura quedó en `build/video-oscuro.html`.
+
+- Marca **Hizca** (productos naturales: aceites, bálsamos y elixires; foto en `material/fotos-3/05-hizca-captura-instagram.jpg`, es una captura de Instagram, se recortó la interfaz). Reemplaza a "Bienestar natural" en la escena de marcas locales.
