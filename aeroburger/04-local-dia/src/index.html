@@ -32,7 +32,9 @@ let acc=START; for(const c of CLIPS){ c.start=acc; c.dur=c.n/60; acc+=c.dur; c.e
 const CEND=acc;                 // ~18.1
 const DURATION=Math.ceil((CEND+3.4)*10)/10; window.DURATION=DURATION;
 const CARD={x:90,y:300,w:900,h:1260,r:28};
-const CREAM='#F3ECE2', INK='#2A221B';   // intro y cierre: crema y café oscuro (madera y bambú del local)
+const CREAM='#EFE8DE', INK='#3B3229';   // v4: un solo tono arena, más cómodo a la vista
+CLIPS.forEach(c=>{ c.bg=CREAM; c.ink=INK; });
+const FOOT_FILTER='contrast(0.95) saturate(0.92) sepia(0.07) brightness(1.03)';   // tomas cálidas y suaves   // intro y cierre: crema y café oscuro (madera y bambú del local)
 const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const mixc=(a,b,e)=>{ const A=hex(a),B=hex(b); return `rgb(${A.map((v,i)=>Math.round(lerp(v,B[i],e))).join(',')})`; };
 const rgba=(h,al)=>`rgba(${hex(h).join(',')},${al})`;
@@ -90,9 +92,9 @@ function sGallery(ctx,t,img){
   const s=lerp(0.97,1,eOut(prog(t,START-0.3,START+0.2)));
   const cx=CARD.x+CARD.w/2, cy=CARD.y+CARD.h/2;
   ctx.save(); ctx.globalAlpha=a; ctx.translate(cx,cy); ctx.scale(s,s); ctx.translate(-cx,-cy);
-  const th=themeAt(t); ctx.shadowColor=rgba(th.inkHex,.22); ctx.shadowBlur=60; ctx.shadowOffsetY=22; rr(ctx,CARD.x,CARD.y,CARD.w,CARD.h,CARD.r); ctx.fillStyle=th.bg; ctx.fill(); ctx.shadowColor='transparent';
+  const th=themeAt(t); ctx.shadowColor=rgba(th.inkHex,.14); ctx.shadowBlur=70; ctx.shadowOffsetY=24; rr(ctx,CARD.x,CARD.y,CARD.w,CARD.h,CARD.r); ctx.fillStyle=th.bg; ctx.fill(); ctx.shadowColor='transparent';
   rr(ctx,CARD.x,CARD.y,CARD.w,CARD.h,CARD.r); ctx.clip();
-  if(img) ctx.drawImage(img,CARD.x,CARD.y,CARD.w,CARD.h);
+  if(img){ ctx.filter=FOOT_FILTER; ctx.drawImage(img,CARD.x,CARD.y,CARD.w,CARD.h); ctx.filter='none'; }
   ctx.restore();
   ctx.save(); ctx.globalAlpha=a; rr(ctx,CARD.x+.5,CARD.y+.5,CARD.w-1,CARD.h-1,CARD.r); ctx.strokeStyle=rgba(th.inkHex,.10); ctx.lineWidth=1.5; ctx.stroke(); ctx.restore();
   // etiquetas tipo galería
@@ -123,7 +125,7 @@ function render(ctx,t,img){
   const th=themeAt(t);
   ctx.fillStyle=th.bg; ctx.fillRect(0,0,W,H);
   // luz suave arriba, como papel iluminado
-  const g=ctx.createRadialGradient(540,500,0,540,500,1400); g.addColorStop(0,'rgba(255,255,255,.35)'); g.addColorStop(1,'rgba(255,255,255,0)');
+  const g=ctx.createRadialGradient(540,500,0,540,500,1400); g.addColorStop(0,'rgba(255,252,246,.30)'); g.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
   sIntro(ctx,t); sGallery(ctx,t,img); sOutro(ctx,t);
 }

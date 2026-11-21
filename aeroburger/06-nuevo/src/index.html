@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Menú de a bordo</title>
+<style>@font-face{font-family:'AirbusSlab';src:url('../assets/Bevan-Regular.ttf')}
+html,body{margin:0;background:#EFE8DE;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · "Menú de a bordo" · Reel 1080x1920 @60fps
+   Carta de avión en papel crema: los platos pasan como páginas, luego la chimenea y el mapa.
+   Animación determinista: window.seek(t).
+   ========================================================================= */
+const W=1080, H=1920;
+const TEXT='"Inter", sans-serif', DISP='"Inter Display", "Inter", sans-serif', SLAB='"AirbusSlab", serif';
+const CREAM='#EFE8DE', INK='#3B3229', SOFT='rgba(59,50,41,.58)', FAINT='rgba(59,50,41,.14)';
+const DISHES=[
+  {img:'p1', name:'Clásica CTA',               desc:'Nuestra hamburguesa clásica.',          ay:0.5},
+  {img:'p2', name:'Airbus',                    desc:'Doble carne · 400 g de res.',           ay:0.55},
+  {img:'p3', name:'Sánduche de la casa',       desc:'Pan artesanal a base de orégano.',      ay:0.5},
+  {img:'p4', name:'Torre de control personal', desc:'Para ti solo, bien cargada.',           ay:0.5},
+  {img:'p5', name:'Gavilán',                   desc:'Desgranado especial.',                  ay:0.5},
+];
+const I0=2.6, ID=2.1;                         // platos
+const I1=I0+DISHES.length*ID;                 // 13.1
+const F0=I1, F1=F0+3.2;                       // chimenea
+const M0=F1;                                  // mapa + cierre
+const DURATION=22.0; window.DURATION=DURATION;
+const CARD={x:110,y:340,w:860,h:1075,r:30};
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eInOutQ=x=>x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2;
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function cover(ctx,img,x,y,w,h,k=1,ax=0.5,ay=0.5){ const s=Math.max(w/img.width,h/img.height)*k; const dw=img.width*s, dh=img.height*s; ctx.drawImage(img,x+(w-dw)*ax,y+(h-dh)*ay,dw,dh); }
+function txt(ctx,str,x,y,font,col,align,tIn,tOut,t,o={}){
+  const a=eOut(prog(t,tIn,tIn+(o.d||0.4)))*(tOut==null?1:1-eInOut(prog(t,tOut,tOut+0.25)));
+  if(a<=0) return;
+  ctx.save(); ctx.globalAlpha*=a; ctx.font=font; ctx.textAlign=align; ctx.fillStyle=col; if(o.ls) ctx.letterSpacing=o.ls+'px';
+  if(o.shadow){ ctx.shadowColor='rgba(0,0,0,.45)'; ctx.shadowBlur=24; }
+  ctx.fillText(str,x+(o.dx||0)*(1-a),y+(1-a)*(o.dy??16)); ctx.restore();
+}
+function plane(ctx,x,y,s,rot,col){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s); ctx.fillStyle=col;
+  ctx.beginPath(); ctx.ellipse(0,0,0.5,0.065,0,0,Math.PI*2); ctx.fill();
+  for(const k of [1,-1]){
+    ctx.beginPath(); ctx.moveTo(0.12,-0.05*k); ctx.lineTo(-0.12,-0.48*k); ctx.lineTo(-0.24,-0.48*k); ctx.lineTo(-0.12,-0.05*k); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.36,-0.04*k); ctx.lineTo(-0.47,-0.2*k); ctx.lineTo(-0.53,-0.2*k); ctx.lineTo(-0.49,-0.04*k); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+function logo(ctx,x,y,r,a=1){ ctx.save(); ctx.globalAlpha*=a; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x-r,y-r,2*r,2*r); ctx.restore(); }
+const IMG={};
+function loadImg(src){ const img=new Image(); img.src=src; return img.decode().then(()=>img); }
+const FILT='contrast(0.97) saturate(0.95) sepia(0.05) brightness(1.02)';
+
+function bg(ctx){
+  ctx.fillStyle=CREAM; ctx.fillRect(0,0,W,H);
+  const g=ctx.createRadialGradient(540,520,0,540,520,1400); g.addColorStop(0,'rgba(255,252,246,.35)'); g.addColorStop(1,'rgba(255,252,246,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+}
+// línea punteada de ruta con avión (detalle de la carta)
+function route(ctx,y,t,t0,a=1){
+  const p=eInOut(prog(t,t0,t0+1.2)); if(p<=0) return;
+  ctx.save(); ctx.globalAlpha*=a; ctx.strokeStyle=FAINT; ctx.lineWidth=2.5; ctx.setLineDash([8,10]);
+  ctx.beginPath(); ctx.moveTo(140,y); ctx.lineTo(140+800*p,y); ctx.stroke(); ctx.setLineDash([]);
+  plane(ctx,140+800*p,y,40,0,INK); ctx.restore();
+}
+
+function sIntro(ctx,t){
+  if(t>I0+0.3) return;
+  const out=1-eInOut(prog(t,I0-0.35,I0));
+  ctx.save(); ctx.globalAlpha=out;
+  logo(ctx,540,640,lerp(60,70,eOut(prog(t,0.05,0.6))),eOut(prog(t,0.05,0.6)));
+  txt(ctx,'AERO BURGER  ·  SANTA ELENA',540,770,`600 26px ${TEXT}`,SOFT,'center',0.2,null,t,{ls:6});
+  txt(ctx,'MENÚ',540,960,`400 150px ${SLAB}`,INK,'center',0.4,null,t,{ls:4});
+  txt(ctx,'DE A BORDO',540,1080,`400 96px ${SLAB}`,INK,'center',0.55,null,t,{ls:4});
+  route(ctx,1170,t,0.8);
+  txt(ctx,'Hoy despegamos con…',540,1290,`500 40px ${TEXT}`,SOFT,'center',1.1,null,t);
+  ctx.restore();
+}
+// platos: la tarjeta entra desde la derecha y sale hacia la izquierda, como pasar página
+function sDishes(ctx,t){
+  if(t<I0-0.5||t>I1+0.6) return;
+  const lastOut=eInOut(prog(t,I1-0.25,I1+0.25));
+  for(let i=0;i<DISHES.length;i++){
+    const d=DISHES[i], a=I0+i*ID, b=a+ID;
+    const pin=eInOutQ(prog(t,a-0.45,a)), pout= i<DISHES.length-1 ? eInOutQ(prog(t,b-0.45,b)) : 0;
+    if(pin<=0||pout>=1) continue;
+    const x=CARD.x+(1-pin)*W*0.9-pout*W*0.9, rot=(1-pin)*0.05-pout*0.05;
+    ctx.save(); ctx.globalAlpha=(i===DISHES.length-1?1-lastOut:1);
+    ctx.translate(x+CARD.w/2,CARD.y+CARD.h/2); ctx.rotate(rot); ctx.translate(-CARD.w/2,-CARD.h/2);
+    ctx.shadowColor='rgba(59,50,41,.16)'; ctx.shadowBlur=70; ctx.shadowOffsetY=26; rr(ctx,0,0,CARD.w,CARD.h,CARD.r); ctx.fillStyle='#fff'; ctx.fill(); ctx.shadowColor='transparent';
+    ctx.save(); rr(ctx,0,0,CARD.w,CARD.h,CARD.r); ctx.clip(); ctx.filter=FILT;
+    cover(ctx,IMG[d.img],0,0,CARD.w,CARD.h,lerp(1.08,1.0,eOut(prog(t,a-0.45,b))),0.5,d.ay); ctx.filter='none'; ctx.restore();
+    rr(ctx,.5,.5,CARD.w-1,CARD.h-1,CARD.r); ctx.strokeStyle='rgba(59,50,41,.10)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.restore();
+    // textos del plato
+    const tin=a-0.1, tout=i<DISHES.length-1?b-0.35:I1-0.3;
+    txt(ctx,String(i+1).padStart(2,'0')+' / 05',CARD.x,292,`600 28px ${TEXT}`,SOFT,'left',tin,tout,t,{dy:10});
+    txt(ctx,'EN LA CARTA',CARD.x+CARD.w,292,`600 24px ${TEXT}`,SOFT,'right',I0-0.3,I1-0.3,t,{ls:5,dy:10});
+    txt(ctx,d.name,540,1520,`700 ${d.name.length>20?58:68}px ${DISP}`,INK,'center',tin+0.05,tout,t,{ls:-1.5});
+    txt(ctx,d.desc,540,1585,`500 36px ${TEXT}`,SOFT,'center',tin+0.15,tout,t);
+  }
+}
+function sFire(ctx,t){
+  if(t<F0-0.4||t>F1+0.5) return;
+  const a=eInOut(prog(t,F0-0.35,F0+0.2))*(1-eInOut(prog(t,F1-0.2,F1+0.3)));
+  ctx.save(); ctx.globalAlpha=a; ctx.filter='contrast(1.02) saturate(1.05) brightness(1.05)';
+  cover(ctx,IMG.fire,0,0,W,H,lerp(1.12,1.04,prog(t,F0-0.4,F1+0.5)),0.5,0.5); ctx.filter='none';
+  let g=ctx.createLinearGradient(0,900,0,H); g.addColorStop(0,'rgba(20,12,8,0)'); g.addColorStop(0.55,'rgba(20,12,8,.6)'); g.addColorStop(1,'rgba(20,12,8,.8)'); ctx.fillStyle=g; ctx.fillRect(0,900,W,H-900);
+  ctx.restore();
+  ctx.save(); ctx.globalAlpha=a;
+  txt(ctx,'Noches frías,',540,1300,`700 76px ${DISP}`,'#FBF6EE','center',F0+0.2,F1-0.35,t,{ls:-2,shadow:true});
+  txt(ctx,'chimenea encendida.',540,1390,`700 76px ${DISP}`,'#F2B467','center',F0+0.4,F1-0.3,t,{ls:-2,shadow:true});
+  ctx.restore();
+}
+function sMap(ctx,t){
+  if(t<M0-0.1) return;
+  const T0=M0+0.1;
+  txt(ctx,'¿CÓMO LLEGAR?',540,330,`600 28px ${TEXT}`,SOFT,'center',T0,null,t,{ls:7});
+  txt(ctx,'Desde El Silletero,',540,420,`700 64px ${DISP}`,INK,'center',T0+0.1,null,t,{ls:-1.5});
+  txt(ctx,'sigue la ruta.',540,495,`700 64px ${DISP}`,INK,'center',T0+0.2,null,t,{ls:-1.5});
+  const p=eOut(prog(t,T0+0.25,T0+0.9));
+  if(p>0){
+    const w=900, h=Math.round(900*IMG.mapa.height/IMG.mapa.width), x=90, y=580+(1-p)*60;
+    ctx.save(); ctx.globalAlpha=p;
+    ctx.shadowColor='rgba(59,50,41,.16)'; ctx.shadowBlur=60; ctx.shadowOffsetY=22; rr(ctx,x,y,w,h,28); ctx.fillStyle='#fff'; ctx.fill(); ctx.shadowColor='transparent';
+    ctx.save(); rr(ctx,x,y,w,h,28); ctx.clip(); ctx.drawImage(IMG.mapa,x,y,w,h); ctx.restore();
+    rr(ctx,x+.5,y+.5,w-1,h-1,28); ctx.strokeStyle='rgba(59,50,41,.12)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.restore();
+  }
+  logo(ctx,540,1430,52,eOut(prog(t,T0+1.0,T0+1.5)));
+  txt(ctx,'Aero Burger  ·  Santa Elena',540,1540,`600 38px ${TEXT}`,INK,'center',T0+1.15,null,t);
+  txt(ctx,'Ven al local o pide domicilio en Santa Elena.',540,1595,`500 32px ${TEXT}`,SOFT,'center',T0+1.3,null,t);
+  txt(ctx,'@aero.burger',540,1665,`700 36px ${TEXT}`,INK,'center',T0+1.45,null,t);
+}
+function render(ctx,t){ bg(ctx); sIntro(ctx,t); sDishes(ctx,t); sFire(ctx,t); sMap(ctx,t); }
+const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
+const accC=document.createElement('canvas'); accC.width=W; accC.height=H; const actx=accC.getContext('2d');
+// desenfoque de movimiento solo en los pases de página
+const inBlur=t=>DISHES.some((d,i)=>{ const a=I0+i*ID; return t>a-0.5&&t<a+0.02; });
+window.seek=async function(t){
+  if(!inBlur(t)){ render(ctx,t); return; }
+  ctx.clearRect(0,0,W,H); const N=5;
+  for(let i=0;i<N;i++){ render(actx,t+(i/(N-1)-0.5)*0.32/60); ctx.globalAlpha=1/(i+1); ctx.drawImage(accC,0,0); ctx.globalAlpha=1; }
+};
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  for(const [k,s] of [['p1','p1_cta.jpg'],['p2','p2_airbus.jpg'],['p3','p3_sanduche.jpg'],['p4','p4_torre.jpg'],['p5','p5_gavilan.jpg'],['fire','fire_sr.png'],['mapa','mapa.jpg'],['logo','logo_crop.png']]) IMG[k]=await loadImg('../assets/'+s);
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+  return true;
+})();
+</script>
+</body>
+</html>
