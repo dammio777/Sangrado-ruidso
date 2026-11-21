@@ -50,3 +50,7 @@ Paleta cálida y terrosa: madera, luz cálida de bombillos, plantas.
 - **Diseño y objetos:** lámpara-hongo, materas impresas en 3D, tote bags "love".
 - **Marcas locales:** Montaña, Frío & Café; Café La Cabaña; Saboryarte (sales); Alima (alcohol para los dolores, bálsamo, crema dental); Pargo Viche.
 - **Descartar o usar poco:** 12-saboryarte-borrosa (desenfocada) y 10-pargo-viche-hongo-oscuro (subexpuesta).
+### Lote 2 (4 fotos, carpeta material/fotos-2)
+- **02-galeria-general-iluminada-vertical**: el mejor plano general, ya en 9:16 y con la lámpara de araña encendida. Plano principal del recorrido.
+- **04-galeria-tapete-desde-armario**: plano general alternativo con el tapete y el estante de la lámpara-hongo.
+- **01 y 03**: muy oscuras, con luz de linterna. Sirven para un efecto de "luces que se encienden" (de la oscura a la iluminada) o se descartan.
