@@ -83,3 +83,11 @@ Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja 
 - **Hizca** NO es marca original: va en "Marcas locales" del video de bienvenida.
 - Mensaje para macetas, cuadros y retratos: "Estamos dispuestas a hacer trabajos personalizados".
 - Video de marcas originales (40 s, fondo blanco): Macetas 3D, Arcoíris Negro, Rhipsalis, Ilustración y retrato.
+
+## Videos por marca (plantilla `build/brand.html`)
+Estructura (29 s): intro Casa Amiga ("Marcas que encuentras en Casa Amiga") → barrido al color de la marca → presentación de la marca (logo, nombre, @, lema) → escena de historia o fotos → producto en Casa Amiga → cierre "Encuéntralo en [marca] × Casa Amiga" con ubicación, web y cuentas. El logo de Casa Amiga queda arriba durante toda la parte de la marca.
+- Cada marca tiene su archivo `build/brands/<id>.js` (colores, tipografías, logo, textos y fotos) y su material en `material/marcas/<id>/`.
+- Render: `PAGE='brand.html?b=<id>' node render.js video salida.mp4 30`. Música: `music_brand_bossa.py` (bossa nova vintage; se puede cambiar el estilo por marca).
+
+### 1. Montaña, Frío & Café (@montanafrioycafe), listo
+Colores del logo: teal `#244147`, naranja `#B06234`, crema `#F3EAD3`. Tipografías: Alfa Slab One, Libre Baskerville y Special Elite (vintage). Tema: "El sabor de Colombia viajando por el mundo" (postales de París y Anchorage, Alaska, tomadas de su Instagram). Bio: "Delicioso Café 100% Colombiano · Aroma y sabor auténticos en cada taza". Bolsa: café tostado, 340 g, 100% arábico, producto de Colombia.
