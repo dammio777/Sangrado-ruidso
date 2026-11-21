@@ -91,3 +91,6 @@ Estructura (29 s): intro Casa Amiga ("Marcas que encuentras en Casa Amiga") → 
 
 ### 1. Montaña, Frío & Café (@montanafrioycafe), listo
 Colores del logo: teal `#244147`, naranja `#B06234`, crema `#F3EAD3`. Tipografías: Alfa Slab One, Libre Baskerville y Special Elite (vintage). Tema: "El sabor de Colombia viajando por el mundo" (postales de París y Anchorage, Alaska, tomadas de su Instagram). Bio: "Delicioso Café 100% Colombiano · Aroma y sabor auténticos en cada taza". Bolsa: café tostado, 340 g, 100% arábico, producto de Colombia.
+
+### 2. Alima | Alquimia de Montaña (@alimademontana), listo
+Colores del logo: vino `#6E3A46`, beige `#D9C4A3`, verde salvia `#6F7D4E` (de la etiqueta del alcohol). Tipografías: Cinzel y Cormorant Garamond (como sus etiquetas). Bio: "Cosmética Natural | Magia, Salud y Bienestar · Conexión Elemental · Medicinas a base de plantas". Productos: Alcohol para los dolores (60 ml), Bálsamo labial humectante (10 g), Crema dental. Música: `music_brand_mistica.py` (handpan, kalimba, tambor de marco). El logo venía tapado por el botón de Instagram y se reconstruyó esa esquina.

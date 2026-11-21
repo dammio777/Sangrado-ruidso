@@ -187,7 +187,7 @@ async function render(t){let u;
   // badge Casa Amiga (arriba) durante la marca
   const bv=p(t,4.6,5.4)*(1-p(t,20.8,21.4));const bd=$('badge');bd.style.opacity=bv;bd.style.transform=`translateX(-50%) translateY(${(1-eo(p(t,4.6,5.4)))*-30}px)`;
   const onPaper=t>=S.C[0]&&t<S.C[1];bd.style.color=onPaper?B.colors.a:B.colors.cream;bd.style.background=onPaper?'rgba(255,255,255,.55)':'rgba(255,255,255,.14)';
-  $('badgeTxt').textContent=t<15.4?'Casa Amiga presenta':'Encuéntralo en Casa Amiga';
+  $('badgeTxt').textContent=t<15.4?'Casa Amiga presenta':(B.badgeFind||'Encuéntralo en Casa Amiga');
   $('grain').style.transform=`translate(${(Math.floor(t*30)*37)%200-100}px,${(Math.floor(t*30)*61)%200-100}px)`;
   await Promise.all([...document.images].filter(i=>!i.complete).map(i=>i.decode().catch(()=>{})));
 }
