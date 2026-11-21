@@ -134,7 +134,23 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
 #m3 .lab div+div{font-size:36px;font-weight:600;line-height:1.2}
 #m3 .tag{position:absolute;right:80px;top:500px;border-radius:999px;padding:16px 28px;font-size:23px;font-weight:600}
 
-#m0,#m3{color:var(--ink)}
+#m0,#m3,#m4{color:var(--ink)}
+.perso{position:absolute;left:80px;border-radius:999px;padding:14px 28px;background:var(--naranja);color:#fff;font-size:25px;font-weight:600;white-space:nowrap;box-shadow:0 14px 34px rgba(194,87,14,.38);transform-origin:0 50%;text-shadow:0 1px 0 rgba(122,46,23,.25)}
+#s6b .perso{top:385px}
+#m4 .perso{top:480px;left:60px}
+#m4 .ghost{position:absolute;top:900px;left:-40px;font-size:560px;color:rgba(242,144,33,.14);white-space:nowrap;line-height:1}
+#m4 .head{position:absolute;top:150px;left:80px}
+#m4 .head .mono{font-size:24px;color:var(--ntxt)}
+#m4 .head .anton{font-size:128px;margin-top:44px}
+#m4 .ibig{position:absolute;left:60px;top:560px;width:560px;height:780px;border-radius:48px;overflow:hidden;box-shadow:0 34px 80px rgba(122,46,23,.4);border:2px solid rgba(255,255,255,.9)}
+#m4 .ip{position:absolute;width:400px;height:520px;background:#fffaf2;padding:16px 16px 56px;border-radius:14px;box-shadow:0 26px 60px rgba(122,46,23,.38)}
+#m4 #iB{left:620px;top:590px}
+#m4 #iC{left:600px;top:1150px}
+#m4 .ibig img,#m4 .ip img{width:100%;height:100%;object-fit:cover;display:block;border-radius:6px}
+#m4 .ibig img{position:absolute;inset:0;border-radius:0}
+#m4 .lab{position:absolute;left:60px;top:1410px;width:500px;border-radius:36px;padding:32px 36px}
+#m4 .lab .mono{font-size:20px;color:var(--ntxt);font-weight:700;margin-bottom:10px}
+#m4 .lab div+div{font-size:34px;font-weight:600;line-height:1.2}
 #m0 .logo{position:absolute;left:50%;top:150px;width:300px;height:300px;margin-left:-150px}
 #m0 .logo img{width:100%;height:100%;filter:drop-shadow(0 20px 36px rgba(122,46,23,.35))}
 #m0 .t{position:absolute;left:0;right:0;top:520px;text-align:center}
@@ -142,11 +158,11 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
 #m0 .l2{color:var(--naranja)}
 #m0 .sc{font-family:'Great Vibes',cursive;font-size:132px;color:var(--ntxt);margin-top:8px;white-space:nowrap;text-transform:none;letter-spacing:0;line-height:1.1}
 #m0 .pics{position:absolute;left:0;right:0;top:1330px;height:380px}
-#m0 .pic{position:absolute;top:0;width:270px;text-align:center}
-#m0 .pic .c{width:270px;height:270px;border-radius:50%;overflow:hidden;border:7px solid #fffaf2;box-shadow:0 24px 50px rgba(122,46,23,.38)}
+#m0 .pic{position:absolute;top:0;width:210px;text-align:center}
+#m0 .pic .c{width:210px;height:210px;border-radius:50%;overflow:hidden;border:7px solid #fffaf2;box-shadow:0 24px 50px rgba(122,46,23,.38)}
 #m0 .pic .c img{width:100%;height:100%;object-fit:cover}
-#m0 .pic .n{display:inline-block;margin-top:22px;border-radius:999px;padding:13px 24px;font-size:25px;font-weight:600;white-space:nowrap}
-#m3 .head .anton{font-size:190px}
+#m0 .pic .n{display:inline-block;margin-top:20px;border-radius:999px;padding:11px 18px;font-size:21px;font-weight:600;white-space:nowrap}
+#m3 .head .anton{font-size:180px}
 #m3 .dots{position:absolute;right:130px;top:510px;display:flex;gap:14px}
 #m3 .dots i{display:block;width:44px;height:44px;border-radius:50%;border:4px solid #fffaf2;box-shadow:0 8px 20px rgba(0,0,0,.28)}
 </style></head><body>
@@ -162,9 +178,10 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
       <div class="sc" id="m0s">de Casa Amiga!</div>
     </div>
     <div class="pics" id="m0pics">
-      <div class="pic" style="left:90px"><div class="c"><img src="assets/img/macetas-luna.jpg" style="object-position:40% 50%"></div><div class="n glass">Macetas 3D</div></div>
-      <div class="pic" style="left:405px"><div class="c"><img src="assets/img/camisetas.jpg" style="object-position:30% 45%"></div><div class="n glass">Arcoíris Negro</div></div>
-      <div class="pic" style="left:720px"><div class="c"><img src="assets/img/hizca.jpg"></div><div class="n glass">Hizca</div></div>
+      <div class="pic" style="left:60px"><div class="c"><img src="assets/img/macetas-luna.jpg" style="object-position:40% 50%"></div><div class="n glass">Macetas 3D</div></div>
+      <div class="pic" style="left:310px"><div class="c"><img src="assets/img/camisetas.jpg" style="object-position:30% 45%"></div><div class="n glass">Arcoíris Negro</div></div>
+      <div class="pic" style="left:560px"><div class="c"><img src="assets/img/rhip1.jpg" style="object-position:60% 35%"></div><div class="n glass">Rhipsalis</div></div>
+      <div class="pic" style="left:810px"><div class="c"><img src="assets/img/ilustra.jpg" style="object-position:40% 45%"></div><div class="n glass">Ilustración</div></div>
     </div>
   </div>
   <!-- S6b macetas 3D -->
@@ -173,6 +190,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
     <div style="position:absolute;inset:0;background:rgba(255,240,218,.88)"></div>
     <div class="ghost anton">3D</div>
     <div class="head"><div class="mono" id="mm">01 — Marca original</div><div class="anton"><span class="mask"><span class="ch" id="mh1">Macetas</span></span> <span class="mask"><span class="ch" id="mh2" style="color:var(--naranja)">3D</span></span></div></div>
+    <div class="perso" id="pM">✦ Estamos dispuestas a hacer trabajos personalizados</div>
     <div class="big" id="mA"><img src="assets/img/macetas-luna.jpg" style="object-position:40% 50%"></div>
     <div class="tag glass" id="mT">Impresas en 3D</div>
     <div class="small" id="mB"><img src="assets/img/macetas-trio.jpg" style="object-position:45% 70%"></div>
@@ -189,14 +207,26 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
     <div class="lab glass" id="cL"><div class="mono">Camisetas tie-dye</div><div>Cada camiseta es una pieza distinta</div></div>
   </div>
   <div class="layer" id="m3">
-    <img class="cover" src="assets/blur/hizca.jpg">
+    <img class="cover" src="assets/blur/rhip1.jpg">
     <div style="position:absolute;inset:0;background:rgba(255,240,218,.88)"></div>
-    <div class="ghost anton">Hizca</div>
-    <div class="head"><div class="mono" id="hm">03 — Marca original</div><div class="anton"><span class="mask"><span class="ch" id="hh1">Hizca</span></span></div></div>
-    <div class="big" id="hA"><img src="assets/img/hizca.jpg" style="object-position:50% 45%"></div>
-    <div class="dots" id="hD"><i style="background:#D9A21B"></i><i style="background:#E59AB2"></i><i style="background:#3B3F8C"></i></div>
-    <div class="small" id="hB"><img src="assets/img/hizca2.jpg" style="object-position:50% 50%"></div>
-    <div class="lab glass" id="hL"><div class="mono">Hizca</div><div>Aceites y bálsamos</div></div>
+    <div class="ghost anton">Rhipsalis</div>
+    <div class="head"><div class="mono" id="hm">03 — Marca original</div><div class="anton"><span class="mask"><span class="ch" id="hh1">Rhipsalis</span></span></div></div>
+    <div class="big" id="hA"><img src="assets/img/rhip1.jpg" style="object-position:50% 30%"></div>
+    <div class="dots" id="hD"><i style="background:#D0208F"></i><i style="background:#1FA4E0"></i><i style="background:#F2C230"></i></div>
+    <div class="small" id="hB"><img src="assets/img/rhip2.jpg" style="object-position:50% 50%"></div>
+    <div class="lab glass" id="hL"><div class="mono">@universo_rhipsalis</div><div>Ropa psicodélica y accesorios artísticos</div></div>
+  </div>
+  <!-- M4 ilustración y retrato -->
+  <div class="layer" id="m4">
+    <img class="cover" src="assets/blur/boceto1.jpg">
+    <div style="position:absolute;inset:0;background:rgba(255,240,218,.88)"></div>
+    <div class="ghost anton">Arte</div>
+    <div class="head"><div class="mono" id="im">04 — Arte original</div><div class="anton"><span class="mask"><span class="ch" id="ih1">Ilustración</span></span><br><span class="mask"><span class="ch" id="ih2" style="color:var(--naranja)">y retrato</span></span></div></div>
+    <div class="perso" id="pI">✦ Estamos dispuestas a hacer trabajos personalizados</div>
+    <div class="ibig" id="iA"><img src="assets/img/ilustra.jpg" style="object-position:40% 50%"></div>
+    <div class="ip" id="iB"><img src="assets/img/boceto1.jpg" style="object-position:55% 45%"></div>
+    <div class="ip" id="iC"><img src="assets/img/boceto2.jpg" style="object-position:40% 45%"></div>
+    <div class="lab glass" id="iL"><div class="mono">Hecho en Casa Amiga</div><div>Inspiradas en la naturaleza y retratos a lápiz</div></div>
   </div>
   <!-- S9 CTA -->
   <div class="layer" id="s9">
@@ -222,8 +252,8 @@ const expo=x=>x>=1?1:1-Math.pow(2,-10*x);
 const back=x=>{const c=.9,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
 const spring=(x,f=4.5,d=6)=>x<=0?0:1-Math.exp(-d*x)*Math.cos(f*Math.PI*x);
 const FPS=30;
-const S={m0:[0,3.6],s6b:[3.5,8.1],s6c:[8.0,12.6],m3:[12.5,17.1],s9:[17.0,25.0]};
-const DUR=25.0;
+const S={m0:[0,3.6],s6b:[3.5,8.1],s6c:[8.0,12.6],m3:[12.5,17.1],m4:[17.0,21.6],s9:[21.5,29.5]};
+const DUR=29.5;
 const URL='casa-amiga-henna.vercel.app';
 // video frames
 const CLIP={v1:98,v2:110,v3:80,v4:109,v5:85};
@@ -248,7 +278,7 @@ async function renderInner(t){
     $('mA').querySelector('img').style.transform=`scale(${lerp(1.4,1.08,eo(p(u,.1,4.4)))})`;
     const y=p(u,.85,1.7);$('mB').style.opacity=y>0?1:0;$('mB').style.transform=`translate(${(1-eo5(y))*700}px,${Math.sin(u*2.2)*7}px) rotate(${lerp(16,4,eo5(y))}deg)`;
     $('mB').querySelector('img').style.transform=`scale(${lerp(1.3,1.05,eo(p(u,.85,4.4)))})`;
-    rise($('mh1'),p(u,.15,.75));rise($('mh2'),p(u,.28,.88));$('mm').style.opacity=p(u,.05,.45);
+    rise($('mh1'),p(u,.15,.75));{const k=p(u,.9,1.5);$('pM').style.opacity=k;$('pM').style.transform=`scale(${lerp(.6,1,back(k))}) translateX(${(1-eo5(k))*-40}px)`;}rise($('mh2'),p(u,.28,.88));$('mm').style.opacity=p(u,.05,.45);
     const lb=p(u,1.5,2.1);$('mL').style.opacity=lb;$('mL').style.transform=`translateY(${(1-eo5(lb))*120}px)`;
     const tg=p(u,1.2,1.8);$('mT').style.opacity=tg;$('mT').style.transform=`scale(${lerp(.7,1,back(tg))})`;
     $('s6b').querySelector('.ghost').style.transform=`translateX(${-u*30}px)`;
@@ -275,6 +305,17 @@ async function renderInner(t){
     const lb=p(u,1.5,2.1);$('hL').style.opacity=lb;$('hL').style.transform=`translateY(${(1-eo5(lb))*120}px)`;
     $('m3').querySelector('.ghost').style.transform=`translateX(${-u*30}px)`;
     const out=p(u,4.15,4.5);$('hA').style.opacity=1-ei(out);$('hB').style.transform+=` translateY(${ei(out)*500}px)`;
+  }
+  if((u=show('m4',t))!==null){
+    const x=eo5(p(u,.1,.95)),i=(1-x)*50;$('iA').style.clipPath=`inset(${i}% ${i}% ${i}% ${i}% round 48px)`;
+    $('iA').querySelector('img').style.transform=`scale(${lerp(1.3,1.04,eo(p(u,.1,4.4)))})`;
+    const b=p(u,.7,1.5),c=p(u,1.0,1.8);
+    $('iB').style.opacity=b>0?1:0;$('iB').style.transform=`translate(${(1-eo5(b))*700}px,${Math.sin(u*2)*6}px) rotate(${lerp(18,5,eo5(b))}deg)`;
+    $('iC').style.opacity=c>0?1:0;$('iC').style.transform=`translate(${(1-eo5(c))*700}px,${(1-eo5(c))*200+Math.sin(u*2+1)*6}px) rotate(${lerp(-16,-4,eo5(c))}deg)`;
+    rise($('ih1'),p(u,.15,.75));{const k=p(u,.9,1.5);$('pI').style.opacity=k;$('pI').style.transform=`scale(${lerp(.6,1,back(k))}) translateX(${(1-eo5(k))*-40}px)`;}rise($('ih2'),p(u,.28,.88));$('im').style.opacity=p(u,.05,.45);
+    const lb=p(u,1.6,2.2);$('iL').style.opacity=lb;$('iL').style.transform=`translateY(${(1-eo5(lb))*120}px)`;
+    $('m4').querySelector('.ghost').style.transform=`translateX(${-u*30}px)`;
+    const out=p(u,4.15,4.5);$('iA').style.opacity=1-ei(out);$('iB').style.opacity=b>0?1-ei(out):0;$('iC').style.opacity=c>0?1-ei(out):0;
   }
   // ---------- S9 CTA
   if((u=show('s9',t))!==null){

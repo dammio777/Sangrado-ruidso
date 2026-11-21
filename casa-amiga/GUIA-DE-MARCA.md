@@ -76,3 +76,10 @@ Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja 
 - `exports/casa-amiga-bienvenida-final.mp4` (40 s): bienvenida + marcas locales (Montaña, Frío & Café; Café La Cabaña; Alima; Saboryarte; Pargo Viche). Fuente: `build/video.html`, música `build/music_bienvenida.py`.
 - `exports/casa-amiga-marcas-originales.mp4` (34 s, ritmo lento y suave): "¡Conoce las marcas originales de Casa Amiga!" con Macetas 3D, Arcoíris Negro e Hizca. Fuente: `build/video-marcas.html`, música `build/music_marcas.py`.
 - Render: `PAGE=video-marcas.html node render.js video salida.mp4 30` (necesita los clips extraídos en `build/assets/clips`).
+
+### Lote 4 (carpeta material/fotos-4) y cambios
+- **Rhipsalis** (@universo_rhipsalis): "Ropa psicodélica y accesorios artísticos", Medellín. Es marca original de Casa Amiga.
+- Ilustraciones (tríptico abeja, orquídea y diente de león) y retratos a lápiz: arte original de Casa Amiga.
+- **Hizca** NO es marca original: va en "Marcas locales" del video de bienvenida.
+- Mensaje para macetas, cuadros y retratos: "Estamos dispuestas a hacer trabajos personalizados".
+- Video de marcas originales (40 s): Macetas 3D, Arcoíris Negro, Rhipsalis, Ilustración y retrato.

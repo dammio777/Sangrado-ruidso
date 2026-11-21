@@ -5,7 +5,7 @@ import numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve
 
 SR = 44100
-DUR = 25.0
+DUR = 29.5
 N = int(SR * DUR)
 BPM = 100
 BEAT = 60 / BPM
@@ -124,7 +124,7 @@ for b in range(nb):
     for j, m in enumerate(ch[1:]):
         add(mus, rhodes(midi(m + 12), 1.2, .07), t0 + 2.5 * BEAT + j * .02)
     # melodía simple de campanitas en la segunda mitad
-    if t0 >= 5 and t0 < 21:
+    if t0 >= 5 and t0 < 25.5:
         mel = [ch[-1] + 12, ch[-2] + 12, ch[-1] + 12 + 2]
         for k, m in enumerate(mel):
             add(mus, chime(midi(m)) * .05, t0 + (1 + k * 1.5) * BEAT)
@@ -133,7 +133,7 @@ for b in range(nb):
         add(mus, bass(midi(roots[b % 4]), .8) * .4, t0 + 2.5 * BEAT)
         add(mus, bass(midi(roots[b % 4] + 7), .7) * .3, t0 + 3.5 * BEAT)
 
-DROP0, BRK0, BRK1, END = 0.5, 999, 999, 23.4
+DROP0, BRK0, BRK1, END = 0.5, 999, 999, 27.9
 beat_t = DROP0
 while beat_t < END:
     in_break = BRK0 <= beat_t < BRK1
@@ -161,11 +161,14 @@ add(sfx, chime(midi(88)) * .1, 9.1)
 add(sfx, whoosh(.8) * .4, 12.2)
 for k,tt in enumerate((13.6,13.85,14.1)): add(sfx, chime(midi(84+k*3)) * .1, tt)
 add(sfx, whoosh(.5) * .3, 13.4)
-add(sfx, whoosh(.7) * .4, 16.7)
-add(sfx, impact() * .7, 17.05)
-for i in range(28): add(sfx, tick() * .1, 17.0 + 1.7 + i * (1.2 / 28))
-add(sfx, click() * .7, 20.5)
-add(sfx, chime(midi(86)) * .2, 20.55); add(sfx, chime(midi(90)) * .14, 20.7)
+add(sfx, whoosh(.8) * .4, 16.7)
+for k,tt in enumerate((17.8,18.05)): add(sfx, whoosh(.5) * .25, tt)
+for k,tt in enumerate((18.7,18.95,19.2)): add(sfx, chime(midi(83+k*4)) * .1, tt)
+add(sfx, whoosh(.7) * .4, 21.2)
+add(sfx, impact() * .7, 21.55)
+for i in range(28): add(sfx, tick() * .1, 21.5 + 1.7 + i * (1.2 / 28))
+add(sfx, click() * .7, 25.0)
+add(sfx, chime(midi(86)) * .2, 25.05); add(sfx, chime(midi(90)) * .14, 25.2)
 
 # reverb sencilla para la parte musical
 ir_n = int(1.8 * SR); ir = rng.normal(0, 1, ir_n) * np.exp(-np.arange(ir_n) / SR / .45); ir = lp(ir, 5000)

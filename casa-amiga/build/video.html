@@ -218,7 +218,7 @@ const DUR=40;
 const ART=[['ilustra','Ilustración','Lleva el territorio contigo','50% 40%'],['perros','Retrato a lápiz','Retratos de nuestros amigos','40% 50%'],['vasija','Cerámica grabada','Hecha a mano','50% 55%'],['figura','Cerámica','Piezas únicas','35% 50%'],['hongo','Diseño','Luz, color y objetos','70% 45%'],['ventana','Diseño 3D','Materas y piezas impresas','30% 50%']];
 const deck=$('deck');
 ART.forEach((a,i)=>{const d=document.createElement('div');d.className='c';d.innerHTML=`<img src="assets/img/${a[0]}.jpg" style="object-position:${a[3]}"><div class="lab glass"><div class="mono">${a[1]}</div><div>${a[2]}</div></div>`;deck.appendChild(d)});
-const BENTO=[['cafe','Montaña, Frío & Café',60,450,560,760,'50% 55%'],['cabana','Café La Cabaña',644,450,376,368,'50% 45%'],['alima','Alima',644,842,376,368,'50% 60%'],['sabor1','Saboryarte',60,1234,376,560,'45% 50%'],['hongo','Pargo Viche',460,1234,560,560,'45% 55%']];
+const BENTO=[['cafe','Montaña, Frío & Café',60,450,560,760,'50% 55%'],['cabana','Café La Cabaña',644,450,376,368,'50% 45%'],['alima','Alima',644,842,376,368,'50% 60%'],['sabor1','Saboryarte',60,1234,376,560,'45% 50%'],['hongo','Pargo Viche',460,1234,560,268,'20% 62%'],['hizca','Hizca',460,1526,560,268,'50% 22%']];
 const bento=$('bento');
 BENTO.forEach(b=>{const d=document.createElement('div');d.className='t';Object.assign(d.style,{left:b[2]+'px',top:b[3]+'px',width:b[4]+'px',height:b[5]+'px'});d.innerHTML=`<img src="assets/img/${b[0]}.jpg" style="object-position:${b[6]}"><div class="chip glass">${b[1]}</div>`;bento.appendChild(d)});
 const CHIPS=['Talleres','Artistas invitados','Música en vivo','Ferias','Diseño'];

@@ -10,7 +10,10 @@ const fs = require('fs');
   const browser = await chromium.launch({ args: ['--allow-file-access-from-files', '--disable-web-security'] });
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
   await page.goto('file://' + path.join(__dirname, process.env.PAGE || 'video.html'));
-  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(async () => {
+    for (const f of ['400 20px Inter', '600 20px Inter', '800 20px Inter', '400 20px Anton', '400 20px "Space Mono"', '700 20px "Space Mono"', '400 20px "Great Vibes"']) await document.fonts.load(f);
+    await document.fonts.ready;
+  });
   await page.waitForTimeout(500);
   if (mode === 'preview') {
     const out = process.env.PREVIEW_DIR;
