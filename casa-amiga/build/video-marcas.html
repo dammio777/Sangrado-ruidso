@@ -2,7 +2,7 @@
 <html lang="es"><head><meta charset="utf-8">
 <link rel="stylesheet" href="assets/local.css">
 <style>
-:root{--crema:#FFF3E0;--ink:#4A1F0E;--ntxt:#C4570E;--naranja:#F29021;--ladrillo:#7A2E17;--choco:#2B1A12;--tierra:#5B3812;--arena:#E3A866;--salvia:#96A86D}
+:root{--crema:#FFFFFF;--ink:#4A1F0E;--ntxt:#C4570E;--naranja:#F29021;--ladrillo:#7A2E17;--choco:#2B1A12;--tierra:#5B3812;--arena:#E3A866;--salvia:#96A86D}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
 #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--crema);font-family:Inter,sans-serif;color:#fff}
@@ -12,14 +12,14 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
 .cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .anton{font-family:Anton,sans-serif;text-transform:uppercase;line-height:.92;letter-spacing:.5px}
 .mono{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.32em}
-.glass{background:rgba(255,255,255,.46);border:1.5px solid rgba(255,255,255,.8);color:var(--ink);backdrop-filter:blur(26px) saturate(1.6);-webkit-backdrop-filter:blur(26px) saturate(1.6);box-shadow:0 18px 50px rgba(122,46,23,.22),inset 0 1px 0 rgba(255,255,255,.9)}
+.glass{background:rgba(255,255,255,.78);border:1.5px solid rgba(122,46,23,.12);color:var(--ink);backdrop-filter:blur(26px) saturate(1.6);-webkit-backdrop-filter:blur(26px) saturate(1.6);box-shadow:0 18px 50px rgba(122,46,23,.22),inset 0 1px 0 rgba(255,255,255,.9)}
 .glass-dark{background:rgba(255,246,232,.66);border:1.5px solid rgba(255,255,255,.85);color:var(--ink);backdrop-filter:blur(30px) saturate(1.5);-webkit-backdrop-filter:blur(30px) saturate(1.5);box-shadow:0 22px 60px rgba(122,46,23,.25),inset 0 1px 0 rgba(255,255,255,.9)}
 .shade-b{position:absolute;left:0;right:0;bottom:0;height:60%;background:linear-gradient(to top,rgba(110,44,16,.8),rgba(110,44,16,.38) 45%,rgba(110,44,16,0))}
 .shade-t{position:absolute;left:0;right:0;top:0;height:32%;background:linear-gradient(to bottom,rgba(110,44,16,.55),rgba(110,44,16,0))}
 .ch{display:inline-block;will-change:transform}
 .mask{display:inline-block;overflow:hidden;vertical-align:top;padding:.2em 4px 0;margin-top:-.2em}
 #grain{position:absolute;inset:-200px;background:url(assets/grain.png);opacity:.07;mix-blend-mode:overlay;pointer-events:none;z-index:50}
-#vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(255,200,120,0) 60%,rgba(150,70,20,.28) 100%);z-index:49}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(255,255,255,0) 65%,rgba(120,90,70,.08) 100%);z-index:49}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:48;mix-blend-mode:soft-light}
 
 /* S1 */
@@ -169,7 +169,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
 <div id="stage">
   <div class="layer" id="m0">
     <img class="cover" src="assets/blur/macetas-luna.jpg">
-    <div style="position:absolute;inset:0;background:rgba(255,240,218,.9)"></div>
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,.95)"></div>
     <div class="logo" id="m0logo"><img src="assets/logo-circulo.png"></div>
     <div class="t anton">
       <span class="l"><span class="mask"><span class="ch" id="a1">¡Conoce las</span></span></span>
@@ -187,7 +187,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
   <!-- S6b macetas 3D -->
   <div class="layer" id="s6b">
     <img class="cover" src="assets/blur/macetas-luna.jpg">
-    <div style="position:absolute;inset:0;background:rgba(255,240,218,.88)"></div>
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,.95)"></div>
     <div class="ghost anton">3D</div>
     <div class="head"><div class="mono" id="mm">01 — Marca original</div><div class="anton"><span class="mask"><span class="ch" id="mh1">Macetas</span></span> <span class="mask"><span class="ch" id="mh2" style="color:var(--naranja)">3D</span></span></div></div>
     <div class="perso" id="pM">✦ Estamos dispuestas a hacer trabajos personalizados</div>
@@ -199,7 +199,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
   <!-- S6c camisetas -->
   <div class="layer" id="s6c">
     <img class="cover" src="assets/blur/camisetas.jpg">
-    <div style="position:absolute;inset:0;background:rgba(255,240,218,.86)"></div>
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,.95)"></div>
     <div class="ghost anton">Moda</div>
     <div class="head"><div class="mono" id="cm">02 — Marca original</div><div class="anton"><span class="mask"><span class="ch" id="ch1">Arcoíris</span></span><br><span class="mask"><span class="ch" id="ch2" style="color:var(--naranja)">Negro</span></span></div></div>
     <div class="card" id="cC"><img src="assets/img/camisetas.jpg"></div>
@@ -208,7 +208,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
   </div>
   <div class="layer" id="m3">
     <img class="cover" src="assets/blur/rhip1.jpg">
-    <div style="position:absolute;inset:0;background:rgba(255,240,218,.88)"></div>
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,.95)"></div>
     <div class="ghost anton">Rhipsalis</div>
     <div class="head"><div class="mono" id="hm">03 — Marca original</div><div class="anton"><span class="mask"><span class="ch" id="hh1">Rhipsalis</span></span></div></div>
     <div class="big" id="hA"><img src="assets/img/rhip1.jpg" style="object-position:50% 30%"></div>
@@ -219,7 +219,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
   <!-- M4 ilustración y retrato -->
   <div class="layer" id="m4">
     <img class="cover" src="assets/blur/boceto1.jpg">
-    <div style="position:absolute;inset:0;background:rgba(255,240,218,.88)"></div>
+    <div style="position:absolute;inset:0;background:rgba(255,255,255,.95)"></div>
     <div class="ghost anton">Arte</div>
     <div class="head"><div class="mono" id="im">04 — Arte original</div><div class="anton"><span class="mask"><span class="ch" id="ih1">Ilustración</span></span><br><span class="mask"><span class="ch" id="ih2" style="color:var(--naranja)">y retrato</span></span></div></div>
     <div class="perso" id="pI">✦ Estamos dispuestas a hacer trabajos personalizados</div>
@@ -231,7 +231,7 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
   <!-- S9 CTA -->
   <div class="layer" id="s9">
     <img class="cover" id="s9v">
-    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,243,224,.88),rgba(255,230,196,.95))"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,255,255,.95),rgba(255,255,255,.97))"></div>
     <div class="ring" id="q1"></div><div class="ring" id="q2"></div>
     <div class="logo" id="s9logo"><img src="assets/logo-circulo.png"></div>
     <div class="h"><div class="anton" style="font-size:146px"><span class="mask"><span class="ch" id="s9a">Encuéntralas</span></span></div><div class="mono" id="s9m">Vereda El Placer · Santa Elena</div></div>

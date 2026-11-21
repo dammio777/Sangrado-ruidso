@@ -82,4 +82,4 @@ Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja 
 - Ilustraciones (tríptico abeja, orquídea y diente de león) y retratos a lápiz: arte original de Casa Amiga.
 - **Hizca** NO es marca original: va en "Marcas locales" del video de bienvenida.
 - Mensaje para macetas, cuadros y retratos: "Estamos dispuestas a hacer trabajos personalizados".
-- Video de marcas originales (40 s): Macetas 3D, Arcoíris Negro, Rhipsalis, Ilustración y retrato.
+- Video de marcas originales (40 s, fondo blanco): Macetas 3D, Arcoíris Negro, Rhipsalis, Ilustración y retrato.
