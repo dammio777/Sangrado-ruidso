@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Aero Burger — Afiches partidos</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script>
+/* Afiches estáticos (uno por partido) en formato publicación 1080x1350 y historia 1080x1920.
+   ?m=1|2  &f=feed|story  — usa el mismo tablero de letras de la promo, ya detenido. */
+const q=new URLSearchParams(location.search); const M=q.get('m')||'1', F=q.get('f')||'story';
+const W=1080, H=F==='feed'?1350:1920;
+const MONO='"JetBrains Mono", monospace', TEXT='"Inter", sans-serif', DISP='"Inter Display", "Inter", sans-serif';
+const AMBER='#FFC72C', WHITE='#F4F1EA', GRAY='rgba(244,241,234,.6)';
+const MATCH={
+  '1':{time:'17:30',a:'MINEIRO',b:'BOCA',tag:'LA FINAL',comp:'CONMEBOL SUDAMERICANA',accent:AMBER,tagFg:'#000',ca:['#111','#fff'],cb:['#123B8C','#F2C230'],
+       photo:'../../01-local/frames/c1/0060.jpg',ay:0.18,line:'La final se vive aquí.',hour:'5:30 p.m.'},
+  '2':{time:'20:15',a:'CALDAS',b:'NACIONAL',tag:'A TIEMPO',comp:'LIGA DIMAYOR · CLAUSURA',accent:'#00A859',tagFg:'#fff',ca:['#ffffff','#C8102E'],cb:['#00A859','#ffffff'],
+       photo:'../../01-local/frames/c4/0100.jpg',ay:0.45,line:'Vívelo en Aero Burger.',hour:'8:15 p.m.'},
+}[M];
+// ---------- Utilidades ----------
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const cache=new Map(); const KEEP=new Set();
+function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>30){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
+const IMG={};
+// pseudoaleatorio determinista
+const rnd=(i)=>{ const x=Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x); };
+
+// ---------- Tablero de letras giratorias ----------
+const CHARSET=' ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÑ0123456789:-.';
+// dibuja una fila: cada letra gira por caracteres al azar y se detiene en su letra final
+function flapRow(ctx,str,x,y,cw,chh,gap,t,t0,{col=WHITE,seed=0,spread=0.5,step=0.028,fade=null}={}){
+  const out = fade? eInOut(prog(t,fade,fade+0.3)) : 0;
+  for(let i=0;i<str.length;i++){
+    const cx=x+i*(cw+gap);
+    const settle=t0+0.25+i*step+rnd(seed+i)*spread;
+    let ch=str[i], phase=0;
+    if(t<t0){ ch=' '; }
+    else if(t<settle){
+      const k=(t-t0)*26+rnd(seed*7+i)*10;
+      ch=CHARSET[(Math.floor(k)+i*5)%CHARSET.length]; phase=k%1;
+    }
+    ctx.save(); ctx.globalAlpha*=1-out;
+    // celda
+    const g=ctx.createLinearGradient(0,y,0,y+chh); g.addColorStop(0,'#1d1d1d'); g.addColorStop(0.5,'#141414'); g.addColorStop(0.5,'#0f0f0f'); g.addColorStop(1,'#171717');
+    rr(ctx,cx,y,cw,chh,cw*0.12); ctx.fillStyle=g; ctx.fill();
+    if(ch!==' '){
+      ctx.save(); rr(ctx,cx,y,cw,chh,cw*0.12); ctx.clip();
+      ctx.font=`800 ${Math.round(chh*0.72)}px ${MONO}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle=col;
+      const mid=y+chh/2;
+      // mitad superior fija; la inferior se "dobla" mientras gira
+      ctx.save(); ctx.beginPath(); ctx.rect(cx,y,cw,chh/2); ctx.clip(); ctx.fillText(ch,cx+cw/2,mid+chh*0.03); ctx.restore();
+      const sy=phase>0?Math.max(0.15,Math.abs(Math.cos(phase*Math.PI))):1;
+      ctx.save(); ctx.beginPath(); ctx.rect(cx,mid,cw,chh/2); ctx.clip(); ctx.translate(0,mid); ctx.scale(1,sy); ctx.fillText(ch,cx+cw/2,chh*0.03); ctx.restore();
+      ctx.restore();
+    }
+    ctx.fillStyle='#000'; ctx.fillRect(cx,y+chh/2-1.5,cw,3);
+    ctx.restore();
+  }
+  return x+str.length*(cw+gap)-gap;
+}
+function plane(ctx,x,y,s,rot,col){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s); ctx.fillStyle=col;
+  ctx.beginPath(); ctx.ellipse(0,0,0.5,0.065,0,0,Math.PI*2); ctx.fill();
+  for(const k of [1,-1]){
+    ctx.beginPath(); ctx.moveTo(0.12,-0.05*k); ctx.lineTo(-0.12,-0.48*k); ctx.lineTo(-0.24,-0.48*k); ctx.lineTo(-0.12,-0.05*k); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.36,-0.04*k); ctx.lineTo(-0.47,-0.2*k); ctx.lineTo(-0.53,-0.2*k); ctx.lineTo(-0.49,-0.04*k); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+function txt(ctx,str,x,y,font,col,align,tIn,tOut,t,o={}){
+  const a=eOut(prog(t,tIn,tIn+0.4))*(tOut==null?1:1-eInOut(prog(t,tOut,tOut+0.25)));
+  if(a<=0) return;
+  ctx.save(); ctx.globalAlpha*=a; ctx.font=font; ctx.textAlign=align; ctx.fillStyle=col; if(o.ls) ctx.letterSpacing=o.ls+'px';
+  ctx.fillText(str,x,y+(1-a)*14); ctx.restore();
+}
+function dot2(ctx,x,y,r,c1,c2){ ctx.save(); ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.clip(); ctx.fillStyle=c1; ctx.fillRect(x-r,y-r,r,2*r); ctx.fillStyle=c2; ctx.fillRect(x,y-r,r,2*r); ctx.restore();
+  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke(); }
+function pill(ctx,str,x,y,bg,fg,a=1){ ctx.save(); ctx.globalAlpha*=a; ctx.font=`800 26px ${MONO}`; const w=ctx.measureText(str).width+36; rr(ctx,x-w,y,w,46,23); ctx.fillStyle=bg; ctx.fill(); ctx.fillStyle=fg; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(str,x-w/2,y+24); ctx.restore(); }
+
+
+function centerRow(ctx,str,y,cw,chh,gap,col){ return flapRow(ctx,str,540-(str.length*(cw+gap)-gap)/2,y,cw,chh,gap,999,0,{col}); }
+async function draw(){
+  await Promise.all([document.fonts.load(`800 60px "JetBrains Mono"`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  const cv=document.getElementById('c'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d');
+  const photo=await loadImg(MATCH.photo), logo=await loadImg('../assets/logo_crop.png');
+  const S=F==='story';
+  // foto de fondo (arriba) que se funde a negro
+  ctx.fillStyle='#050506'; ctx.fillRect(0,0,W,H);
+  const ph=S?1180:820; const sc=Math.max(W/photo.width,ph/photo.height); const dw=photo.width*sc, dh=photo.height*sc;
+  ctx.save(); ctx.beginPath(); ctx.rect(0,0,W,ph); ctx.clip(); ctx.globalAlpha=S?0.62:0.5; ctx.drawImage(photo,(W-dw)/2,(ph-dh)*MATCH.ay,dw,dh); ctx.restore();
+  let g=ctx.createLinearGradient(0,ph*0.35,0,ph); g.addColorStop(0,'rgba(5,5,6,0)'); g.addColorStop(1,'rgba(5,5,6,1)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,ph+2);
+  g=ctx.createLinearGradient(0,0,0,S?420:300); g.addColorStop(0,'rgba(5,5,6,.85)'); g.addColorStop(1,'rgba(5,5,6,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,S?420:300);
+  // cabecera
+  const hy=S?210:84, lr=S?44:36;
+  ctx.save(); ctx.beginPath(); ctx.arc(540,hy,lr,0,Math.PI*2); ctx.clip(); ctx.drawImage(logo,540-lr,hy-lr,2*lr,2*lr); ctx.restore();
+  ctx.font=`600 ${S?26:22}px ${TEXT}`; ctx.letterSpacing='6px'; ctx.textAlign='center'; ctx.fillStyle=GRAY; ctx.fillText('AERO BURGER  ·  SANTA ELENA',540,hy+lr+(S?46:36)); ctx.letterSpacing='0px';
+  // bloque central
+  let y=S?760:370;
+  ctx.font=`700 ${S?28:24}px ${TEXT}`; ctx.letterSpacing='7px'; ctx.fillStyle=MATCH.accent; ctx.fillText('HOY  ·  SÁBADO 21 DE NOVIEMBRE',540,y); ctx.letterSpacing='0px';
+  plane(ctx,540,y+(S?60:46),S?56:44,0,'rgba(244,241,234,.8)');
+  const tcw=S?118:96, tch=S?178:144;
+  y+=S?110:84; centerRow(ctx,MATCH.time,y,tcw,tch,10,AMBER);
+  y+=tch+(S?46:34);
+  const n=Math.max(MATCH.a.length,MATCH.b.length); const cw=Math.min(S?84:66,Math.floor((900-(n-1)*7)/n)), chh=Math.round(cw*1.45);
+  centerRow(ctx,MATCH.a,y,cw,chh,7,WHITE);
+  // "vs" con los colores de cada equipo
+  const vy=y+chh+(S?52:40); ctx.font=`800 34px ${MONO}`; ctx.fillStyle=GRAY; ctx.fillText('VS',540,vy+12);
+  dot2(ctx,470,vy,17,...MATCH.ca); dot2(ctx,610,vy,17,...MATCH.cb);
+  y=vy+(S?42:32); centerRow(ctx,MATCH.b,y,cw,chh,7,WHITE);
+  y+=chh+(S?60:50);
+  // competencia + etiqueta
+  ctx.font=`600 28px ${TEXT}`; ctx.letterSpacing='4px'; ctx.fillStyle=GRAY; ctx.fillText(MATCH.comp,540,y); ctx.letterSpacing='0px';
+  y+=34; ctx.font=`800 30px ${MONO}`; const tw=ctx.measureText(MATCH.tag).width+48; rr(ctx,540-tw/2,y,tw,56,28); ctx.fillStyle=MATCH.accent; ctx.fill();
+  ctx.fillStyle=MATCH.tagFg; ctx.textBaseline='middle'; ctx.fillText(MATCH.tag,540,y+29); ctx.textBaseline='alphabetic';
+  // remate
+  y+= S?190:128;
+  ctx.font=`700 ${S?64:56}px ${DISP}`; ctx.letterSpacing='-1.5px'; ctx.fillStyle=WHITE; ctx.fillText(MATCH.line,540,y); ctx.letterSpacing='0px';
+  ctx.font=`500 ${S?36:32}px ${TEXT}`; ctx.fillStyle=GRAY; ctx.fillText(`${MATCH.hour}  ·  Llega antes del pitazo.`,540,y+(S?62:54));
+  ctx.font=`600 ${S?36:32}px ${TEXT}`; ctx.fillStyle=WHITE; ctx.fillText('@aero.burger',540,y+(S?140:112));
+  window.done=true;
+}
+window.ready=draw();
+</script></body></html>

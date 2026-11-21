@@ -8,3 +8,7 @@ Reel 1080×1920 a 60 fps, de 18,5 s. Concepto: un tablero de salidas de aeropuer
 
 Reutiliza fotogramas de `01-local/frames` y `02-airbus/frames`. No usa escudos de clubes (son marcas registradas): solo nombres y colores.
 Regenerar: `node src/render.js video 60 && python3 src/make_sfx.py out/sfx.wav`, luego unir con ffmpeg.
+
+## Afiches (uno por partido)
+`src/poster.html?m=1|2&f=feed|story` dibuja el afiche con el mismo tablero de letras, ya detenido. `node src/posters.js` exporta los 4 PNG a `out/afiches/`:
+Mineiro‑Boca y Caldas‑Nacional, cada uno en publicación (1080×1350) e historia (1080×1920).
