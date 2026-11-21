@@ -54,3 +54,10 @@ Paleta cálida y terrosa: madera, luz cálida de bombillos, plantas.
 - **02-galeria-general-iluminada-vertical**: el mejor plano general, ya en 9:16 y con la lámpara de araña encendida. Plano principal del recorrido.
 - **04-galeria-tapete-desde-armario**: plano general alternativo con el tapete y el estante de la lámpara-hongo.
 - **01 y 03**: muy oscuras, con luz de linterna. Sirven para un efecto de "luces que se encienden" (de la oscura a la iluminada) o se descartan.
+
+### Video (1 clip, VID-20261120-WA0000, 75 s, vertical 576×1024 comprimido por WhatsApp)
+Fachada de día con gente (0–9 s), letrero de cerca (6–9 s), interior con sofá turquesa y lámpara de araña (12–29 s), puerta y jardín (30–47 s), feria bajo la carpa (48–70 s), fachada final (71–74 s).
+
+## Videos producidos
+- `exports/casa-amiga-bienvenida.mp4`: Bienvenida, 40 s, 1080×1920, 30 fps, con música original. Fuente en `build/` (`video.html` = animación, `render.js` = render, `music.py` = música y efectos).
+  - Para volver a renderizarlo, extrae los clips a `build/assets/clips/v1..v5` (comandos en el historial) y corre `node render.js video salida.mp4`.
