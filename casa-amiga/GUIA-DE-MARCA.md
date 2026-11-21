@@ -63,7 +63,7 @@ Fachada de día con gente (0–9 s), letrero de cerca (6–9 s), interior con so
   - Para volver a renderizarlo, extrae los clips a `build/assets/clips/v1..v5` (comandos en el historial) y corre `node render.js video salida.mp4`.
 
 ### Lote 3 (carpeta material/fotos-3)
-- 01 y 02: **macetas 3D**, una marca de la dueña de Casa Amiga (trío de animalitos y maceta luna con el Principito). Tienen escena propia en el video.
+- 01 y 02: **macetas 3D**, una de las marcas del espacio (trío de animalitos y maceta luna con el Principito). Tienen escena propia en el video.
 - 03: **camisetas tie-dye** (vino, mostaza, oliva y negro). Marca **Arcoíris Negro** (confirmado por el cliente; falta su usuario de Instagram). Escena propia en el video.
 - 04: cabaña al atardecer con el perro. Es el inicio del video (tema claro y cálido).
 
