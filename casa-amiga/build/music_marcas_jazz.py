@@ -1,4 +1,4 @@
-# Jazz cozy original + efectos para "Marcas originales de Casa Amiga" (síntesis procedimental, libre de derechos)
+# Jazz vintage relajado original + efectos para "Marcas originales de Casa Amiga" (síntesis procedimental, libre de derechos)
 # Uso: python3 music_marcas_jazz.py salida.wav
 import sys
 import numpy as np
@@ -7,7 +7,7 @@ from scipy.signal import butter, sosfilt, fftconvolve
 SR = 44100
 DUR = 39.83
 N = int(SR * DUR)
-BPM = 84
+BPM = 72
 BEAT = 60 / BPM
 rng = np.random.default_rng(7)
 t_all = np.arange(N) / SR
@@ -130,7 +130,7 @@ def vibes(f, dur=1.6):
 def ride(v=1.0):
     n = int(.9 * SR); t = np.arange(n) / SR
     nz = bp(rng.normal(0, 1, n), 4500, 11000)
-    metal = sum(np.sin(2 * np.pi * f * t) for f in (3150, 4270, 5530, 6810)) * .08
+    metal = sum(np.sin(2 * np.pi * f * t) for f in (3150, 4270, 5530, 6810)) * .015
     return (nz * .5 + metal) * env(n, .001, .32) * v
 
 
@@ -225,13 +225,16 @@ dry = mus + lead
 wet = fftconvolve(dry, ir)[:N]
 music = dry * .8 + wet * .42
 dr = lp(drums, 10000); dr = dr * .8 + fftconvolve(dr, ir)[:N] * .2
-vinyl = hp(rng.normal(0, 1, N), 1500) * .002 + (rng.random(N) > .9998) * rng.normal(0, .1, N)
-mix = music * 1.4 + dr * .32 + sfx * .5 + lp(vinyl, 7000)
+vinyl = lp(hp(rng.normal(0, 1, N), 800), 5000) * .004 + lp((rng.random(N) > .99955) * rng.normal(0, .35, N), 3500) + lp((rng.random(N) > .99997) * rng.normal(0, 1.2, N), 2500)
+def warp(x):  # ondulación de cinta (wow & flutter)
+    tt = t_all + .0024 * np.sin(2 * np.pi * .5 * t_all) + .0004 * np.sin(2 * np.pi * 6.1 * t_all)
+    return np.interp(tt * SR, np.arange(len(x)), x)
+mix = bp(warp(music) * 1.4 + dr * .2, 110, 4200, 2) + bp(sfx, 150, 6000, 1) * .45 + vinyl
 fi = np.clip(t_all / 1.5, 0, 1); fo = np.clip((DUR - t_all) / 2.8, 0, 1)
 mix *= fi * fo
-mix = np.tanh(mix / (np.abs(mix).max() + 1e-9) * 1.3) / np.tanh(1.3)
+mix = np.tanh(mix / (np.abs(mix).max() + 1e-9) * 2.0) / np.tanh(2.0)
 mix = mix / np.abs(mix).max() * .89
-st = np.stack([mix, np.roll(mix, int(.014 * SR)) * .96 + mix * .04], 1)
+st = np.stack([mix, np.roll(mix, int(.005 * SR)) * .5 + mix * .5], 1)
 import wave
 with wave.open(sys.argv[1], 'wb') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
