@@ -174,33 +174,12 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--crema)}
     <div class="head"><div class="mono" id="s6m">02 — La tienda</div><div class="anton" id="s6h"><span class="mask"><span class="ch">Marcas</span></span> <span class="mask"><span class="ch" style="color:var(--naranja)">locales</span></span></div></div>
     <div id="bento"></div>
   </div>
-  <!-- S6b macetas 3D -->
-  <div class="layer" id="s6b">
-    <img class="cover" src="assets/blur/macetas-luna.jpg">
-    <div style="position:absolute;inset:0;background:rgba(255,240,218,.88)"></div>
-    <div class="ghost anton">3D</div>
-    <div class="head"><div class="mono" id="mm">03 — Marca de la casa</div><div class="anton"><span class="mask"><span class="ch" id="mh1">Macetas</span></span> <span class="mask"><span class="ch" id="mh2" style="color:var(--naranja)">3D</span></span></div></div>
-    <div class="big" id="mA"><img src="assets/img/macetas-luna.jpg" style="object-position:40% 50%"></div>
-    <div class="tag glass" id="mT">Impresas en 3D</div>
-    <div class="small" id="mB"><img src="assets/img/macetas-trio.jpg" style="object-position:45% 70%"></div>
-    <div class="lab glass" id="mL"><div class="mono">Macetas 3D</div><div>Plantas con personalidad</div></div>
-  </div>
-  <!-- S6c camisetas -->
-  <div class="layer" id="s6c">
-    <img class="cover" src="assets/blur/camisetas.jpg">
-    <div style="position:absolute;inset:0;background:rgba(255,240,218,.86)"></div>
-    <div class="ghost anton">Moda</div>
-    <div class="head"><div class="mono" id="cm">04 — Moda</div><div class="anton"><span class="mask"><span class="ch" id="ch1">Arcoíris</span></span><br><span class="mask"><span class="ch" id="ch2" style="color:var(--naranja)">Negro</span></span></div></div>
-    <div class="card" id="cC"><img src="assets/img/camisetas.jpg"></div>
-    <div class="dots" id="cD"><i style="background:#7A1F3D"></i><i style="background:#D9A21B"></i><i style="background:#6B7A3A"></i><i style="background:#262626"></i></div>
-    <div class="lab glass" id="cL"><div class="mono">Camisetas tie-dye</div><div>Cada camiseta es una pieza distinta</div></div>
-  </div>
   <!-- S7 experiencia video -->
   <div class="layer" id="s7">
     <img class="cover" id="s7v">
     <div class="shade-b"></div><div class="shade-t"></div>
     <div class="chips" id="s7chips"></div>
-    <div class="txt"><div class="mono" id="s7m">05 — La experiencia</div><div class="anton"><span class="mask"><span class="ch" id="s7a">Vive la</span></span><br><span class="mask"><span class="ch" id="s7b" style="color:var(--naranja)">experiencia</span></span></div></div>
+    <div class="txt"><div class="mono" id="s7m">03 — La experiencia</div><div class="anton"><span class="mask"><span class="ch" id="s7a">Vive la</span></span><br><span class="mask"><span class="ch" id="s7b" style="color:var(--naranja)">experiencia</span></span></div></div>
   </div>
   <!-- S8 pila de fotos -->
   <div class="layer" id="s8">
@@ -233,13 +212,13 @@ const expo=x=>x>=1?1:1-Math.pow(2,-10*x);
 const back=x=>{const c=1.70158,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
 const spring=(x,f=4.5,d=6)=>x<=0?0:1-Math.exp(-d*x)*Math.cos(f*Math.PI*x);
 const FPS=30;
-const S={s1:[0,3.45],s2:[3.25,6.45],s3:[6.0,9.05],s4:[8.95,11.7],s5:[11.6,19.55],s6:[19.45,24.6],s6b:[24.5,29.0],s6c:[28.9,33.1],s7:[33.0,38.6],s8:[38.5,40.7],s9:[40.6,48.5]};
-const DUR=48.5;
+const S={s1:[0,3.45],s2:[3.25,6.45],s3:[6.0,9.05],s4:[8.95,11.7],s5:[11.6,19.55],s6:[19.45,24.6],s7:[24.5,30.1],s8:[30.0,32.2],s9:[32.1,40]};
+const DUR=40;
 // --- build dynamic DOM
 const ART=[['ilustra','Ilustración','Lleva el territorio contigo','50% 40%'],['perros','Retrato a lápiz','Retratos de nuestros amigos','40% 50%'],['vasija','Cerámica grabada','Hecha a mano','50% 55%'],['figura','Cerámica','Piezas únicas','35% 50%'],['hongo','Diseño','Luz, color y objetos','70% 45%'],['ventana','Diseño 3D','Materas y piezas impresas','30% 50%']];
 const deck=$('deck');
 ART.forEach((a,i)=>{const d=document.createElement('div');d.className='c';d.innerHTML=`<img src="assets/img/${a[0]}.jpg" style="object-position:${a[3]}"><div class="lab glass"><div class="mono">${a[1]}</div><div>${a[2]}</div></div>`;deck.appendChild(d)});
-const BENTO=[['cafe','Montaña, Frío & Café',60,450,560,760,'50% 55%'],['cabana','Café La Cabaña',644,450,376,368,'50% 45%'],['alima','Alima',644,842,376,368,'50% 60%'],['sabor1','Saboryarte',60,1234,376,560,'45% 50%'],['hongo','Pargo Viche',460,1234,560,268,'20% 62%'],['hizca','Hizca',460,1526,560,268,'50% 22%']];
+const BENTO=[['cafe','Montaña, Frío & Café',60,450,560,760,'50% 55%'],['cabana','Café La Cabaña',644,450,376,368,'50% 45%'],['alima','Alima',644,842,376,368,'50% 60%'],['sabor1','Saboryarte',60,1234,376,560,'45% 50%'],['hongo','Pargo Viche',460,1234,560,560,'45% 55%']];
 const bento=$('bento');
 BENTO.forEach(b=>{const d=document.createElement('div');d.className='t';Object.assign(d.style,{left:b[2]+'px',top:b[3]+'px',width:b[4]+'px',height:b[5]+'px'});d.innerHTML=`<img src="assets/img/${b[0]}.jpg" style="object-position:${b[6]}"><div class="chip glass">${b[1]}</div>`;bento.appendChild(d)});
 const CHIPS=['Talleres','Artistas invitados','Música en vivo','Ferias','Diseño'];
@@ -334,29 +313,6 @@ async function render(t){
     $('s6m').style.opacity=p(u,0,.4);
     document.querySelector('#s6 .ghost').style.transform=`translateX(${-u*40}px)`;
     $('s6').querySelector('.head').style.opacity=1-p(u,4.6,5.0);
-  }
-  // ---------- S6b macetas
-  if((u=show('s6b',t))!==null){
-    const x=eo5(p(u,.1,.95)),i=(1-x)*50;$('mA').style.clipPath=`inset(${i}% ${i}% ${i}% ${i}% round 56px)`;
-    $('mA').querySelector('img').style.transform=`scale(${lerp(1.4,1.08,eo(p(u,.1,4.4)))})`;
-    const y=p(u,.85,1.7);$('mB').style.opacity=y>0?1:0;$('mB').style.transform=`translate(${(1-eo5(y))*700}px,${Math.sin(u*2.2)*7}px) rotate(${lerp(16,4,eo5(y))}deg)`;
-    $('mB').querySelector('img').style.transform=`scale(${lerp(1.3,1.05,eo(p(u,.85,4.4)))})`;
-    rise($('mh1'),p(u,.15,.75));rise($('mh2'),p(u,.28,.88));$('mm').style.opacity=p(u,.05,.45);
-    const lb=p(u,1.5,2.1);$('mL').style.opacity=lb;$('mL').style.transform=`translateY(${(1-eo5(lb))*120}px)`;
-    const tg=p(u,1.2,1.8);$('mT').style.opacity=tg;$('mT').style.transform=`scale(${lerp(.7,1,back(tg))})`;
-    $('s6b').querySelector('.ghost').style.transform=`translateX(${-u*30}px)`;
-    const out=p(u,4.15,4.5);$('s6b').style.opacity=1-out*0;$('mA').style.opacity=1-ei(out);$('mB').style.transform+=` translateY(${ei(out)*500}px)`;
-  }
-  // ---------- S6c camisetas
-  if((u=show('s6c',t))!==null){
-    const x=eo5(p(u,.05,1.0));$('cC').style.opacity=eo(p(u,.05,.4));
-    $('cC').style.transform=`perspective(1800px) translateY(${(1-x)*900}px) rotateX(${(1-x)*22}deg) rotateZ(${lerp(-5,0,x)+Math.sin(u*1.6)*.35}deg)`;
-    $('cC').querySelector('img').style.transform=`scale(${lerp(1.3,1.05,eo(p(u,.05,4.0)))}) translateX(${lerp(0,-3,p(u,.5,4))}%)`;
-    rise($('ch1'),p(u,.15,.75));rise($('ch2'),p(u,.28,.88));$('cm').style.opacity=p(u,.05,.45);
-    [...$('cD').children].forEach((d,i)=>{const k=p(u,1.0+i*.14,1.5+i*.14);d.style.opacity=k;d.style.transform=`scale(${back(k)})`});
-    const lb=p(u,1.5,2.1);$('cL').style.opacity=lb;$('cL').style.transform=`translateY(${(1-eo5(lb))*120}px)`;
-    document.querySelector('#s6c .ghost').style.transform=`translateX(${-u*30}px)`;
-    const out=p(u,3.7,4.1);$('cC').style.opacity=1-ei(out);$('cL').style.opacity=lb*(1-out);
   }
   // ---------- S7 video experiencia
   if((u=show('s7',t))!==null){

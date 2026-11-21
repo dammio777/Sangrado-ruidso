@@ -9,7 +9,7 @@ const fs = require('fs');
   const mode = process.argv[2];
   const browser = await chromium.launch({ args: ['--allow-file-access-from-files', '--disable-web-security'] });
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
-  await page.goto('file://' + path.join(__dirname, 'video.html'));
+  await page.goto('file://' + path.join(__dirname, process.env.PAGE || 'video.html'));
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(500);
   if (mode === 'preview') {

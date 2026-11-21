@@ -71,3 +71,8 @@ Fachada de día con gente (0–9 s), letrero de cerca (6–9 s), interior con so
 Fondo crema `#FFF3E0`, textos café `#4A1F0E`, naranja `#F29021` (texto naranja sobre claro: `#C4570E`), cristal blanco translúcido. Archivo: `exports/casa-amiga-bienvenida-v4.mp4` (48,5 s). La versión oscura quedó en `build/video-oscuro.html`.
 
 - Marca **Hizca** (productos naturales: aceites, bálsamos y elixires; foto en `material/fotos-3/05-hizca-captura-instagram.jpg`, es una captura de Instagram, se recortó la interfaz). Reemplaza a "Bienestar natural" en la escena de marcas locales.
+
+## Videos finales
+- `exports/casa-amiga-bienvenida-final.mp4` (40 s): bienvenida + marcas locales (Montaña, Frío & Café; Café La Cabaña; Alima; Saboryarte; Pargo Viche). Fuente: `build/video.html`, música `build/music_bienvenida.py`.
+- `exports/casa-amiga-marcas-originales.mp4` (25 s): "¡Conoce las marcas originales de Casa Amiga!" con Macetas 3D, Arcoíris Negro e Hizca. Fuente: `build/video-marcas.html`, música `build/music_marcas.py`.
+- Render: `PAGE=video-marcas.html node render.js video salida.mp4 30` (necesita los clips extraídos en `build/assets/clips`).

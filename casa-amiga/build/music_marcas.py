@@ -5,7 +5,7 @@ import numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve
 
 SR = 44100
-DUR = 48.5
+DUR = 25.0
 N = int(SR * DUR)
 BPM = 100
 BEAT = 60 / BPM
@@ -124,17 +124,16 @@ for b in range(nb):
     for j, m in enumerate(ch[1:]):
         add(mus, rhodes(midi(m + 12), 1.2, .07), t0 + 2.5 * BEAT + j * .02)
     # melodía simple de campanitas en la segunda mitad
-    if t0 >= 11.5 and t0 < 38.5:
+    if t0 >= 5 and t0 < 21:
         mel = [ch[-1] + 12, ch[-2] + 12, ch[-1] + 12 + 2]
         for k, m in enumerate(mel):
             add(mus, chime(midi(m)) * .05, t0 + (1 + k * 1.5) * BEAT)
-    if t0 >= 3.2:
+    if t0 >= 0.4:
         add(mus, bass(midi(roots[b % 4]), 1.6) * .55, t0)
         add(mus, bass(midi(roots[b % 4]), .8) * .4, t0 + 2.5 * BEAT)
         add(mus, bass(midi(roots[b % 4] + 7), .7) * .3, t0 + 3.5 * BEAT)
 
-# batería desde el logo (3.25s) con pausa en "Y mucho más" (30.0–32.1) y final suave
-DROP0, BRK0, BRK1, END = 3.25, 38.5, 40.6, 47.1
+DROP0, BRK0, BRK1, END = 0.5, 999, 999, 23.4
 beat_t = DROP0
 while beat_t < END:
     in_break = BRK0 <= beat_t < BRK1
@@ -148,35 +147,25 @@ while beat_t < END:
             add(drums, shaker() * (.035 if s else .022), beat_t + sw * BEAT)
     beat_t += BEAT
 
-# efectos sincronizados con el video
-add(sfx, riser(2.0) * .35, 1.3)            # subida hacia el logo
-add(sfx, impact() * .9, 3.3)               # aparición del logo
-add(sfx, chime(midi(74)) * .18, 3.4); add(sfx, chime(midi(81)) * .12, 3.55)
-add(sfx, whoosh(.8) * .45, 5.6)            # zoom naranja -> video
-for i, tt in enumerate([9.55, 9.63, 9.73, 9.79, 9.9]):  # parpadeo de luces
-    add(sfx, click() * (.5 if i % 2 == 0 else .25), tt)
-add(sfx, impact() * .35, 9.9)
-add(sfx, whoosh(.7) * .35, 11.4)           # entrada carrusel
-for k in range(6):                          # cada tarjeta
-    add(sfx, whoosh(.45, False) * .18, 11.6 + .7 + k * 1.18 + .62 * 1.18 - .1)
-add(sfx, whoosh(.8) * .4, 19.1)            # bento
-for i in range(7): add(sfx, tick() * .35, 19.45 + .25 + i * .11)
-add(sfx, whoosh(.8) * .4, 24.2)            # macetas 3D
-for k,tt in enumerate((25.3,25.55,25.8)): add(sfx, chime(midi(86+k*2)) * .12, tt)
-add(sfx, whoosh(.5) * .3, 25.1)
-add(sfx, whoosh(.8) * .4, 28.6)            # camisetas
-for k,tt in enumerate((29.9,30.15,30.4,30.65)): add(sfx, tick() * .5, tt)
-add(sfx, chime(midi(88)) * .1, 30.0)
-add(sfx, whoosh(.7) * .4, 32.7)            # video experiencia
-for cc in (34.85, 36.6): add(sfx, whoosh(.45) * .3, cc - .2)
-for i in range(9): add(sfx, whoosh(.25, False) * .25, 38.55 + i * .17)  # pila de fotos
-add(sfx, riser(1.2) * .25, 39.5)
-add(sfx, impact() * .7, 40.65)             # CTA
-n_chars = 28
-for i in range(n_chars):                    # tecleo URL
-    add(sfx, tick() * .1, 40.6 + 1.7 + i * (1.2 / n_chars))
-add(sfx, click() * .7, 44.1)                # toque en el enlace
-add(sfx, chime(midi(86)) * .2, 44.15); add(sfx, chime(midi(90)) * .14, 44.3)
+add(sfx, riser(.5) * .3, 0.0)
+add(sfx, impact() * .8, 0.1)
+add(sfx, chime(midi(74)) * .18, 0.2); add(sfx, chime(midi(81)) * .12, 0.35)
+for i,tt in enumerate((.5,.66,.82)): add(sfx, whoosh(.45) * .22, tt)
+for i,tt in enumerate((1.9,2.1,2.3)): add(sfx, chime(midi(86+i*2)) * .1, tt)
+add(sfx, whoosh(.8) * .4, 3.2)
+for k,tt in enumerate((4.6,4.85,5.1)): add(sfx, chime(midi(86+k*2)) * .1, tt)
+add(sfx, whoosh(.5) * .3, 4.4)
+add(sfx, whoosh(.8) * .4, 7.7)
+for k,tt in enumerate((9.0,9.15,9.3,9.45)): add(sfx, tick() * .5, tt)
+add(sfx, chime(midi(88)) * .1, 9.1)
+add(sfx, whoosh(.8) * .4, 12.2)
+for k,tt in enumerate((13.6,13.85,14.1)): add(sfx, chime(midi(84+k*3)) * .1, tt)
+add(sfx, whoosh(.5) * .3, 13.4)
+add(sfx, whoosh(.7) * .4, 16.7)
+add(sfx, impact() * .7, 17.05)
+for i in range(28): add(sfx, tick() * .1, 17.0 + 1.7 + i * (1.2 / 28))
+add(sfx, click() * .7, 20.5)
+add(sfx, chime(midi(86)) * .2, 20.55); add(sfx, chime(midi(90)) * .14, 20.7)
 
 # reverb sencilla para la parte musical
 ir_n = int(1.8 * SR); ir = rng.normal(0, 1, ir_n) * np.exp(-np.arange(ir_n) / SR / .45); ir = lp(ir, 5000)
