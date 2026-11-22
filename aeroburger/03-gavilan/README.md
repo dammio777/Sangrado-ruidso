@@ -19,3 +19,8 @@ THEME=light OUT=video_light.mp4 node src/render.js video 60
 ```
 
 **Color de los pasos (natural, solo más luz):** `curves=all='0/0.02 0.25/0.32 0.5/0.6 0.75/0.83 1/1',eq=saturation=1.08,unsharp=5:5:0.6`
+
+## Actualización: fotos nuevas y música cozy
+- `assets/photo_top.jpg` (bowl de frente) y `assets/photo_bottom.jpg` (con los tenedores) vienen de las fotos nuevas (1200×1600), recortadas a formato de tarjeta. Las anteriores quedaron en `assets/old/`.
+- Tiempos: 9 compases a 88,9 BPM (compás = 2,7 s = 1 paso), render a 1,35×: `THEME=light TIMESCALE=1.35 LOSSLESS=1 CRF=13 OUT=final_noaudio.mp4 node src/render.js video 60`.
+- Música: `python3 music/cozy.py gavilan ...` (Sol mayor: Rhodes, chops de guitarra, campanita, batería lo-fi) + `common/loudnorm.sh`.

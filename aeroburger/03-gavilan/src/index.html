@@ -21,7 +21,7 @@ const FONT='"Inter Display", "Inter", sans-serif', TEXT='"Inter", sans-serif', S
 const LIGHT=new URLSearchParams(location.search).get('theme')==='light';
 const fg=a=>LIGHT?`rgba(0,0,0,${a})`:`rgba(255,255,255,${a})`;
 const FGC=LIGHT?'#000':'#fff', BGC=LIGHT?'#fff':'#000';
-const DURATION=21.0; window.DURATION=DURATION;
+const DURATION=19.2; window.DURATION=DURATION;   // x1,35 = 25,92 s finales (9 compases a 88,9 BPM)
 
 // ---------- Línea de tiempo ----------
 const OPEN1=3.2;                  // termina la apertura
@@ -34,7 +34,7 @@ const STEPS=[
   {dir:'s5', label:'Y un toque final.'},
 ];
 const STEP1=STEP0+STEPS.length*STEPD;   // 13.2
-const RES0=STEP1, RES1=16.3;            // resultado (foto con tenedor)
+const RES0=STEP1, RES1=15.2;            // resultado (foto con tenedor)
 const END0=RES1;                        // cierre
 
 // ---------- Utilidades ----------

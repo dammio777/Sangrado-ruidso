@@ -530,6 +530,57 @@ def song_llegar(out):
     S.mixdown(out, (None, (31.6, 1.7)), duck=(0.15, 0.3, 0.15), lead_gain=1.3, keys_gain=0.95)
 
 
+# ------------------------------------------------------------ 4) Gavilán (Sol mayor, 88,9 BPM: compás = 2,7 s = 1 paso)
+def song_gavilan(out):
+    S = Song(88.889, 1.62, 25.92, seed=51, swing=0.15); S.ir = room_ir(21, 2.5, 2.0, 0.7)
+    V = {'Gmaj9': (43, [59, 62, 66, 69]), 'Em9': (40, [55, 59, 62, 66]), 'Cmaj9': (36, [55, 59, 62, 64]),
+         'D9sus': (38, [57, 60, 64, 67]), 'Bm7': (47, [57, 62, 66, 69])}
+    P = {0: [('Gmaj9', 0, 4)], 1: [('Gmaj9', 0, 4)], 2: [('Em9', 0, 4)], 3: [('Cmaj9', 0, 4)],
+         4: [('D9sus', 0, 2), ('Bm7', 2, 2)], 5: [('Em9', 0, 2), ('D9sus', 2, 2)], 6: [('Gmaj9', 0, 4)],
+         7: [('Cmaj9', 0, 4)], 8: [('Gmaj9', 0, 4)]}
+    for bar, chords in P.items():
+        for name, b0, ln in chords:
+            root, notes = V[name]; t0 = S.T(bar, b0); final = bar == 8
+            if final:
+                S.chord('rhodes', notes, t0, 5.0, 0.5, roll=0.05, send=0.4)
+                S.b['bass'].add(S.I.bass(root, 4.5, 0.55), t0)
+            else:
+                S.chord('rhodes', notes, t0, min(ln, 2.8) * S.beat, 0.6, roll=0.012)
+                if ln == 4: S.chord('rhodes', notes[1:], S.T(bar, 2.5, swing=True), 1.1 * S.beat, 0.4, roll=0.01)
+                if bar >= 1:
+                    S.b['bass'].add(S.I.bass(root, 1.4 * S.beat, S.v(0.75)), t0)
+                    if ln == 4:
+                        S.b['bass'].add(S.I.bass(root + 7, 0.8 * S.beat, S.v(0.5)), S.T(bar, 1.5, True))
+                        S.b['bass'].add(S.I.bass(root + 12, 0.45 * S.beat, S.v(0.45)), S.T(bar, 2.5, True))
+                    else:
+                        S.b['bass'].add(S.I.bass(root + 7, 0.45 * S.beat, S.v(0.5)), S.T(bar, b0 + 1.5, True))
+            for m in notes[:3]: S.b['pad'].add(S.I.pad(m, ln * S.beat * 0.98 if not final else 4.5, 0.45, 2000), t0, 1.0, 0, 0.4)
+            # guitarra apagada (chops) a contratiempo en los pasos y el resultado
+            if 2 <= bar <= 6:
+                for b in (0.5, 1.5, 2.25, 3.0):
+                    if b0 <= b < b0 + ln:
+                        for j, m in enumerate(notes[1:4]): S.b['keys'].add(S.I.nylon(m + 12, 0.16, S.v(0.5), 0.9), S.T(bar, b, True) + j * 0.007, 0.8, -0.3 + 0.3 * j, 0.15)
+    for bar in range(0, 9):
+        if bar == 8: S.drum_hit('kick', S.T(8, 0, hum=0.002), 0.6); continue
+        if bar == 0 or bar == 7:
+            for k in range(8): S.drum_hit('shaker', S.T(bar, k * 0.5, True), 0.14 + 0.08 * (k % 2), 0.3)
+            continue
+        S.drum_hit('kick', S.T(bar, 0, hum=0.002), 0.78); S.drum_hit('kick', S.T(bar, 2.5, True, 0.002), 0.55)
+        if bar % 2: S.drum_hit('kick', S.T(bar, 1.75, True, 0.002), 0.3)
+        for b in (1, 3): S.drum_hit('snare', S.T(bar, b, hum=0.004), 0.5, 0.05, 0.12, brush=True)
+        for k in range(16):
+            S.drum_hit('hat', S.T(bar, k * 0.25, True), (0.4, 0.13, 0.25, 0.13)[k % 4], -0.25, 0.05)
+    MEL = {2: [(0.5, 74, 1.0), (1.5, 71, 1.0), (3.0, 79, 1.0)], 3: [(0.0, 76, 2.0), (2.5, 74, 1.5)],
+           4: [(0.5, 72, 1.0), (2.0, 76, 1.5)], 5: [(0.5, 79, 1.0), (2.0, 76, 2.0)],
+           6: [(0.0, 79, 2.0), (2.0, 76, 1.0), (3.0, 74, 1.0)], 7: [(0.5, 72, 1.5), (2.5, 74, 1.5)], 8: [(0.0, 71, 3.5)]}
+    for bar, notes in MEL.items():
+        for b, m, d in notes:
+            S.b['lead'].add(S.I.bell(m, d * S.beat, S.v(0.5)), S.T(bar, b, True), 1.0, 0.15, 0.45)
+            S.b['lead'].add(S.I.bell(m + 12, d * S.beat, S.v(0.12)), S.T(bar, b, True) + 0.004, 1.0, -0.2, 0.5)
+    S.swell(V['Gmaj9'][1], S.T(0, 0, hum=0), 1.6, 0.5)
+    S.mixdown(out, (None, (24.3, 1.6)), duck=(0.3, 0.33, 0.17))
+
+
 if __name__ == '__main__':
-    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar}[sys.argv[1]](sys.argv[2])
+    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar, 'gavilan': song_gavilan}[sys.argv[1]](sys.argv[2])
     print('ok', sys.argv[1], sys.argv[2])
