@@ -21,8 +21,8 @@ const WHITE='#FFFFFF', W80='rgba(255,255,255,.84)', W60='rgba(255,255,255,.62)';
 const FOOT='contrast(0.96) saturate(0.95) sepia(0.05) brightness(1.02)';
 const F='../../04-local-dia/frames_full/';
 // tiempos (s)
-const A_END=4.3, B0=3.6, B_ROUTE0=5.2, B_ROUTE1=14.2, B_ZOOM1=15.8, B_END=17.0, C0=16.4, C_END=25.9, D0=25.2;
-const DURATION=30.0; window.DURATION=DURATION;
+const B0=0, B_ROUTE0=1.6, B_ROUTE1=10.6, B_ZOOM1=12.2, B_END=13.4, C0=12.8, C_END=22.3, D0=21.6;   // el video empieza directo en el mapa
+const DURATION=26.4; window.DURATION=DURATION;
 const SHOTS=[ {dir:F+'c3', n:147, label:'Terraza al aire libre',  sub:'Mesas bajo el cielo de Santa Elena.'},
               {dir:F+'c2', n:148, label:'Somos petfriendly',      sub:'Ven con tu perrito.'},
               {dir:F+'c8', n:140, label:'Domicilios',             sub:'Solo en Santa Elena.'} ];
@@ -91,11 +91,11 @@ function sB(ctx,t){      // mapa: la cámara sigue la ruta
   ctx.shadowColor='rgba(59,50,41,.16)'; ctx.shadowBlur=70; ctx.shadowOffsetY=26; rr(ctx,cx,cy,cw,ch,30); ctx.fillStyle='#fff'; ctx.fill(); ctx.shadowColor='transparent';
   ctx.save(); rr(ctx,cx,cy,cw,ch,30); ctx.clip();
   // cámara
-  const p=routeP(t); const zIn=eInOut(prog(t,4.3,5.2)), zOut=eInOut(prog(t,B_ROUTE1,B_ZOOM1));
+  const p=routeP(t); const zIn=eInOut(prog(t,0.7,1.6)), zOut=eInOut(prog(t,B_ROUTE1,B_ZOOM1));
   let z=lerp(1.0,2.7,zIn); z=lerp(z,1.0,zOut);
   const smooth=(pp)=>{ let sx=0,sy=0; for(let i=-4;i<=4;i++){ const q=posAt(clamp(pp+i*0.012)); sx+=q[0]; sy+=q[1]; } return [sx/9,sy/9]; };
   const follow=smooth(p), start=[ROUTE[0][0]+40,ROUTE[0][1]-20];
-  let cxm=lerp(540,lerp(start[0],follow[0],eInOut(prog(t,5.0,5.6))),zIn), cym=lerp(405,lerp(start[1],follow[1],eInOut(prog(t,5.0,5.6))),zIn);
+  let cxm=lerp(540,lerp(start[0],follow[0],eInOut(prog(t,1.4,2.0))),zIn), cym=lerp(405,lerp(start[1],follow[1],eInOut(prog(t,1.4,2.0))),zIn);
   cxm=lerp(cxm,540,zOut); cym=lerp(cym,405,zOut);
   const vw=1080/z, vh=810/z; let sx=clamp(cxm-vw/2,0,1080-vw), sy=clamp(cym-vh/2,0,810-vh);
   ctx.drawImage(IMG.map,sx*2,sy*2,vw*2,vh*2,cx,cy,cw,ch);
@@ -156,15 +156,14 @@ function sD(ctx,t){
 }
 function render(ctx,t,fa,fc){
   ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
-  if(t<A_END+0.1) sA(ctx,t,fa);
-  if(t>=B0&&t<=B_END+0.4){ ctx.save(); ctx.globalAlpha=eInOut(prog(t,B0,A_END)); sB(ctx,t); ctx.restore(); }
+  if(t<=B_END+0.4){ ctx.save(); ctx.globalAlpha=Math.min(1,0.15+prog(t,0,0.5)); sB(ctx,t); ctx.restore(); }
   if(t>=C0&&t<=C_END+0.9){ ctx.save(); ctx.globalAlpha=eInOut(prog(t,C0,C0+0.6)); sC(ctx,t,fc); ctx.restore(); }
   if(t>=D0){ ctx.save(); ctx.globalAlpha=eInOut(prog(t,D0,D0+0.7)); sD(ctx,t); ctx.restore(); }
 }
 const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
 window.seek=async function(t){
   const a1={dir:F+'c1',n:113,t:0};
-  const fa = t<A_END+0.1 ? await loadImg(frameOf(a1,t,0.55)) : null;
+  const fa = null;
   const fc=[null,null,null];
   if(t>=C0-0.05&&t<=C_END+0.9) for(let i=0;i<SHOTS.length;i++){ const s=SHOTS[i]; if(t>=s.t-0.05&&t<=s.end+0.4) fc[i]=await loadImg(frameOf(s,Math.max(t,s.t))); }
   render(ctx,t,fa,fc);
