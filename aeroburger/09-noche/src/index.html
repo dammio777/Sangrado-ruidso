@@ -11,34 +11,40 @@ html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:10
 <script>
 /* =========================================================================
    Aero Burger · "Una noche en Aero Burger" · Reel 1080x1920 @60fps
-   Montaje cinematográfico sin textos: video real a pantalla completa, cortes en los tiempos
-   de la música (100 BPM) y solo la firma de la marca al final.
+   Montaje en primer plano: video real a pantalla completa con frases al estilo Instagram (sin emojis),
+   las bebidas como página de la carta y cortes en los tiempos de la música (120 BPM).
    ========================================================================= */
-const W=1080, H=1920, BEAT=0.6;
+const W=1080, H=1920;
+// Música a 120 BPM y render a 1,35× más lento: un tiempo de la música = 0,5 s en el video final = 0,5/1,35 s aquí.
+const BEAT=0.5/1.35;
+const CAP='600 46px "Inter", sans-serif';
+const CREAM='#EFE8DE', INK='#3B3229', SOFT='rgba(59,50,41,.58)';
 const NIGHT='saturate(0.9) sepia(0.08) contrast(0.98) brightness(1.03)';
 const L='../../01-local/frames/', A='../../02-airbus/frames/', S='../../07-aerosanduche/frames/';
 // beats: duración en tiempos · seq: carpeta de cuadros a 60 fps · img: foto con movimiento lento
 const SHOTS=[
-  {beats:3, type:'seq', dir:L+'c1', n:126, off:0},                 // el letrero encendido
-  {beats:3, type:'seq', dir:L+'c2', n:177, off:20},                // la carpa con luces
-  {beats:3, type:'seq', dir:L+'c3', n:126, off:0},                 // el mural del avión
-  {beats:3, type:'seq', dir:L+'c4', n:186, off:40},                // la terraza con gente
-  {beats:3, type:'img', img:'fire', k:[1.14,1.04], ax:[0.5,0.5], ay:0.5, f:'brightness(1.05)'},   // la chimenea
-  {beats:3, type:'seq', dir:L+'c6', n:126, off:0},                 // la luna y la pantalla
-  {beats:3, type:'seq', dir:A+'a1', n:175, off:0},                 // el queso de la Airbus (cámara lenta)
-  {beats:3, type:'seq', dir:S+'n1', n:120, off:0, png:true},       // pollo desmechado
-  {beats:2, type:'seq', dir:S+'n2', n:120, off:10, png:true},      // bien cargado
-  {beats:2, type:'seq', dir:S+'n4', n:120, off:0, png:true},       // se cierra
-  {beats:3, type:'img', img:'combo',  k:[1.06,1.0],  ax:[0.08,0.45], ay:0.5,  f:NIGHT},  // el combo
-  {beats:2, type:'img', img:'drinks', k:[1.0,1.07],  ax:[0.5,0.55],  ay:0.5,  f:NIGHT},  // las bebidas
-  {beats:3, type:'img', img:'close',  k:[1.02,1.12], ax:[0.42,0.46], ay:0.55, f:NIGHT},  // de frente, cremoso
+  {beats:5, type:'seq', dir:L+'c1', n:126, off:0,  cap:'pov: tienes hambre en Santa Elena'},                    // el letrero encendido
+  {beats:5, type:'seq', dir:L+'c2', n:177, off:20, cap:'y alguien dice: "vamos a Aero Burger"'},                // la carpa con luces
+  {beats:5, type:'seq', dir:L+'c3', n:126, off:0,  cap:'llegas y ya te gustó el lugar'},                       // el mural del avión
+  {beats:5, type:'seq', dir:L+'c4', n:186, off:40, cap:'con tu parche'},                                        // la terraza con gente
+  {beats:5, type:'img', img:'fire', k:[1.14,1.04], ax:[0.5,0.5], ay:0.5, f:'brightness(1.05)', cap:'hace frío… pero hay chimenea'},   // la chimenea
+  {beats:5, type:'seq', dir:L+'c6', n:126, off:0,  cap:'bajo la luna'},                                         // la luna y la pantalla
+  {beats:5, type:'seq', dir:A+'a1', n:175, off:0,  cap:'una Airbus, doble carne'},                              // el queso de la Airbus (cámara lenta)
+  {beats:5, type:'seq', dir:S+'n1', n:120, off:0, png:true, cap:'o el Aerosanduche de pollo'},                  // pollo desmechado
+  {beats:4, type:'seq', dir:S+'n2', n:120, off:10, png:true, cap:'bien cargado'},                               // bien cargado
+  {beats:4, type:'seq', dir:S+'n4', n:120, off:0, png:true, cap:'lo cierran…'},                                // se cierra
+  {beats:5, type:'img', img:'combo',  k:[1.06,1.0],  ax:[0.08,0.45], ay:0.5,  f:NIGHT, cap:'llega con papas'},  // el combo
+  {beats:4, type:'card', img:'dcard', title:'Bebidas de la casa', desc:'Para acompañar el vuelo.'},          // las bebidas, como página de la carta
+  {beats:5, type:'img', img:'close',  k:[1.02,1.12], ax:[0.42,0.46], ay:0.55, f:NIGHT, cap:'y tú, ¿qué pides?'},  // de frente, cremoso
 ];
 let acc=0; for(const s of SHOTS){ s.t=acc; acc+=s.beats*BEAT; s.end=acc; }
-const END0=acc, DURATION=END0+4*BEAT+0.6; window.DURATION=DURATION;   // 21,6 s de montaje + firma
+const END0=acc, DURATION=END0+5*BEAT; window.DURATION=DURATION;   // 62 tiempos de montaje + 5 de firma = 33,5 s finales
 
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const prog=(t,a,b)=>clamp((t-a)/(b-a));
 const lerp=(a,b,e)=>a+(b-a)*e;
+const eOutBack=x=>{ const c=1.4; return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2); };
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 const eOut=x=>1-Math.pow(1-x,3);
 const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 function cover(ctx,img,k=1,ax=0.5,ay=0.5){ const s=Math.max(W/img.width,H/img.height)*k; const dw=img.width*s, dh=img.height*s; ctx.drawImage(img,(W-dw)*ax,(H-dh)*ay,dw,dh); }
@@ -61,6 +67,36 @@ function drawShot(ctx,s,t,frame){
   const u=prog(t,s.t,s.end+XF);
   if(s.type==='seq'&&frame) cover(ctx,frame,1+0.035*u,0.5,0.5);
   else if(s.type==='img'){ ctx.filter=s.f; cover(ctx,IMG[s.img],lerp(s.k[0],s.k[1],u),lerp(s.ax[0],s.ax[1],eInOut(u)),s.ay); ctx.filter='none'; }
+  else if(s.type==='card') drawCard(ctx,s,t);
+}
+// página de la carta (como en el Menú de a bordo): papel crema, tarjeta con la foto, nombre y descripción
+function drawCard(ctx,s,t){
+  ctx.fillStyle=CREAM; ctx.fillRect(0,0,W,H);
+  const g=ctx.createRadialGradient(540,560,0,540,560,1400); g.addColorStop(0,'rgba(255,252,246,.35)'); g.addColorStop(1,'rgba(255,252,246,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  const k=eOut(prog(t,s.t,s.t+0.6)), cx=110, cy=340, cw=860, ch=1075;
+  ctx.save(); ctx.globalAlpha=k; ctx.translate(0,(1-k)*40);
+  ctx.shadowColor='rgba(59,50,41,.16)'; ctx.shadowBlur=70; ctx.shadowOffsetY=26; rr(ctx,cx,cy,cw,ch,30); ctx.fillStyle='#fff'; ctx.fill(); ctx.shadowColor='transparent';
+  ctx.save(); rr(ctx,cx,cy,cw,ch,30); ctx.clip(); ctx.filter='contrast(0.97) saturate(0.95) sepia(0.05) brightness(1.02)';
+  const im=IMG[s.img], z=lerp(1.08,1.0,eOut(prog(t,s.t,s.end))), sc=Math.max(cw/im.width,ch/im.height)*z; ctx.drawImage(im,cx+(cw-im.width*sc)/2,cy+(ch-im.height*sc)/2,im.width*sc,im.height*sc); ctx.filter='none'; ctx.restore();
+  rr(ctx,cx+.5,cy+.5,cw-1,ch-1,30); ctx.strokeStyle='rgba(59,50,41,.10)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.font='600 24px "Inter"'; ctx.letterSpacing='5px'; ctx.fillStyle=SOFT; ctx.textAlign='right'; ctx.fillText('EN LA CARTA',cx+cw,292);
+  const a=eOut(prog(t,s.t+0.2,s.t+0.7)), b2=eOut(prog(t,s.t+0.35,s.t+0.85));
+  ctx.globalAlpha=a; ctx.font='700 68px "Inter Display", "Inter"'; ctx.letterSpacing='-1.5px'; ctx.fillStyle=INK; ctx.textAlign='center'; ctx.fillText(s.title,540,1520+(1-a)*14);
+  ctx.globalAlpha=b2; ctx.font='500 36px "Inter"'; ctx.letterSpacing='0px'; ctx.fillStyle=SOFT; ctx.fillText(s.desc,540,1585+(1-b2)*14);
+  ctx.restore();
+}
+// frase estilo Instagram: caja blanca con texto negro y un pequeño "pop" al entrar
+function caption(ctx,str,t,t0,t1){
+  const pin=prog(t,t0+0.08,t0+0.3), pout=prog(t,t1-0.14,t1);
+  if(pin<=0||pout>=1) return;
+  ctx.save(); ctx.font=CAP; ctx.letterSpacing='-0.5px';
+  const w=ctx.measureText(str).width+56, h=78, x=540-w/2, y=1150, sc=lerp(0.88,1,eOutBack(pin));
+  ctx.globalAlpha=clamp(pin*2)*(1-pout);
+  ctx.translate(540,y+h/2); ctx.scale(sc,sc); ctx.translate(-540,-(y+h/2));
+  ctx.shadowColor='rgba(0,0,0,.25)'; ctx.shadowBlur=20; ctx.shadowOffsetY=4;
+  rr(ctx,x,y,w,h,18); ctx.fillStyle='#fff'; ctx.fill(); ctx.shadowColor='transparent';
+  ctx.fillStyle='#111'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(str,540,y+h/2+2);
+  ctx.restore();
 }
 function render(ctx,t,frame,prevFrame){
   ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
@@ -75,7 +111,8 @@ function render(ctx,t,frame,prevFrame){
   }
   // fundido de entrada y viñeta suave para un look de cine
   const fi=1-prog(t,0,0.35); if(fi>0){ ctx.fillStyle=`rgba(0,0,0,${fi})`; ctx.fillRect(0,0,W,H); }
-  const v=ctx.createRadialGradient(540,960,600,540,960,1250); v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(0,0,0,.35)'); ctx.fillStyle=v; ctx.fillRect(0,0,W,H);
+  if(!(t<END0&&s.type==='card'&&t>s.t+XF)){ const v=ctx.createRadialGradient(540,960,600,540,960,1250); v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(0,0,0,.35)'); ctx.fillStyle=v; ctx.fillRect(0,0,W,H); }
+  if(t<END0) for(const sh of SHOTS) if(sh.cap) caption(ctx,sh.cap,t,sh.t,sh.end);
   const d=eInOut(prog(t,END0-0.05,END0+0.6)); if(d>0){ ctx.fillStyle=`rgba(8,5,3,${0.66*d})`; ctx.fillRect(0,0,W,H); }
   if(t>=END0){
     const a=eOut(prog(t,END0+0.15,END0+0.8));
@@ -94,8 +131,8 @@ window.seek=async function(t){
   render(ctx,t,a?await loadImg(a):null,b?await loadImg(b):null);
 };
 window.ready=(async()=>{
-  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
-  for(const [k,s] of [['fire','../../06-nuevo/assets/fire_sr.png'],['combo','../../07-aerosanduche/assets/combo_top_sr.png'],['close','../../07-aerosanduche/assets/combo_close_sr.png'],['drinks','../../06-nuevo/assets/n_bebidas.jpg'],['logo','../assets/logo_crop.png']]){ KEEP.add(s); IMG[k]=await loadImg(s); }
+  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`700 30px "Inter"`)]);
+  for(const [k,s] of [['fire','../../06-nuevo/assets/fire_sr.png'],['combo','../../07-aerosanduche/assets/combo_top_sr.png'],['close','../../07-aerosanduche/assets/combo_close_sr.png'],['dcard','../../06-nuevo/assets/p6_bebidas.jpg'],['logo','../assets/logo_crop.png']]){ KEEP.add(s); IMG[k]=await loadImg(s); }
   await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
   return true;
 })();

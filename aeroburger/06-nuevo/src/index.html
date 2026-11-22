@@ -25,11 +25,13 @@ const DISHES=[
   {img:'p5', name:'Gavilán',                   desc:'Desgranado especial.',                  ay:0.5},
   {img:'p6', name:'Bebidas de la casa',        desc:'Para acompañar el vuelo.',              ay:0.5},
 ];
-const I0=2.6, ID=2.1;                         // platos
-const I1=I0+DISHES.length*ID;                 // 13.1
-const F0=I1, F1=F0+2*ID;                      // chimenea (2 compases de la música)
+// Música: "Para no verte más" (La Mosca), estribillo desde 1:39,83 a ~100 BPM (tiempo = 0,5986 s en el video final).
+// Se renderiza a 1,35x: la primera página cae en el golpe de entrada del estribillo; cada página dura 5 tiempos.
+const I0=2.66044, ID=2.21704;                   // 6 tiempos de entrada, 5 por plato
+const I1=I0+DISHES.length*ID;
+const F0=I1, F1=F0+2*ID;                      // chimenea (10 tiempos)
 const M0=F1;                                  // mapa + cierre
-const DURATION=M0+5.2; window.DURATION=DURATION;   // 24,6 s
+const DURATION=M0+5.32089; window.DURATION=DURATION;   // 12 tiempos de mapa   // 24,6 s
 const CARD={x:110,y:340,w:860,h:1075,r:30};
 
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));

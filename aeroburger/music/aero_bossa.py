@@ -15,7 +15,8 @@ SR = 44100
 ap = argparse.ArgumentParser()
 ap.add_argument('out'); ap.add_argument('--bpm', type=float, default=114); ap.add_argument('--bar0', type=float, default=2.0)
 ap.add_argument('--dur', type=float, default=20); ap.add_argument('--breakdown', type=float, nargs=2, default=None)
-ap.add_argument('--seed', type=int, default=3); ap.add_argument('--fade', type=float, default=1.6)
+ap.add_argument('--seed', type=int, default=3); ap.add_argument('--energy', action='store_true', help='versión animada: bombo en cada tiempo, palmas, hi-hats, bajo en corcheas y guitarra funky')
+ap.add_argument('--seed2', type=int, default=0); ap.add_argument('--fade', type=float, default=1.6)
 A = ap.parse_args()
 rng = np.random.default_rng(A.seed)
 BEAT = 60 / A.bpm; BAR = 4 * BEAT
@@ -84,6 +85,20 @@ def shaker(accent=1.0):
     n = int(0.09 * SR); nz = rng.normal(0, 1, n); nz = nz - onepole(nz, 5000)
     t = np.arange(n) / SR; e = (t / 0.012) ** 2 * np.exp(-t / 0.02); e /= e.max(); return nz * e * 0.35 * accent
 
+def clap():
+    n = int(0.16 * SR); t = np.arange(n) / SR
+    nz = rng.normal(0, 1, n); nz = onepole(nz, 3800) - onepole(nz, 700)
+    e = np.exp(-t / 0.05) * (1 + 0.8 * (np.sin(2 * np.pi * 90 * t) > 0.3))
+    return nz * e / (np.abs(nz * e).max() + 1e-9) * 0.7
+
+def hat(open_=False):
+    n = int(0.12 * SR if open_ else 0.05 * SR); t = np.arange(n) / SR
+    nz = rng.normal(0, 1, n); nz = nz - onepole(nz, 6500)
+    return nz * np.exp(-t / (0.05 if open_ else 0.012)) * 0.5
+
+def chop(m, dur=0.16):
+    return nylon(m, dur, 0.95) * np.exp(-np.arange(int(dur * SR)) / (0.05 * SR))
+
 def crackle(dur):
     n = int(dur * SR); x = onepole(rng.normal(0, 1, n), 2500) * 0.02
     k = 0
@@ -141,10 +156,18 @@ while tb < end_t + BAR:
         for k in range(16):
             sw = (BEAT / 4) * (0.12 if k % 2 else 0)   # ligero swing
             put(shaker(1.0 if k % 4 == 2 else 0.6), tb + k * BEAT / 4 + sw, 0.42, 0.35)
+    if A.energy and not in_break(tb + 0.1):
+        for b in (1.0, 3.0): put(kick(), tb + b * BEAT, 0.40)                 # bombo en cada tiempo
+        for b in (1.0, 3.0): put(clap(), tb + b * BEAT, 0.34, 0.15)           # palmas en 2 y 4
+        for k in range(8):                                                      # hi-hat en corcheas, abierto en el "y" del 4
+            put(hat(open_=(k == 7)), tb + (k + 0.5 * 0) * BEAT / 2 + (BEAT / 2) * 0.0 + (BEAT / 2) * (0.5 if k % 2 else 0) * 0.0, 0.18 if k % 2 == 0 else 0.30, -0.25)
+        for b in (0.5, 1.5, 2.5, 3.5): put(bass(bass_m + (12 if b % 1 else 7), 0.35), tb + b * BEAT, 0.30)   # bajo que salta
+        for b in (0.5, 1.5, 2.25, 3.0, 3.5):                                    # guitarra funky a contratiempo
+            for j, m in enumerate(voices[:3]): put(chop(m + 12), tb + b * BEAT + j * 0.006, 0.20, -0.2 + 0.2 * j)
     # vibráfono (melodía) a partir del segundo compás, y siempre en el breakdown
     for (mb, b, m, d) in MEL:
-        if mb == bar % 4 and (bar >= 1 or in_break(tb)):
-            put(vibes(m, d * BEAT + 1.0), tb + b * BEAT, 0.17 if not in_break(tb) else 0.22, 0.15)
+        if mb == bar % 4 and (bar >= 1 or in_break(tb) or A.energy):
+            put(vibes(m + (12 if (A.energy and bar % 8 >= 4) else 0), d * BEAT + 1.0), tb + b * BEAT, 0.17 if not in_break(tb) else 0.22, 0.15)
     if last:   # final: acorde que queda sonando
         for j, m in enumerate(PROG[0][1]): put(epiano(m + 12, 3.5), tb + BAR, 0.08, 0.3 - 0.2 * j)
         break
