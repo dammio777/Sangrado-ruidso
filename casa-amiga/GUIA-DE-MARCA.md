@@ -103,3 +103,6 @@ Brebajes del Pacífico. Colores: rojo `#B23E2A`, crema papel `#E6DED1` (de su pu
 
 ### 5. Hizca (@hizcafitomedicina), listo
 Colores del logo: crema `#FCEBD0`, café `#6B3A1B`, verde salvia `#5F7A5C`. Tipografías: Kaushan Script (nombre, como su logo), Libre Baskerville y Cormorant. Fondo de rombos concéntricos (`decor: 'diamonds'`, como su logo). Bio: "Medicina con plantas (fitoterapia) · Cosmética medicinal · Herbolaria sagrada funcional · Terapia floral método Bach". Productos: extractos oficinales (tintura madre) de diente de león, cardo mariano y ortiga; ungüento para dolor y contracción. Música: `music_brand_jazzcozy.py hizca` (jazz cozy moderno; antes folk).
+
+### 6. Arcoíris Negro (@universo_arcoirisnegro), listo
+Colores: negro `#16191A`, naranja quemado `#D9722F` (de sus camisetas), verde tinta del logo `#1F2A26`. Tipografías: Permanent Marker (pincel, como su logo) y Special Elite. Bio: "Estampados experimentales · Tintes y procesos de estampación manual · Medellín-Colombia". Lemas de sus publicaciones: "Negro. Fuego. Metal." y "No venimos a encajar. Venimos a romper la forma". Música: `music_brand_jazzcozy.py arcoiris` (jazz cozy en La menor, nocturno).

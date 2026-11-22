@@ -6,9 +6,9 @@ from scipy.signal import butter, sosfilt, fftconvolve, lfilter
 
 SR = 44100; DUR = 29.0; N = int(SR * DUR)
 VAR = sys.argv[2] if len(sys.argv) > 2 else 'pargo'
-BPM = 78 if VAR == 'pargo' else 70; BEAT = 60 / BPM; BAR = 4 * BEAT
+BPM = {'pargo': 78, 'hizca': 70, 'arcoiris': 74}.get(VAR, 74); BEAT = 60 / BPM; BAR = 4 * BEAT
 VAR = sys.argv[2] if len(sys.argv) > 2 else 'pargo'
-rng = np.random.default_rng(5 if VAR == 'pargo' else 9)
+rng = np.random.default_rng({'pargo': 5, 'hizca': 9}.get(VAR, 13))
 t_all = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
 def hp(x, f, o=2): return sosfilt(butter(o, f, 'high', fs=SR, output='sos'), x)
@@ -87,6 +87,10 @@ if VAR == 'pargo':   # Fa mayor cálido: Fmaj9 – Dm9 – Gm9 – C13sus
     V = [[57, 60, 64, 67], [57, 60, 64, 65], [58, 62, 65, 69], [58, 62, 64, 69]]
     R = [41, 38, 43, 36]
     MEL = [[(0,72),(1.5,74),(2.5,76)], [(0+SW,72),(2,69)], [(0,74),(1,77),(2.5,76),(3.5,74)], [(1,72),(2+SW,70)]]
+elif VAR == 'arcoiris':  # La menor nocturno: Am9 – Fmaj7#11 – Dm9 – E7(b9)
+    V = [[55, 59, 60, 64], [52, 57, 59, 64], [53, 57, 60, 64], [56, 59, 62, 65]]
+    R = [33, 41, 38, 40]
+    MEL = [[(0,72),(1.5,71),(3,69)], [(1,71),(2+SW,72)], [(0,74),(1.5,72),(3,69)], [(1,68),(2.5,71)]]
 else:                # Re mayor sereno: Dmaj9 – Bm11 – Gmaj9 – Em9/A
     V = [[54, 57, 61, 64], [54, 57, 61, 64], [54, 57, 59, 62], [55, 59, 62, 66]]
     R = [38, 35, 43, 33]
