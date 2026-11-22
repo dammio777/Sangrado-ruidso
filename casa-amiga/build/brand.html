@@ -143,7 +143,9 @@ function brush(svg,seed){const cols=B.brushColors||[B.colors.b];let h='<defs><fi
   for(let k=0;k<7;k++){const c=cols[(k+seed)%cols.length],x=((k*389+seed*211)%1100)-60,y=((k*577+seed*97)%1800)+40,w=380+((k*131)%260),r=-35+((k*53+seed*29)%70);
     h+=`<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#bl${seed})" opacity="${.32+(k%3)*.06}"><rect x="${-w/2}" y="-60" width="${w}" height="120" rx="60" fill="${c}"/><rect x="${-w/2+40}" y="-30" width="${w*.7}" height="70" rx="35" fill="${c}"/></g>`}
   svg.innerHTML=h}
-if(B.decor==='brush'){brush($('ridges'),1);brush($('ridges2'),4);}else{ridges($('ridges'),1);ridges($('ridges2'),4);}
+function waves(svg,seed){let h='';for(let k=0;k<14;k++){let y=120+k*130,d=`M0 ${y}`;for(let x=0;x<=1280;x+=20){d+=` L${x} ${(y+Math.sin((x+k*70+seed*40)/95)*18+Math.sin((x*.5+k*33)/60)*6).toFixed(1)}`}h+=`<path d="${d}" fill="none" stroke="${B.colors.cream}" stroke-opacity="${.07+(k%3)*.025}" stroke-width="3"/>`}svg.innerHTML=h}
+function diamonds(svg,seed){let h='';const cx=[640,180,1100,380,900][seed%5],cy=[960,420,1500,1650,300][seed%5];for(let k=1;k<12;k++){const r=k*110;h+=`<path d="M${cx} ${cy-r} L${cx+r} ${cy} L${cx} ${cy+r} L${cx-r} ${cy} Z" fill="none" stroke="${B.colors.cream}" stroke-opacity="${.05+(k%3)*.03}" stroke-width="4"/>`}svg.innerHTML=h}
+const DEC={brush,waves,diamonds,ridges};const dec=DEC[B.decor]||ridges;dec($('ridges'),1);dec($('ridges2'),4);
 const URL='casa-amiga-henna.vercel.app';
 const S={A:[0,3.9],B:[3.6,9.2],C:[9.0,15.6],D:[15.4,21.4],E:[21.2,29.0]};const DUR=29.0;
 function show(id,t){const [a,b]=S[id];const on=t>=a&&t<b;$(id).style.display=on?'block':'none';return on?t-a:null}

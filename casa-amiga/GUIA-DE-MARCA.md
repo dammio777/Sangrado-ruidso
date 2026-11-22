@@ -97,3 +97,9 @@ Colores del logo: vino `#6E3A46`, beige `#D9C4A3`, verde salvia `#6F7D4E` (de la
 
 ### 3. SaboryArte | Mezcla de sales y especias Gourmet (@saboryarte.cocina), listo
 Colores del logo: rosa `#EAD3CB`, verde oscuro `#1F4A32`, terracota `#B5574F` (la "y"), pinceladas en malva, salvia y mostaza. Tipografías: Great Vibes (nombre), Bree Serif (como sus publicaciones) y Caveat. Fondo de pinceladas de acuarela (`decor: 'brush'`). Bio: "Mezclas de sales y especias que transforman tus comidas · El arte de crear, el arte de cocinar". Productos (de sus publicaciones): Sal de la vid (aliada de la parrilla), Sal Chilemon (ácida y picante), Sal de sol, Sal de oro, Sal de luna rosa. Música: `music_brand_ukelele.py` (ukelele, glockenspiel, chasquidos, madera).
+
+### 4. Pargo Viche (@pargoviche), listo
+Brebajes del Pacífico. Colores: rojo `#B23E2A`, crema papel `#E6DED1` (de su publicación "El viche es un amor bailado de cerca y (despacio)"). Tipografías: Libre Baskerville y Special Elite (máquina de escribir). Fondo de olas (`decor: 'waves'`). Lemas de su etiqueta: "Tiempo · Fuego · Sabor", "Tómelo sin prisa", "Alto contenido de fuego". No había captura del logo en grande, así que se armó un sello circular con su pez rojo recortado de su publicación. **Si mandan el logo original, reemplazar `assets/brands/pargoviche/logo.png`.** Música: `music_brand_cumbia.py` (cumbia lenta).
+
+### 5. Hizca (@hizcafitomedicina), listo
+Colores del logo: crema `#FCEBD0`, café `#6B3A1B`, verde salvia `#5F7A5C`. Tipografías: Kaushan Script (nombre, como su logo), Libre Baskerville y Cormorant. Fondo de rombos concéntricos (`decor: 'diamonds'`, como su logo). Bio: "Medicina con plantas (fitoterapia) · Cosmética medicinal · Herbolaria sagrada funcional · Terapia floral método Bach". Productos: extractos oficinales (tintura madre) de diente de león, cardo mariano y ortiga; ungüento para dolor y contracción. Música: `music_brand_folk.py` (guitarra punteada, flauta, pájaros).

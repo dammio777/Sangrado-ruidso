@@ -11,7 +11,7 @@ const fs = require('fs');
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
   await page.goto('file://' + path.join(__dirname, process.env.PAGE || 'video.html'));
   await page.evaluate(async () => {
-    for (const f of ['400 20px Inter', '600 20px Inter', '800 20px Inter', '400 20px Anton', '400 20px "Space Mono"', '700 20px "Space Mono"', '400 20px "Great Vibes"', '400 20px "Alfa Slab One"', '400 20px "Special Elite"', '400 20px "Libre Baskerville"', 'italic 400 20px "Libre Baskerville"', '700 20px "Libre Baskerville"', '500 20px Cinzel', '700 20px Cinzel', '500 20px "Cormorant Garamond"', 'italic 500 20px "Cormorant Garamond"', '400 20px "Bree Serif"', '500 20px Caveat', '700 20px Caveat']) await document.fonts.load(f);
+    for (const f of ['400 20px Inter', '600 20px Inter', '800 20px Inter', '400 20px Anton', '400 20px "Space Mono"', '700 20px "Space Mono"', '400 20px "Great Vibes"', '400 20px "Alfa Slab One"', '400 20px "Special Elite"', '400 20px "Libre Baskerville"', 'italic 400 20px "Libre Baskerville"', '700 20px "Libre Baskerville"', '500 20px Cinzel', '700 20px Cinzel', '500 20px "Cormorant Garamond"', 'italic 500 20px "Cormorant Garamond"', '400 20px "Bree Serif"', '500 20px Caveat', '700 20px Caveat', '400 20px "Kaushan Script"']) await document.fonts.load(f);
     await document.fonts.ready;
   });
   await page.waitForTimeout(500);
