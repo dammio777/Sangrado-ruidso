@@ -18,3 +18,8 @@ python src/sr_clip.py out/tmp/srvgg_mix06.onnx VID-WA0074.mp4 1.7 130 0 136 720 
 bash src/extract.sh      # usa los *_sr.mp4 si existen
 LOSSLESS=1 CRF=14 node src/render.js video 60
 ```
+
+## Versión final "primer plano" calmada y en alta calidad
+- `src/natural.html`: video a pantalla completa con la interfaz discreta y fundidos suaves entre tomas.
+- `src/extract_full.sh`: tomas a 1080×1920 estabilizadas. Los clips de WhatsApp (c1–c3) y el diploma (c6) pasan por Real-ESRGAN **a cuadro completo** (`out/tmp/fullsr_cN.mp4`, 30 fps con interpolación a 60), en vez de recortar una franja.
+- Render: `PAGE=natural.html TIMESCALE=1.35 CRF=13 OUT=slow_noaudio.mp4 node src/render.js video 60` (35 % más lento) y música a 77,8 BPM.
