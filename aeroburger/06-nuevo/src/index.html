@@ -23,12 +23,13 @@ const DISHES=[
   {img:'p3', name:'Sánduche de la casa',       desc:'Pan artesanal a base de orégano.',      ay:0.5},
   {img:'p4', name:'Torre de control personal', desc:'Para ti solo, bien cargada.',           ay:0.5},
   {img:'p5', name:'Gavilán',                   desc:'Desgranado especial.',                  ay:0.5},
+  {img:'p6', name:'Bebidas de la casa',        desc:'Para acompañar el vuelo.',              ay:0.5},
 ];
 const I0=2.6, ID=2.1;                         // platos
 const I1=I0+DISHES.length*ID;                 // 13.1
-const F0=I1, F1=F0+3.2;                       // chimenea
+const F0=I1, F1=F0+2*ID;                      // chimenea (2 compases de la música)
 const M0=F1;                                  // mapa + cierre
-const DURATION=22.0; window.DURATION=DURATION;
+const DURATION=M0+5.2; window.DURATION=DURATION;   // 24,6 s
 const CARD={x:110,y:340,w:860,h:1075,r:30};
 
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -102,7 +103,7 @@ function sDishes(ctx,t){
     ctx.restore();
     // textos del plato
     const tin=a-0.1, tout=i<DISHES.length-1?b-0.35:I1-0.3;
-    txt(ctx,String(i+1).padStart(2,'0')+' / 05',CARD.x,292,`600 28px ${TEXT}`,SOFT,'left',tin,tout,t,{dy:10});
+    txt(ctx,String(i+1).padStart(2,'0')+' / '+String(DISHES.length).padStart(2,'0'),CARD.x,292,`600 28px ${TEXT}`,SOFT,'left',tin,tout,t,{dy:10});
     txt(ctx,'EN LA CARTA',CARD.x+CARD.w,292,`600 24px ${TEXT}`,SOFT,'right',I0-0.3,I1-0.3,t,{ls:5,dy:10});
     txt(ctx,d.name,540,1520,`700 ${d.name.length>20?58:68}px ${DISP}`,INK,'center',tin+0.05,tout,t,{ls:-1.5});
     txt(ctx,d.desc,540,1585,`500 36px ${TEXT}`,SOFT,'center',tin+0.15,tout,t);
@@ -152,7 +153,7 @@ window.seek=async function(t){
 };
 window.ready=(async()=>{
   await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
-  for(const [k,s] of [['p1','p1_cta.jpg'],['p2','p2_airbus.jpg'],['p3','p3_sanduche.jpg'],['p4','p4_torre.jpg'],['p5','p5_gavilan.jpg'],['fire','fire_sr.png'],['mapa','mapa.jpg'],['logo','logo_crop.png']]) IMG[k]=await loadImg('../assets/'+s);
+  for(const [k,s] of [['p1','p1_cta.jpg'],['p2','p2_airbus.jpg'],['p3','p3_sanduche.jpg'],['p4','p4_torre.jpg'],['p5','p5_gavilan.jpg'],['p6','p6_bebidas.jpg'],['fire','fire_sr.png'],['mapa','mapa.jpg'],['logo','logo_crop.png']]) IMG[k]=await loadImg('../assets/'+s);
   await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
   return true;
 })();

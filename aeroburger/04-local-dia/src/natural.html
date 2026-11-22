@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — De día (primer plano)</title>
+<style>@font-face{font-family:'AirbusSlab';src:url('../assets/fonts/Bevan-Regular.ttf')}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · El local de día · versión PRIMER PLANO · Reel 1080x1920 @60fps
+   El video real ocupa toda la pantalla; la interfaz va pequeña encima.
+   Cortes sobre los tiempos de la música (105 BPM): cada toma dura un número entero de tiempos.
+   ========================================================================= */
+const W=1080, H=1920;
+const TEXT='"Inter", sans-serif', DISP='"Inter Display", "Inter", sans-serif', SLAB='"AirbusSlab", serif';
+const WHITE='#FFFFFF', W80='rgba(255,255,255,.84)', W60='rgba(255,255,255,.62)';
+const FOOT='contrast(0.96) saturate(0.95) sepia(0.05) brightness(1.02)';   // cálido y cómodo
+const BEAT=60/105;
+const CLIPS=[
+  {dir:'c1', n:113, beats:3, label:'La llegada'},
+  {dir:'c2', n:148, beats:4, label:'Bajo la carpa'},
+  {dir:'c3', n:147, beats:4, label:'El corredor'},
+  {dir:'c4', n:87,  beats:2, label:'Cada rincón'},
+  {dir:'c5', n:136, beats:4, label:'La luna'},
+  {dir:'c6', n:113, beats:3, label:'Alma de piloto'},
+  {dir:'c7', n:67,  beats:2, label:'La barra'},
+  {dir:'c8', n:140, beats:4, label:'Tu mesa'},
+];
+let acc=0; for(const c of CLIPS){ c.start=acc; acc+=c.beats*BEAT; c.end=acc; }
+const CEND=acc;                    // 14,86 s
+const DURATION=32*BEAT; window.DURATION=DURATION;   // 8 compases = 18,29 s
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+function cover(ctx,img,k=1,ax=0.5,ay=0.5){ const s=Math.max(W/img.width,H/img.height)*k; const dw=img.width*s, dh=img.height*s; ctx.drawImage(img,(W-dw)*ax,(H-dh)*ay,dw,dh); }
+const cache=new Map(); const KEEP=new Set();
+function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>30){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
+const IMG={};
+const clipAt=t=>CLIPS.find(c=>t<c.end)||CLIPS[CLIPS.length-1];
+function frameSrc(t){ const c=clipAt(t); const idx=clamp(Math.floor((t-c.start)*60)+1,1,c.n); return `../frames_full/${c.dir}/${String(idx).padStart(4,'0')}.jpg`; }
+function txt(ctx,str,x,y,font,col,tIn,tOut,t,o={}){
+  const a=eOut(prog(t,tIn,tIn+0.4))*(tOut==null?1:1-eInOut(prog(t,tOut,tOut+0.2)));
+  if(a<=0) return;
+  ctx.save(); ctx.globalAlpha*=a; ctx.font=font; ctx.textAlign=o.align||'left'; ctx.fillStyle=col; if(o.ls) ctx.letterSpacing=o.ls+'px';
+  ctx.shadowColor='rgba(0,0,0,.45)'; ctx.shadowBlur=18; ctx.shadowOffsetY=2;
+  ctx.fillText(str,x,y+(1-a)*12); ctx.restore();
+}
+function render(ctx,t,img){
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  const c=clipAt(t), u=prog(t,c.start,c.end);
+  if(img){ ctx.filter=FOOT; cover(ctx,img, t<CEND ? 1+0.03*u : 1.03+0.05*prog(t,CEND,DURATION),0.5,0.5); ctx.filter='none'; }
+  // degradados suaves para leer el texto
+  let g=ctx.createLinearGradient(0,1200,0,H); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(0.55,'rgba(0,0,0,.38)'); g.addColorStop(1,'rgba(0,0,0,.58)'); ctx.fillStyle=g; ctx.fillRect(0,1200,W,H-1200);
+  g=ctx.createLinearGradient(0,0,0,330); g.addColorStop(0,'rgba(0,0,0,.38)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,330);
+  const d=eInOut(prog(t,CEND,CEND+0.6)); if(d>0){ ctx.fillStyle=`rgba(0,0,0,${0.35*d})`; ctx.fillRect(0,0,W,H); }
+  const X=80;
+  // marca discreta arriba
+  const ma=eOut(prog(t,0.2,0.8));
+  if(ma>0){ ctx.save(); ctx.globalAlpha=ma*0.92; ctx.beginPath(); ctx.arc(108,214,28,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,80,186,56,56); ctx.restore();
+    txt(ctx,'AERO BURGER  ·  DE DÍA',152,223,`600 24px ${TEXT}`,W80,0.2,null,t,{ls:5}); }
+  // apertura sobre la primera toma
+  txt(ctx,'AERO BURGER',X,1490,`400 84px ${SLAB}`,WHITE,0.2,CLIPS[0].end-0.25,t,{ls:2});
+  txt(ctx,'de día.',X,1560,`500 46px ${TEXT}`,W80,0.4,CLIPS[0].end-0.25,t);
+  // nombre de cada toma (desde la segunda)
+  for(let i=1;i<CLIPS.length;i++){
+    const cl=CLIPS[i];
+    txt(ctx,String(i+1).padStart(2,'0'),X,1500,`600 26px ${TEXT}`,W60,cl.start+0.04,cl.end-0.2,t,{ls:3});
+    txt(ctx,cl.label,X,1565,`700 58px ${DISP}`,WHITE,cl.start+0.08,cl.end-0.2,t,{ls:-1});
+  }
+  // línea de progreso fina
+  const pa=1-eInOut(prog(t,CEND-0.2,CEND+0.2));
+  if(pa>0){ ctx.save(); ctx.globalAlpha=pa*0.85; ctx.fillStyle='rgba(255,255,255,.28)'; ctx.fillRect(X,1625,W-2*X,3); ctx.fillStyle=WHITE; ctx.fillRect(X,1625,(W-2*X)*clamp(t/CEND),3); ctx.restore(); }
+  // cierre sobre la última toma
+  txt(ctx,'Te esperamos.',X,1440,`700 74px ${DISP}`,WHITE,CEND+0.3,null,t,{ls:-2});
+  txt(ctx,'Aero Burger · Santa Elena · Somos petfriendly.',X,1505,`500 34px ${TEXT}`,W80,CEND+0.5,null,t);
+  txt(ctx,'@aero.burger',X,1570,`700 38px ${TEXT}`,WHITE,CEND+0.7,null,t);
+}
+const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
+window.seek=async function(t){ render(ctx,t,await loadImg(frameSrc(t))); };
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  KEEP.add('../assets/logo_crop.png'); IMG.logo=await loadImg('../assets/logo_crop.png');
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+  return true;
+})();
+</script>
+</body>
+</html>

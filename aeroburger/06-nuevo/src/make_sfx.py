@@ -1,6 +1,6 @@
 # Sonido: pop de entrada, pase de página por plato, crepitar de chimenea, campanita al final.
 import numpy as np, wave, sys
-SR=48000; DUR=22.0; N=int(SR*DUR); L=np.zeros(N); R=np.zeros(N); rng=np.random.default_rng(11)
+SR=48000; DUR=24.6; N=int(SR*DUR); L=np.zeros(N); R=np.zeros(N); rng=np.random.default_rng(11)
 def add(sig,t,g=1.0,pan=0.0):
     i=int(t*SR); s=sig[:max(0,N-i)]*g; L[i:i+len(s)]+=s*np.sqrt((1-pan)/2); R[i:i+len(s)]+=s*np.sqrt((1+pan)/2)
 def env(n,a,d): t=np.arange(n)/SR; return (1-np.exp(-t/a))*np.exp(-t/d)
@@ -27,10 +27,11 @@ def chime():
     return y
 add(pop(),0.08,0.5)
 I0,ID=2.6,2.1
-for i in range(5): add(page(),I0+i*ID-0.48,0.35,0.3 if i%2 else -0.3)
-add(crackle(3.6),13.0,0.55)
-add(page(),16.2,0.25)
-add(chime(),17.4,0.30)
+for i in range(6): add(page(),I0+i*ID-0.48,0.35,0.3 if i%2 else -0.3)
+F0=I0+6*ID; M0=F0+2*ID
+add(crackle(4.4),F0-0.1,0.55)
+add(page(),M0-0.1,0.25)
+add(chime(),M0+1.1,0.30)
 st=np.stack([L,R],1); st*=0.5/np.abs(st).max()
 with wave.open(sys.argv[1],'wb') as w: w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((st*32767).astype('<i2').tobytes())
 print('ok')

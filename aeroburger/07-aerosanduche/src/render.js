@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 
 const ROOT = path.resolve(__dirname, '..');
-const URL = 'file://' + path.join(ROOT, 'src', 'index.html') + (process.env.THEME ? '?theme=' + process.env.THEME : '');
+const URL = 'file://' + path.join(ROOT, 'src', process.env.PAGE || 'index.html') + (process.env.THEME ? '?theme=' + process.env.THEME : '');
 
 (async () => {
   const [mode, ...args] = process.argv.slice(2);

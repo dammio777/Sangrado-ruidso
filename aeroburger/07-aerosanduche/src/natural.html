@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Aerosanduche (natural)</title>
+<style>@font-face{font-family:'AirbusSlab';src:url('../assets/Bevan-Regular.ttf')}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · Aerosanduche de pollo · versión NATURAL · Reel 1080x1920 @60fps
+   El video real ocupa toda la pantalla; la interfaz (textos, ruta, logo) va discreta encima.
+   ========================================================================= */
+const W=1080, H=1920;
+const TEXT='"Inter", sans-serif', DISP='"Inter Display", "Inter", sans-serif', SLAB='"AirbusSlab", serif';
+const WHITE='#FFFFFF', W80='rgba(255,255,255,.82)', W60='rgba(255,255,255,.62)';
+const STEPS=[
+  {dir:'n1', label:'Pollo desmechado'},
+  {dir:'n2', label:'Bien cargado'},
+  {dir:'n3', label:'Se cierra el pan'},
+  {dir:'n4', label:'Listo para despegar'},
+];
+const O1=2.6, S0=2.6, SD=2.0, S1=S0+STEPS.length*SD;   // 10.6
+const C0=S1, E0=C0+3.0;                                 // combo 10.6–13.6, cierre desde 13.6
+const DURATION=16.6; window.DURATION=DURATION;
+const XF=0.18;   // fundido corto entre tomas
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function cover(ctx,img,k=1,ax=0.5,ay=0.5){ const s=Math.max(W/img.width,H/img.height)*k; const dw=img.width*s, dh=img.height*s; ctx.drawImage(img,(W-dw)*ax,(H-dh)*ay,dw,dh); }
+const cache=new Map(); const KEEP=new Set();
+function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>30){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
+const IMG={};
+const NIGHT='saturate(0.88) sepia(0.10) contrast(0.98) brightness(1.03)';   // suaviza el morado de la luz de noche
+
+function stepSrc(t){
+  if(t<S0-XF||t>=S1+XF) return null;
+  const i=clamp(Math.floor((t-S0)/SD),0,STEPS.length-1), u=Math.max(0,t-S0-i*SD);
+  return `../frames/${STEPS[i].dir}/${String(clamp(Math.floor(u*60)+1,1,120)).padStart(4,'0')}.png`;
+}
+// texto secundario: aparece con un fundido y un pequeño desplazamiento
+function txt(ctx,str,x,y,font,col,tIn,tOut,t,o={}){
+  const a=eOut(prog(t,tIn,tIn+0.45))*(tOut==null?1:1-eInOut(prog(t,tOut,tOut+0.25)));
+  if(a<=0) return;
+  ctx.save(); ctx.globalAlpha*=a; ctx.font=font; ctx.textAlign=o.align||'left'; ctx.fillStyle=col; if(o.ls) ctx.letterSpacing=o.ls+'px';
+  ctx.shadowColor='rgba(0,0,0,.45)'; ctx.shadowBlur=18; ctx.shadowOffsetY=2;
+  ctx.fillText(str,x,y+(1-a)*14); ctx.restore();
+}
+function plane(ctx,x,y,s,col){
+  ctx.save(); ctx.translate(x,y); ctx.scale(s,s); ctx.fillStyle=col;
+  ctx.beginPath(); ctx.ellipse(0,0,0.5,0.065,0,0,Math.PI*2); ctx.fill();
+  for(const k of [1,-1]){
+    ctx.beginPath(); ctx.moveTo(0.12,-0.05*k); ctx.lineTo(-0.12,-0.48*k); ctx.lineTo(-0.24,-0.48*k); ctx.lineTo(-0.12,-0.05*k); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.36,-0.04*k); ctx.lineTo(-0.47,-0.2*k); ctx.lineTo(-0.53,-0.2*k); ctx.lineTo(-0.49,-0.04*k); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ---------- capa de video / foto a pantalla completa ----------
+function media(ctx,t,step){
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  const lay=(a,fn)=>{ if(a<=0) return; ctx.save(); ctx.globalAlpha=a; fn(); ctx.restore(); };
+  // 1. primer plano de frente (mordido), con un acercamiento lento
+  lay(1-prog(t,O1-XF,O1), ()=>{ ctx.filter=NIGHT; cover(ctx,IMG.close,lerp(1.10,1.02,eOut(prog(t,0,O1))),lerp(0.40,0.46,prog(t,0,O1)),0.55); ctx.filter='none'; });
+  // 2. preparación
+  if(step) lay(prog(t,S0-XF,S0)*(1-prog(t,S1-XF,S1)), ()=>{ const u=((t-S0)%SD)/SD; cover(ctx,step,1+0.025*u,0.5,0.5); });
+  // 3. combo en la mesa: paneo del sánduche a las papas
+  lay(prog(t,C0-XF,C0), ()=>{ ctx.filter=NIGHT; cover(ctx,IMG.combo,lerp(1.06,1.0,eOut(prog(t,C0,DURATION))),lerp(0.06,0.50,eInOut(prog(t,C0,DURATION))),0.5); ctx.filter='none'; });
+  // degradados para que el texto se lea sin tapar la comida
+  let g=ctx.createLinearGradient(0,1180,0,H); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(0.55,'rgba(0,0,0,.42)'); g.addColorStop(1,'rgba(0,0,0,.62)'); ctx.fillStyle=g; ctx.fillRect(0,1180,W,H-1180);
+  g=ctx.createLinearGradient(0,0,0,330); g.addColorStop(0,'rgba(0,0,0,.40)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,330);
+  // en el cierre se oscurece un poco más para el texto final
+  const d=eInOut(prog(t,E0,E0+0.6)); if(d>0){ ctx.fillStyle=`rgba(0,0,0,${0.28*d})`; ctx.fillRect(0,0,W,H); }
+}
+
+// ---------- interfaz discreta ----------
+function ui(ctx,t){
+  // marca arriba a la izquierda, siempre visible y pequeña
+  const ma=eOut(prog(t,0.2,0.8));
+  if(ma>0){ ctx.save(); ctx.globalAlpha=ma*0.92;
+    ctx.beginPath(); ctx.arc(108,214,28,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,80,186,56,56); ctx.restore();
+    txt(ctx,'AERO BURGER',152,223,`600 24px ${TEXT}`,W80,0.2,null,t,{ls:5}); }
+  const X=80;
+  // apertura
+  txt(ctx,'AEROSANDUCHE',X,1480,`400 76px ${SLAB}`,WHITE,0.35,O1-0.3,t,{ls:1});
+  txt(ctx,'de pollo',X,1548,`600 46px ${DISP}`,W80,0.55,O1-0.3,t);
+  // pasos
+  for(let i=0;i<STEPS.length;i++){
+    const a=S0+i*SD, b=a+SD;
+    txt(ctx,`${String(i+1).padStart(2,'0')}  ·  ASÍ SE PREPARA`,X,1440,`600 24px ${TEXT}`,W60,a+0.1,b-0.3,t,{ls:4});
+    txt(ctx,STEPS[i].label,X,1510,`700 58px ${DISP}`,WHITE,a+0.15,b-0.28,t,{ls:-1});
+  }
+  // ruta fina con avión (secundaria)
+  const ra=eOut(prog(t,S0+0.2,S0+0.6))*(1-eInOut(prog(t,S1-0.3,S1)));
+  if(ra>0){
+    ctx.save(); ctx.globalAlpha=ra*0.85;
+    const x0=X, x1=X+420, y=1572, n=STEPS.length, dx=(x1-x0)/(n-1);
+    const i=clamp(Math.floor((t-S0)/SD),0,n-1), u=(t-S0)-i*SD, pos=i===0?0:(i-1)+eInOut(clamp(u/0.7));
+    ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=2; ctx.setLineDash([6,8]); ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle=WHITE; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x0+dx*pos,y); ctx.stroke();
+    for(let k=0;k<n;k++){ ctx.beginPath(); ctx.arc(x0+k*dx,y,pos>=k-0.01?6:5,0,Math.PI*2); ctx.fillStyle=pos>=k-0.01?WHITE:'rgba(255,255,255,.4)'; ctx.fill(); }
+    plane(ctx,x0+dx*pos,y-24,40,WHITE);
+    ctx.restore();
+  }
+  // combo
+  txt(ctx,'En combo,',X,1460,`700 62px ${DISP}`,WHITE,C0+0.2,E0-0.3,t,{ls:-1});
+  txt(ctx,'con papas a la francesa.',X,1525,`500 40px ${TEXT}`,W80,C0+0.35,E0-0.3,t);
+  // cierre
+  txt(ctx,'AEROSANDUCHE',X,1380,`400 76px ${SLAB}`,WHITE,E0+0.3,null,t,{ls:1});
+  txt(ctx,'de pollo',X,1448,`600 46px ${DISP}`,W80,E0+0.45,null,t);
+  txt(ctx,'Ven al local o pide domicilio en Santa Elena.',X,1515,`500 32px ${TEXT}`,W80,E0+0.65,null,t);
+  txt(ctx,'@aero.burger',X,1575,`700 36px ${TEXT}`,WHITE,E0+0.85,null,t);
+  const pp=prog(t,E0+0.9,E0+2.4); if(pp>0&&pp<1){ ctx.save(); ctx.globalAlpha=0.8*Math.sin(Math.PI*pp); plane(ctx,lerp(-60,W+60,eInOut(pp)),1300,44,WHITE); ctx.restore(); }
+}
+
+function render(ctx,t,step){ media(ctx,t,step); ui(ctx,t); }
+const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
+window.seek=async function(t){ const s=stepSrc(t); render(ctx,t,s?await loadImg(s):null); };
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`600 40px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  for(const [k,s] of [['close','combo_close_sr.png'],['combo','combo_top_sr.png'],['logo','logo_crop.png']]){ KEEP.add('../assets/'+s); IMG[k]=await loadImg('../assets/'+s); }
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+  return true;
+})();
+</script>
+</body>
+</html>
