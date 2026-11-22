@@ -1,10 +1,10 @@
 # Jazz cozy artesanal, moderno y limpio, para videos de marca (29 s). Libre de derechos.
 # Uso: python3 music_brand_jazzcozy.py salida.wav [pargo|hizca]
-import sys, wave
+import sys, wave, os
 import numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve, lfilter
 
-SR = 44100; DUR = 29.0; N = int(SR * DUR)
+SR = 44100; DUR = float(os.environ.get('DUR', 29.0)); N = int(SR * DUR)
 VAR = sys.argv[2] if len(sys.argv) > 2 else 'pargo'
 BPM = {'pargo': 78, 'hizca': 70, 'arcoiris': 74, 'rhipsalis': 82}.get(VAR, 74); BEAT = 60 / BPM; BAR = 4 * BEAT
 VAR = sys.argv[2] if len(sys.argv) > 2 else 'pargo'
@@ -132,6 +132,12 @@ add(sfx, whoosh(.9) * .14, 15.2); add(sfx, whoosh(.6) * .1, 16.7)
 for k in range(3): add(sfx, tick() * .15, 17.2 + k * .3)
 add(sfx, chime(midi(79)) * .12, 21.3); add(sfx, chime(midi(84)) * .1, 22.1); add(sfx, chime(midi(88)) * .08, 22.5)
 for i in range(27): add(sfx, tick() * .05, 24.2 + i * (1.4 / 27))
+
+# pista de la próxima marca (escena final, solo si el video dura más de 30 s)
+if DUR > 30:
+    add(sfx, whoosh(.9) * .12, 26.7)
+    for k, tt in enumerate((27.9, 28.15, 28.4)): add(sfx, chime(midi(84 + k * 4)) * .07, tt)
+    add(sfx, chime(midi(91)) * .06, 29.4)
 
 # mezcla limpia y moderna (sin vinilo ni cinta), estéreo amplio
 ir_n = int(2.4 * SR); irL = lp(rng.normal(0,1,ir_n)*np.exp(-np.arange(ir_n)/SR/.6), 6000); irR = lp(rng.normal(0,1,ir_n)*np.exp(-np.arange(ir_n)/SR/.6), 6000)

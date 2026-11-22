@@ -1,10 +1,10 @@
 # Música mística "alquimia" (handpan, kalimba, pad, tambor de marco) para videos de marca (plantilla brand.html, 29 s). Libre de derechos.
 # Uso: python3 music_brand_mistica.py salida.wav [semilla]
-import sys, wave
+import sys, wave, os
 import numpy as np
 from scipy.signal import butter, sosfilt, fftconvolve, lfilter
 
-SR = 44100; DUR = 29.0; N = int(SR * DUR)
+SR = 44100; DUR = float(os.environ.get('DUR', 29.0)); N = int(SR * DUR)
 BPM = 76; BEAT = 60 / BPM; BAR = 4 * BEAT
 rng = np.random.default_rng(int(sys.argv[2]) if len(sys.argv) > 2 else 11)
 t_all = np.arange(N) / SR
@@ -114,6 +114,12 @@ add(sfx, whoosh(.9) * .25, 15.2); add(sfx, whoosh(.6) * .18, 16.7)
 for k in range(3): add(sfx, tick() * .3, 17.2 + k * .3)
 add(sfx, chime(midi(79)) * .12, 21.3); add(sfx, chime(midi(84)) * .1, 22.1); add(sfx, chime(midi(88)) * .08, 22.5)
 for i in range(27): add(sfx, tick() * .07, 24.2 + i * (1.4 / 27))
+
+# pista de la próxima marca (escena final, solo si el video dura más de 30 s)
+if DUR > 30:
+    add(sfx, whoosh(.9) * .12, 26.7)
+    for k, tt in enumerate((27.9, 28.15, 28.4)): add(sfx, chime(midi(84 + k * 4)) * .07, tt)
+    add(sfx, chime(midi(91)) * .06, 29.4)
 
 ir_n = int(1.8 * SR); ir = rng.normal(0, 1, ir_n) * np.exp(-np.arange(ir_n) / SR / .45); ir = lp(ir, 4500); ir /= np.sqrt((ir ** 2).sum())
 music = gtr * 1.0 + bs * .9 + lead

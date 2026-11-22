@@ -73,9 +73,28 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--caBg)}
 #E .url{display:inline-block;border-radius:999px;padding:24px 40px;font-size:36px;font-weight:800;background:var(--ca);color:#fff;white-space:nowrap}
 #E .hs{margin-top:24px;font-size:28px;font-weight:600;color:var(--caInk)}
 #E .hs span{color:var(--caTxt)}
+/* Día N */
+#Aday{position:absolute;left:50%;top:330px;transform:translateX(-50%);display:flex;align-items:center;gap:18px;padding:16px 40px;border-radius:999px;background:var(--ca);color:#fff;box-shadow:0 18px 40px rgba(242,144,33,.35);white-space:nowrap}
+#Aday b{font-family:Anton,sans-serif;font-size:78px;font-weight:400;line-height:1;letter-spacing:1px}
+#Aday i{font-style:normal;font-family:'Space Mono',monospace;font-size:24px;text-transform:uppercase;letter-spacing:.18em;opacity:.95;line-height:1.25;text-align:left}
+/* F: pista de la próxima marca */
+#F{background:var(--caBg)}
+#F .dd{position:absolute;left:0;right:0;top:300px;text-align:center;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.3em;font-size:26px;color:var(--caTxt)}
+#F .mn{position:absolute;left:0;right:0;top:385px;text-align:center;font-family:Anton,sans-serif;text-transform:uppercase;font-size:190px;line-height:1;color:var(--caInk)}
+#F .mn em{font-style:normal;color:var(--ca)}
+#F .orb{position:absolute;left:50%;top:640px;width:600px;height:600px;margin-left:-300px;border-radius:50%;overflow:hidden;box-shadow:0 30px 70px rgba(122,46,23,.3),0 0 0 12px rgba(255,255,255,.85)}
+#F .orb img{position:absolute;inset:-60px;width:calc(100% + 120px);height:calc(100% + 120px);object-fit:cover}
+#F .orb .q{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Anton,sans-serif;font-size:330px;color:#fff;text-shadow:0 10px 40px rgba(0,0,0,.35)}
+#F .pl{position:absolute;left:0;right:0;top:1300px;text-align:center;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:.3em;font-size:24px;color:var(--caTxt)}
+#F .hint{position:absolute;left:90px;right:90px;top:1350px;text-align:center;font-family:'Great Vibes',cursive;font-size:96px;line-height:1.08;color:var(--caInk)}
+#F .fw{position:absolute;left:0;right:0;top:1660px;text-align:center;font-size:30px;font-weight:600;color:var(--caInk)}
+#F .fw span{color:var(--caTxt)}
+#F .ring{position:absolute;left:50%;top:640px;width:600px;height:600px;margin-left:-300px}
+#F .ring img{position:absolute;width:190px;height:190px;border-radius:50%;box-shadow:0 14px 34px rgba(0,0,0,.25),0 0 0 5px #fff}
 </style></head><body>
 <div id="stage">
   <div class="layer" id="A">
+    <div id="Aday"><b id="AdayN">DÍA 1</b><i>Marcas de<br>Casa Amiga</i></div>
     <div class="logo" id="Alogo"><img src="assets/logo-circulo.png"></div>
     <div class="t1" id="At1">Marcas que encuentras en</div>
     <div class="t2" id="At2">Casa Amiga</div>
@@ -106,6 +125,15 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--caBg)}
     <div class="ca" id="Eca">Casa Amiga</div>
     <div class="loc" id="Eloc">Vereda El Placer · Santa Elena</div>
     <div class="card" id="Ecard"><div class="url"><span id="Eurl"></span></div><div class="hs" id="Ehs"></div></div>
+  </div>
+  <div class="layer" id="F">
+    <div class="dd" id="Fdd"></div>
+    <div class="mn" id="Fmn"><span class="mask"><span class="ch" id="Fmn1"></span></span></div>
+    <div class="orb" id="Forb"><img id="Fimg"><div class="q" id="Fq">?</div></div>
+    <div class="ring" id="Fring"></div>
+    <div class="pl" id="Fpl"></div>
+    <div class="hint" id="Fhint"></div>
+    <div class="fw" id="Ffw"></div>
   </div>
   <div id="wipe"></div>
   <div id="badge"><img src="assets/logo-circulo.png"><span id="badgeTxt">Esto lo puedes encontrar en Casa Amiga</span></div>
@@ -148,15 +176,44 @@ function waves(svg,seed){let h='';for(let k=0;k<14;k++){let y=120+k*130,d=`M0 ${
 function diamonds(svg,seed){let h='';const cx=[640,180,1100,380,900][seed%5],cy=[960,420,1500,1650,300][seed%5];for(let k=1;k<12;k++){const r=k*110;h+=`<path d="M${cx} ${cy-r} L${cx+r} ${cy} L${cx} ${cy+r} L${cx-r} ${cy} Z" fill="none" stroke="${B.colors.cream}" stroke-opacity="${.05+(k%3)*.03}" stroke-width="4"/>`}svg.innerHTML=h}
 const DEC={brush,waves,diamonds,ridges};const dec=DEC[B.decor]||ridges;dec($('ridges'),1);dec($('ridges2'),4);
 const URL='casa-amiga-henna.vercel.app';
-const S={A:[0,3.9],B:[3.6,9.2],C:[9.0,15.6],D:[15.4,21.4],E:[21.2,29.0]};const DUR=29.0;
+const S={A:[0,3.9],B:[3.6,9.2],C:[9.0,15.6],D:[15.4,21.4],E:[21.2,27.2],F:[26.9,33.0]};const DUR=33.0;
+// semana de marcas: orden, día y pista de la próxima
+const WEEK=[
+  {id:'montana',hint:'El arte de crear se mezcla con el arte de cocinar',img:'assets/brands/saboryarte/vid.jpg'},
+  {id:'saboryarte',hint:'Plantas que sanan, medicina con raíz',img:'assets/brands/hizca/extractos.jpg'},
+  {id:'hizca',hint:'Un brebaje del Pacífico para tomar sin prisa',img:'assets/brands/pargoviche/botellas.jpg'},
+  {id:'pargoviche',hint:'Alquimia nacida en la montaña',img:'assets/brands/alima/trio.jpg'},
+  {id:'alima',hint:'Un universo de colores psicodélicos',img:'assets/brands/rhipsalis/lamina.jpg'},
+  {id:'rhipsalis',hint:'Negro. Fuego. Metal.',img:'assets/brands/arcoiris/fuego1.jpg'},
+  {id:'arcoiris',hint:null}];
+const DAY=WEEK.findIndex(w=>w.id===B.id)+1, NX=WEEK[DAY-1];
+$('AdayN').textContent='DÍA '+DAY;
+$('Fdd').textContent=`Día ${DAY} de 7 · Marcas de Casa Amiga`;
+if(NX.hint){$('Fmn1').innerHTML='Mañana';$('Fimg').src=NX.img;$('Fpl').textContent=`Día ${DAY+1} · Una pista`;$('Fhint').textContent='“'+NX.hint+'”';
+  $('Ffw').innerHTML='Síguenos para no perdértela · <span>@galeria.casaamiga</span>';$('Fring').style.display='none';}
+else{$('Fmn1').innerHTML='¡Gracias!';$('Forb').style.display='none';$('Fpl').textContent='7 marcas · 7 días';$('Fhint').textContent='¿Cuál fue tu favorita?';
+  $('Ffw').innerHTML='Cuéntanos en los comentarios · <span>@galeria.casaamiga</span>';
+  const ids=WEEK.map(w=>w.id),R0=255;ids.forEach((id,k)=>{const a=-Math.PI/2+k*2*Math.PI/7;const im=document.createElement('img');im.src=`assets/brands/${id}/logo.png`;
+    im.style.left=(300+Math.cos(a)*R0-95)+'px';im.style.top=(300+Math.sin(a)*R0-95)+'px';$('Fring').appendChild(im)});}
 function show(id,t){const [a,b]=S[id];const on=t>=a&&t<b;$(id).style.display=on?'block':'none';return on?t-a:null}
 async function render(t){let u;
   if((u=show('A',t))!==null){
+    {const k=p(u,.0,.7);$('Aday').style.opacity=eo(k);$('Aday').style.transform=`translateX(-50%) translateY(${(1-eo(k))*-40}px) scale(${lerp(.8,1,soft(k))})`;}
     $('Alogo').style.transform=`scale(${soft(p(u,.1,1.4))}) rotate(${lerp(-10,0,eo(p(u,.1,1.3)))}deg)`;$('Alogo').style.opacity=eo(p(u,.1,.5));
     const a=p(u,.9,1.5),b=p(u,1.2,1.9),c=p(u,1.7,2.3);
     $('At1').style.opacity=a;$('At1').style.transform=`translateY(${(1-eo(a))*30}px)`;
     $('At2').style.opacity=b;$('At2').style.transform=`translateY(${(1-eo(b))*40}px) scale(${lerp(.9,1,eo(b))})`;
     $('At3').style.opacity=c;$('At3').style.transform=`translateY(${(1-eo(c))*30}px)`;
+  }
+  if((u=show('F',t))!==null){
+    $('F').style.opacity=eo(p(u,0,.5));
+    const a=p(u,.2,.7);$('Fdd').style.opacity=a;rise($('Fmn1'),p(u,.35,1.05));
+    const o=p(u,.8,1.8);$('Forb').style.opacity=eo(o);$('Forb').style.transform=`scale(${lerp(.6,1,soft(o))})`;
+    $('Fimg').style.filter=`blur(${lerp(40,24,eo(p(u,1,5.5)))}px) saturate(1.3)`;$('Fimg').style.transform=`scale(${1.1+u*.02}) rotate(${u*2}deg)`;
+    $('Fq').style.transform=`scale(${lerp(.4,1,soft(p(u,1.3,2.2)))*(1+.04*Math.sin(u*4))})`;$('Fq').style.opacity=p(u,1.3,1.7);
+    [...$('Fring').children].forEach((im,k)=>{const z=p(u,.8+k*.15,1.4+k*.15);im.style.opacity=z;im.style.transform=`scale(${lerp(.4,1,soft(z))})`});
+    const h=p(u,2.0,2.6),hh=p(u,2.3,3.1);$('Fpl').style.opacity=h;$('Fhint').style.opacity=hh;$('Fhint').style.transform=`translateY(${(1-eo(hh))*30}px)`;
+    $('Ffw').style.opacity=p(u,3.2,3.8);
   }
   // barrido de color desde el logo de Casa Amiga
   const w=p(t,3.0,3.9);$('wipe').style.display=(w>0&&w<1)?'block':'none';$('wipe').style.clipPath=`circle(${eio(w)*1500}px at 50% 40%)`;
