@@ -21,12 +21,13 @@ const WHITE='#FFFFFF', W80='rgba(255,255,255,.84)', W60='rgba(255,255,255,.62)';
 const FOOT='contrast(0.96) saturate(0.95) sepia(0.05) brightness(1.02)';
 const F='../../04-local-dia/frames_full/';
 // tiempos (s)
-const B0=0, B_ROUTE0=1.6, B_ROUTE1=10.6, B_ZOOM1=12.2, B_END=13.4, C0=12.8, C_END=22.3, D0=21.6;   // el video empieza directo en el mapa
-const DURATION=26.4; window.DURATION=DURATION;
-const SHOTS=[ {dir:F+'c3', n:147, label:'Terraza al aire libre',  sub:'Mesas bajo el cielo de Santa Elena.'},
-              {dir:F+'c2', n:148, label:'Somos petfriendly',      sub:'Ven con tu perrito.'},
-              {dir:F+'c8', n:140, label:'Domicilios',             sub:'Solo en Santa Elena.'} ];
-const CS=3.0; SHOTS.forEach((s,i)=>{ s.t=C0+i*CS; s.end=s.t+CS; });
+// Música a 72 BPM (compás = 3.3333 s). Las tomas y el cierre caen en el compás.
+const B0=0, B_ROUTE0=2.8, B_ROUTE1=15.0, B_ZOOM1=16.5, C0=16.5167, B_END=17.2167, C_END=26.5167, D0=26.3167;   // el video empieza directo en el mapa
+const DURATION=33.3333; window.DURATION=DURATION;
+const SHOTS=[ {dir:'../frames/c3', n:208, label:'Terraza al aire libre',  sub:'Mesas bajo el cielo de Santa Elena.'},
+              {dir:'../frames/c2', n:209, label:'Somos petfriendly',      sub:'Ven con tu perrito.'},
+              {dir:'../frames/c8', n:198, label:'Domicilios',             sub:'Solo en Santa Elena.'} ];
+const CS=3.33333; SHOTS.forEach((s,i)=>{ s.t=C0+i*CS; s.end=s.t+CS; });
 
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
 const prog=(t,a,b)=>clamp((t-a)/(b-a));
@@ -91,11 +92,11 @@ function sB(ctx,t){      // mapa: la cámara sigue la ruta
   ctx.shadowColor='rgba(59,50,41,.16)'; ctx.shadowBlur=70; ctx.shadowOffsetY=26; rr(ctx,cx,cy,cw,ch,30); ctx.fillStyle='#fff'; ctx.fill(); ctx.shadowColor='transparent';
   ctx.save(); rr(ctx,cx,cy,cw,ch,30); ctx.clip();
   // cámara
-  const p=routeP(t); const zIn=eInOut(prog(t,0.7,1.6)), zOut=eInOut(prog(t,B_ROUTE1,B_ZOOM1));
+  const p=routeP(t); const zIn=eInOut(prog(t,1.2,2.6)), zOut=eInOut(prog(t,B_ROUTE1,B_ZOOM1));
   let z=lerp(1.0,2.7,zIn); z=lerp(z,1.0,zOut);
   const smooth=(pp)=>{ let sx=0,sy=0; for(let i=-4;i<=4;i++){ const q=posAt(clamp(pp+i*0.012)); sx+=q[0]; sy+=q[1]; } return [sx/9,sy/9]; };
   const follow=smooth(p), start=[ROUTE[0][0]+40,ROUTE[0][1]-20];
-  let cxm=lerp(540,lerp(start[0],follow[0],eInOut(prog(t,1.4,2.0))),zIn), cym=lerp(405,lerp(start[1],follow[1],eInOut(prog(t,1.4,2.0))),zIn);
+  let cxm=lerp(540,lerp(start[0],follow[0],eInOut(prog(t,2.0,2.8))),zIn), cym=lerp(405,lerp(start[1],follow[1],eInOut(prog(t,2.0,2.8))),zIn);
   cxm=lerp(cxm,540,zOut); cym=lerp(cym,405,zOut);
   const vw=1080/z, vh=810/z; let sx=clamp(cxm-vw/2,0,1080-vw), sy=clamp(cym-vh/2,0,810-vh);
   ctx.drawImage(IMG.map,sx*2,sy*2,vw*2,vh*2,cx,cy,cw,ch);
@@ -126,7 +127,8 @@ function sB(ctx,t){      // mapa: la cámara sigue la ruta
   ctx.save(); ctx.globalAlpha=bar; rr(ctx,90,1560,900,6,3); ctx.fillStyle=FAINT; ctx.fill(); rr(ctx,90,1560,Math.max(6,900*p),6,3); ctx.fillStyle=INK; ctx.fill(); ctx.restore();
   txt(ctx,'Aero Burger queda en Santa Elena, Antioquia.',540,1700,`500 32px ${TEXT}`,SOFT,B_ZOOM1,null,t,{align:'center'});
 }
-function frameOf(sh,t,spd=0.8){ const idx=clamp(Math.floor((t-sh.t)*60*spd)+1,1,sh.n); return `${sh.dir}/${String(idx).padStart(4,'0')}.jpg`; }
+const FR=600/7;   // cuadros interpolados: 0,7x de velocidad con 60 fps reales
+function frameOf(sh,t){ const idx=clamp(Math.floor((t-sh.t)*FR)+1,1,sh.n); return `${sh.dir}/${String(idx).padStart(4,'0')}.jpg`; }
 function sC(ctx,t,frames){
   ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
   for(let i=0;i<SHOTS.length;i++){

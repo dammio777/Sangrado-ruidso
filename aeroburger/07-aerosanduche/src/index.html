@@ -46,7 +46,7 @@ const IMG={};
 function stepFrame(t){
   if(t<STEP0-0.35||t>=STEP1+0.4) return null;
   const i=clamp(Math.floor((t-STEP0)/STEPD),0,STEPS.length-1), u=Math.max(0,t-STEP0-i*STEPD);
-  return `../frames/${STEPS[i].dir}/${String(clamp(Math.floor(u*60)+1,1,120)).padStart(4,'0')}.png`;
+  return `../frames/${STEPS[i].dir}_90/${String(clamp(Math.floor(u*90)+1,1,180)).padStart(4,'0')}.png`;   // 90 fps: a 1,5x da 60 fps reales
 }
 function mt(ctx,str,x,y,size,weight,fill,tIn,tOut,t,o={}){   // texto con máscara vertical
   const pIn=eOut5(prog(t,tIn,tIn+(o.inDur||0.5))), pOut=tOut==null?0:eInOut(prog(t,tOut,tOut+0.28));
@@ -186,7 +186,7 @@ const BLUR=[[0,0.8],[OPEN1-0.2,OPEN1+0.3],[CB0-0.15,CB0+0.35],[CB1-0.15,CB1+0.35
 const inBlur=t=>BLUR.some(([a,b])=>t>a-0.02&&t<b+0.02);
 window.seek=async function(t){
   const times=inBlur(t)?Array.from({length:5},(_,i)=>t+(i/4-0.5)*0.32/60):[t];
-  const imgs=await Promise.all(times.map(async tt=>{ const s=stepFrame(tt)||(tt>OPEN1-0.35&&tt<STEP0?'../frames/s1/0001.png':null); return s?await loadImg(s):null; }));
+  const imgs=await Promise.all(times.map(async tt=>{ const s=stepFrame(tt)||(tt>OPEN1-0.35&&tt<STEP0?'../frames/s1_90/0001.png':null); return s?await loadImg(s):null; }));
   if(times.length===1){ render(ctx,t,imgs[0]); return; }
   ctx.clearRect(0,0,W,H);
   for(let i=0;i<times.length;i++){ render(actx,Math.max(0,times[i]),imgs[i]); ctx.globalAlpha=1/(i+1); ctx.drawImage(accC,0,0); ctx.globalAlpha=1; }
