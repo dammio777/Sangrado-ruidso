@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Cómo llegar</title>
+<style>@font-face{font-family:'AirbusSlab';src:url('../assets/Bevan-Regular.ttf')}
+html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · "Cómo llegar" · Reel 1080x1920 @60fps
+   A) llegada sobre video real · B) el mapa desde El Silletero: la cámara sigue la ruta con un avión
+   C) lo que encontrarás (video real) · D) datos de contacto
+   ========================================================================= */
+const W=1080, H=1920;
+const TEXT='"Inter", sans-serif', DISP='"Inter Display", "Inter", sans-serif', SLAB='"AirbusSlab", serif';
+const CREAM='#EFE8DE', INK='#3B3229', SOFT='rgba(59,50,41,.58)', FAINT='rgba(59,50,41,.14)';
+const WHITE='#FFFFFF', W80='rgba(255,255,255,.84)', W60='rgba(255,255,255,.62)';
+const FOOT='contrast(0.96) saturate(0.95) sepia(0.05) brightness(1.02)';
+const F='../../04-local-dia/frames_full/';
+// tiempos (s)
+const A_END=4.3, B0=3.6, B_ROUTE0=5.2, B_ROUTE1=14.2, B_ZOOM1=15.8, B_END=17.0, C0=16.4, C_END=25.9, D0=25.2;
+const DURATION=30.0; window.DURATION=DURATION;
+const SHOTS=[ {dir:F+'c3', n:147, label:'Terraza al aire libre',  sub:'Mesas bajo el cielo de Santa Elena.'},
+              {dir:F+'c2', n:148, label:'Somos petfriendly',      sub:'Ven con tu perrito.'},
+              {dir:F+'c8', n:140, label:'Domicilios',             sub:'Solo en Santa Elena.'} ];
+const CS=3.0; SHOTS.forEach((s,i)=>{ s.t=C0+i*CS; s.end=s.t+CS; });
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eSine=x=>(1-Math.cos(Math.PI*x))/2;
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function cover(ctx,img,k=1){ const s=Math.max(W/img.width,H/img.height)*k; const dw=img.width*s, dh=img.height*s; ctx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh); }
+const cache=new Map(); const KEEP=new Set();
+function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>30){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
+const IMG={};
+function txt(ctx,str,x,y,font,col,tIn,tOut,t,o={}){
+  const a=eOut(prog(t,tIn,tIn+0.45))*(tOut==null?1:1-eInOut(prog(t,tOut,tOut+0.25)));
+  if(a<=0) return;
+  ctx.save(); ctx.globalAlpha*=a; ctx.font=font; ctx.textAlign=o.align||'left'; ctx.fillStyle=col; if(o.ls) ctx.letterSpacing=o.ls+'px';
+  if(o.shadow){ ctx.shadowColor='rgba(0,0,0,.45)'; ctx.shadowBlur=18; ctx.shadowOffsetY=2; }
+  ctx.fillText(str,x,y+(1-a)*14); ctx.restore();
+}
+function plane(ctx,x,y,s,rot,col){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s); ctx.fillStyle=col;
+  ctx.beginPath(); ctx.ellipse(0,0,0.5,0.065,0,0,Math.PI*2); ctx.fill();
+  for(const k of [1,-1]){
+    ctx.beginPath(); ctx.moveTo(0.12,-0.05*k); ctx.lineTo(-0.12,-0.48*k); ctx.lineTo(-0.24,-0.48*k); ctx.lineTo(-0.12,-0.05*k); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.36,-0.04*k); ctx.lineTo(-0.47,-0.2*k); ctx.lineTo(-0.53,-0.2*k); ctx.lineTo(-0.49,-0.04*k); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+function logo(ctx,x,y,r,a=1){ if(a<=0) return; ctx.save(); ctx.globalAlpha*=a; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x-r,y-r,2*r,2*r); ctx.restore(); }
+
+// ---------- ruta (coordenadas del mapa 1080x810, trazadas sobre la línea roja) ----------
+const ROUTE=[[125,600],[125,625],[150,635],[195,640],[260,625],[330,632],[380,636],[465,649],[540,648],[590,640],[615,615],[650,617],[700,618],[750,610],[800,590],[840,575],[870,560],[880,545],[865,530],[880,510],[900,490],[905,480],[885,445],[865,420],[845,410],[822,390],[800,372]];
+const SEG=[]; let TOT=0; for(let i=1;i<ROUTE.length;i++){ const d=Math.hypot(ROUTE[i][0]-ROUTE[i-1][0],ROUTE[i][1]-ROUTE[i-1][1]); SEG.push(d); TOT+=d; }
+function posAt(p){ let d=clamp(p)*TOT; for(let i=0;i<SEG.length;i++){ if(d<=SEG[i]||i===SEG.length-1){ const u=clamp(d/SEG[i]); const a=ROUTE[i], b=ROUTE[i+1]; return [lerp(a[0],b[0],u),lerp(a[1],b[1],u),Math.atan2(b[1]-a[1],b[0]-a[0]),i,u]; } d-=SEG[i]; } }
+const routeP=t=>eSine(prog(t,B_ROUTE0,B_ROUTE1));
+const STEPS=[ {a:-1,   b:0.14, n:'01', title:'Sal de El Silletero',        sub:'Punto de partida'},
+              {a:0.14, b:0.55, n:'02', title:'Sigue por la Vía Vereda Mazo', sub:'Hacia el centro de Santa Elena'},
+              {a:0.55, b:0.86, n:'03', title:'Sube por la Calle 18',        sub:'Pasas Panchocha Santa Elena'},
+              {a:0.86, b:9,    n:'04', title:'Llegas a Aero Burger',        sub:'Junto a Restaurante Donde Edward'} ];
+
+function sA(ctx,t,fr){   // llegada sobre video real, en cámara lenta
+  if(t>A_END+0.1) return;
+  if(fr){ ctx.filter=FOOT; cover(ctx,fr,1+0.04*prog(t,0,A_END)); ctx.filter='none'; }
+  let g=ctx.createLinearGradient(0,1100,0,H); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(0.55,'rgba(0,0,0,.42)'); g.addColorStop(1,'rgba(0,0,0,.62)'); ctx.fillStyle=g; ctx.fillRect(0,1100,W,H-1100);
+  g=ctx.createLinearGradient(0,0,0,330); g.addColorStop(0,'rgba(0,0,0,.38)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,330);
+  const ma=eOut(prog(t,0.2,0.8)); if(ma>0){ ctx.save(); ctx.globalAlpha=ma*0.92; logo(ctx,108,214,28); ctx.restore(); txt(ctx,'AERO BURGER  ·  SANTA ELENA',152,223,`600 24px ${TEXT}`,W80,0.2,null,t,{ls:4}); }
+  txt(ctx,'¿CÓMO LLEGAR',80,1440,`400 96px ${SLAB}`,WHITE,0.4,A_END-0.4,t,{ls:2,shadow:true});
+  txt(ctx,'A AERO BURGER?',80,1535,`400 78px ${SLAB}`,WHITE,0.65,A_END-0.4,t,{ls:2,shadow:true});
+  txt(ctx,'Te llevamos de la mano.',80,1600,`500 40px ${TEXT}`,W80,1.1,A_END-0.4,t,{shadow:true});
+}
+function sB(ctx,t){      // mapa: la cámara sigue la ruta
+  ctx.fillStyle=CREAM; ctx.fillRect(0,0,W,H);
+  const g=ctx.createRadialGradient(540,560,0,540,560,1400); g.addColorStop(0,'rgba(255,252,246,.35)'); g.addColorStop(1,'rgba(255,252,246,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  const b=B0+0.1;
+  logo(ctx,540,150,46,eOut(prog(t,b,b+0.6)));
+  txt(ctx,'¿CÓMO LLEGAR?',540,285,`600 26px ${TEXT}`,SOFT,b+0.1,null,t,{ls:6,align:'center'});
+  txt(ctx,'Desde El Silletero',540,365,`700 64px ${DISP}`,INK,b+0.2,null,t,{ls:-1.5,align:'center'});
+  // tarjeta del mapa
+  const cx=70, cy=430, cw=940, ch=705;
+  const k=eOut(prog(t,b+0.3,b+1.0));
+  ctx.save(); ctx.globalAlpha=k; ctx.translate(0,(1-k)*50);
+  ctx.shadowColor='rgba(59,50,41,.16)'; ctx.shadowBlur=70; ctx.shadowOffsetY=26; rr(ctx,cx,cy,cw,ch,30); ctx.fillStyle='#fff'; ctx.fill(); ctx.shadowColor='transparent';
+  ctx.save(); rr(ctx,cx,cy,cw,ch,30); ctx.clip();
+  // cámara
+  const p=routeP(t); const zIn=eInOut(prog(t,4.3,5.2)), zOut=eInOut(prog(t,B_ROUTE1,B_ZOOM1));
+  let z=lerp(1.0,2.7,zIn); z=lerp(z,1.0,zOut);
+  const smooth=(pp)=>{ let sx=0,sy=0; for(let i=-4;i<=4;i++){ const q=posAt(clamp(pp+i*0.012)); sx+=q[0]; sy+=q[1]; } return [sx/9,sy/9]; };
+  const follow=smooth(p), start=[ROUTE[0][0]+40,ROUTE[0][1]-20];
+  let cxm=lerp(540,lerp(start[0],follow[0],eInOut(prog(t,5.0,5.6))),zIn), cym=lerp(405,lerp(start[1],follow[1],eInOut(prog(t,5.0,5.6))),zIn);
+  cxm=lerp(cxm,540,zOut); cym=lerp(cym,405,zOut);
+  const vw=1080/z, vh=810/z; let sx=clamp(cxm-vw/2,0,1080-vw), sy=clamp(cym-vh/2,0,810-vh);
+  ctx.drawImage(IMG.map,sx*2,sy*2,vw*2,vh*2,cx,cy,cw,ch);
+  const S=cw/vw;   // píxeles de tarjeta por píxel de mapa
+  const M=(x,y)=>[cx+(x-sx)*S, cy+(y-sy)*S];
+  // tramo recorrido, resaltado
+  ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='rgba(225,48,40,.95)'; ctx.lineWidth=Math.max(7,7*S*0.5);
+  ctx.beginPath(); let m0=M(ROUTE[0][0],ROUTE[0][1]); ctx.moveTo(m0[0],m0[1]);
+  const cur=posAt(p); for(let i=1;i<=cur[3];i++){ const q=M(ROUTE[i][0],ROUTE[i][1]); ctx.lineTo(q[0],q[1]); } const cq=M(cur[0],cur[1]); ctx.lineTo(cq[0],cq[1]); ctx.stroke();
+  // avión
+  if(t>B_ROUTE0-0.4){ const al=eOut(prog(t,B_ROUTE0-0.4,B_ROUTE0)); ctx.save(); ctx.globalAlpha=al; ctx.shadowColor='rgba(0,0,0,.4)'; ctx.shadowBlur=14; plane(ctx,cq[0],cq[1],Math.max(62,28*S),cur[2],INK); ctx.restore(); }
+  ctx.restore();
+  rr(ctx,cx+.5,cy+.5,cw-1,ch-1,30); ctx.strokeStyle='rgba(59,50,41,.10)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.restore();
+  // pasos
+  const bar=eOut(prog(t,b+1.0,b+1.6));
+  for(const st of STEPS){
+    const a=Math.min(prog(p,st.a,st.a+0.035),1-prog(p,st.b-0.03,st.b));
+    const al=st.a<0?Math.min(eOut(prog(t,b+1.1,b+1.7)),1-prog(p,st.b-0.03,st.b)):a;
+    if(al<=0) continue;
+    ctx.save(); ctx.globalAlpha=al; ctx.translate(0,(1-al)*22);
+    ctx.font=`400 96px ${SLAB}`; ctx.letterSpacing='2px'; ctx.fillStyle=INK; ctx.textAlign='left'; ctx.fillText(st.n,90,1290);
+    ctx.font=`700 54px ${DISP}`; ctx.letterSpacing='-1px'; ctx.fillText(st.title,90,1385);
+    ctx.font=`500 36px ${TEXT}`; ctx.letterSpacing='0px'; ctx.fillStyle=SOFT; ctx.fillText(st.sub,90,1445);
+    ctx.restore();
+  }
+  // indicador de avance
+  ctx.save(); ctx.globalAlpha=bar; rr(ctx,90,1560,900,6,3); ctx.fillStyle=FAINT; ctx.fill(); rr(ctx,90,1560,Math.max(6,900*p),6,3); ctx.fillStyle=INK; ctx.fill(); ctx.restore();
+  txt(ctx,'Aero Burger queda en Santa Elena, Antioquia.',540,1700,`500 32px ${TEXT}`,SOFT,B_ZOOM1,null,t,{align:'center'});
+}
+function frameOf(sh,t,spd=0.8){ const idx=clamp(Math.floor((t-sh.t)*60*spd)+1,1,sh.n); return `${sh.dir}/${String(idx).padStart(4,'0')}.jpg`; }
+function sC(ctx,t,frames){
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<SHOTS.length;i++){
+    const s=SHOTS[i]; const a=prog(t,s.t-0.01,s.t+0.3)*(i<SHOTS.length-1?1:1); if(t<s.t-0.01||t>s.end+0.3||!frames[i]) continue;
+    ctx.save(); ctx.globalAlpha=i===0?1:a; ctx.filter=FOOT; cover(ctx,frames[i],1+0.03*prog(t,s.t,s.end)); ctx.filter='none'; ctx.restore();
+  }
+  let g=ctx.createLinearGradient(0,1150,0,H); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(0.55,'rgba(0,0,0,.42)'); g.addColorStop(1,'rgba(0,0,0,.62)'); ctx.fillStyle=g; ctx.fillRect(0,1150,W,H-1150);
+  g=ctx.createLinearGradient(0,0,0,330); g.addColorStop(0,'rgba(0,0,0,.38)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,330);
+  const ma=eOut(prog(t,C0+0.2,C0+0.8)); if(ma>0){ ctx.save(); ctx.globalAlpha=ma*0.92; logo(ctx,108,214,28); ctx.restore(); txt(ctx,'AERO BURGER  ·  SANTA ELENA',152,223,`600 24px ${TEXT}`,W80,C0+0.2,null,t,{ls:4}); }
+  SHOTS.forEach((s,i)=>{
+    txt(ctx,`0${i+1} / 03`,80,1480,`600 26px ${TEXT}`,W60,s.t+0.1,s.end-0.25,t,{ls:3,shadow:true});
+    txt(ctx,s.label,80,1555,`700 66px ${DISP}`,WHITE,s.t+0.15,s.end-0.25,t,{ls:-1.5,shadow:true});
+    txt(ctx,s.sub,80,1615,`500 38px ${TEXT}`,W80,s.t+0.3,s.end-0.22,t,{shadow:true});
+  });
+}
+function sD(ctx,t){
+  ctx.fillStyle=CREAM; ctx.fillRect(0,0,W,H);
+  const g=ctx.createRadialGradient(540,560,0,540,560,1400); g.addColorStop(0,'rgba(255,252,246,.35)'); g.addColorStop(1,'rgba(255,252,246,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  const T0=D0+0.3;
+  logo(ctx,540,640,100,eOut(prog(t,T0,T0+0.7)));
+  txt(ctx,'AERO BURGER',540,905,`400 100px ${SLAB}`,INK,T0+0.3,null,t,{ls:3,align:'center'});
+  txt(ctx,'Santa Elena',540,985,`600 46px ${DISP}`,INK,T0+0.55,null,t,{align:'center'});
+  txt(ctx,'Terraza al aire libre  ·  Somos petfriendly',540,1070,`500 34px ${TEXT}`,SOFT,T0+0.8,null,t,{align:'center'});
+  txt(ctx,'Ven al local o pide domicilio en Santa Elena.',540,1125,`500 34px ${TEXT}`,SOFT,T0+0.95,null,t,{align:'center'});
+  txt(ctx,'@aero.burger',540,1230,`700 48px ${TEXT}`,INK,T0+1.2,null,t,{align:'center'});
+  const pp=prog(t,T0+1.4,T0+3.2); if(pp>0&&pp<1){ ctx.save(); ctx.globalAlpha=0.8*Math.sin(Math.PI*pp); plane(ctx,lerp(-60,W+60,eInOut(pp)),1330,50,0,INK); ctx.restore(); }
+}
+function render(ctx,t,fa,fc){
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+  if(t<A_END+0.1) sA(ctx,t,fa);
+  if(t>=B0&&t<=B_END+0.4){ ctx.save(); ctx.globalAlpha=eInOut(prog(t,B0,A_END)); sB(ctx,t); ctx.restore(); }
+  if(t>=C0&&t<=C_END+0.9){ ctx.save(); ctx.globalAlpha=eInOut(prog(t,C0,C0+0.6)); sC(ctx,t,fc); ctx.restore(); }
+  if(t>=D0){ ctx.save(); ctx.globalAlpha=eInOut(prog(t,D0,D0+0.7)); sD(ctx,t); ctx.restore(); }
+}
+const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
+window.seek=async function(t){
+  const a1={dir:F+'c1',n:113,t:0};
+  const fa = t<A_END+0.1 ? await loadImg(frameOf(a1,t,0.55)) : null;
+  const fc=[null,null,null];
+  if(t>=C0-0.05&&t<=C_END+0.9) for(let i=0;i<SHOTS.length;i++){ const s=SHOTS[i]; if(t>=s.t-0.05&&t<=s.end+0.4) fc[i]=await loadImg(frameOf(s,Math.max(t,s.t))); }
+  render(ctx,t,fa,fc);
+};
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  for(const [k,s] of [['map','../assets/mapa_sr.png'],['logo','../assets/logo_crop.png']]){ KEEP.add(s); IMG[k]=await loadImg(s); }
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+  return true;
+})();
+</script>
+</body>
+</html>
