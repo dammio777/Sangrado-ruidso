@@ -43,7 +43,9 @@ const cache=new Map(); const KEEP=new Set();
 function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>30){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
 const IMG={};
 const clipAt=t=>CLIPS.find(c=>t<c.end)||CLIPS[CLIPS.length-1];
-function frameSrc(t){ const c=clipAt(t); const idx=clamp(Math.floor((t-c.start)*60)+1,1,c.n); return `../frames_full/${c.dir}/${String(idx).padStart(4,'0')}.jpg`; }
+const XF=0.32;   // fundido suave entre tomas
+function srcOf(c,t){ const idx=clamp(Math.floor((t-c.start)*60)+1,1,c.n); return `../frames_full/${c.dir}/${String(idx).padStart(4,'0')}.jpg`; }
+function frameSrc(t){ return srcOf(clipAt(t),t); }
 function txt(ctx,str,x,y,font,col,tIn,tOut,t,o={}){
   const a=eOut(prog(t,tIn,tIn+0.4))*(tOut==null?1:1-eInOut(prog(t,tOut,tOut+0.2)));
   if(a<=0) return;
@@ -51,10 +53,12 @@ function txt(ctx,str,x,y,font,col,tIn,tOut,t,o={}){
   ctx.shadowColor='rgba(0,0,0,.45)'; ctx.shadowBlur=18; ctx.shadowOffsetY=2;
   ctx.fillText(str,x,y+(1-a)*12); ctx.restore();
 }
-function render(ctx,t,img){
+function render(ctx,t,img,prev){
   ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
-  const c=clipAt(t), u=prog(t,c.start,c.end);
-  if(img){ ctx.filter=FOOT; cover(ctx,img, t<CEND ? 1+0.03*u : 1.03+0.05*prog(t,CEND,DURATION),0.5,0.5); ctx.filter='none'; }
+  const c=clipAt(t), u=prog(t,c.start,c.end), i=CLIPS.indexOf(c);
+  const xf=(i>0&&t<CEND)?eInOut(prog(t,c.start,c.start+XF)):1;
+  if(prev&&xf<1){ const pc=CLIPS[i-1]; ctx.filter=FOOT; cover(ctx,prev,1+0.03*prog(t,pc.start,pc.end+XF),0.5,0.5); ctx.filter='none'; }
+  if(img){ ctx.save(); ctx.globalAlpha=xf; ctx.filter=FOOT; cover(ctx,img, t<CEND ? 1+0.03*u : 1.03+0.05*prog(t,CEND,DURATION),0.5,0.5); ctx.filter='none'; ctx.restore(); }
   // degradados suaves para leer el texto
   let g=ctx.createLinearGradient(0,1200,0,H); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(0.55,'rgba(0,0,0,.38)'); g.addColorStop(1,'rgba(0,0,0,.58)'); ctx.fillStyle=g; ctx.fillRect(0,1200,W,H-1200);
   g=ctx.createLinearGradient(0,0,0,330); g.addColorStop(0,'rgba(0,0,0,.38)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,330);
@@ -82,7 +86,7 @@ function render(ctx,t,img){
   txt(ctx,'@aero.burger',X,1570,`700 38px ${TEXT}`,WHITE,CEND+0.7,null,t);
 }
 const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
-window.seek=async function(t){ render(ctx,t,await loadImg(frameSrc(t))); };
+window.seek=async function(t){ const c=clipAt(t), i=CLIPS.indexOf(c); const p=(i>0&&t<c.start+XF&&t<CEND)?await loadImg(srcOf(CLIPS[i-1],t)):null; render(ctx,t,await loadImg(frameSrc(t)),p); };
 window.ready=(async()=>{
   await Promise.all([document.fonts.load(`400 80px AirbusSlab`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
   KEEP.add('../assets/logo_crop.png'); IMG.logo=await loadImg('../assets/logo_crop.png');
