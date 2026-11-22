@@ -5,7 +5,7 @@
 set -e
 cd "$(dirname "$0")"
 TMP=$(mktemp -d)
-JPGQ=100 CRF=10 PAGE="$1" node render.js video "$TMP/master.mp4" 60 > "$TMP/log" 2>&1
+JPGQ=100 CRF=10 PAGE="$1" node render.js video "$TMP/master.mp4" ${FPS:-60} > "$TMP/log" 2>&1
 enc(){ ffmpeg -v error -i "$TMP/master.mp4" -i "$2" -map 0:v -map 1:a \
   -vf "unsharp=5:5:0.35:5:5:0,format=yuv420p" -c:v libx264 -preset slow -crf "$1" -profile:v high -level 4.2 \
   -color_primaries bt709 -color_trc bt709 -colorspace bt709 -g 120 \
