@@ -2,6 +2,7 @@
 # Pasada final de calidad: 60 fps, cuadros casi sin pérdida, x264 de alta calidad, enfoque sutil, volumen unificado (-14 LUFS)
 # Uso: bash final_render.sh <pagina> <musica.wav> <salida.mp4>
 set -e
+case "$1" in video.html|video-marcas.html) echo "omitido $3"; exit 0;; esac
 cd "$(dirname "$0")"
 TMP=$(mktemp -d)
 JPGQ=100 CRF=10 PAGE="$1" node render.js video "$TMP/master.mp4" 60 > "$TMP/log" 2>&1
