@@ -124,6 +124,7 @@ for(const [k,v] of Object.entries({bA:B.colors.a,bB:B.colors.b,bB2:B.colors.b2||
 $('At3').textContent=B.introTag||'';
 $('BlogoImg').src=B.logo; $('Bname').innerHTML=B.name.map(l=>`<span class="mask"><span class="ch">${l}</span></span>`).join('<br>');
 if(B.nameFont){const n=$('Bname');n.style.fontFamily=B.nameFont;n.style.fontSize=(B.nameSize||104)+'px';n.style.textTransform=B.nameCase||'uppercase';n.style.lineHeight='1.1';}
+if(B.ringLogo){$('Blogo').style.boxShadow='0 40px 90px rgba(0,0,0,.5),0 0 0 6px rgba(255,255,255,.85)';$('El1').style.outline='6px solid rgba(255,255,255,.9)';}
 if(B.lightBg){$('Blogo').style.boxShadow='0 36px 80px rgba(90,40,30,.28),0 0 0 14px rgba(255,255,255,.8)';}
 $('Bhandle').textContent=B.handle; $('Btag').textContent=B.tagline;
 $('Ch1').textContent=B.travel.title; $('Ch2').textContent=B.travel.sub; $('route').setAttribute('stroke',B.colors.b);
