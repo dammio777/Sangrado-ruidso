@@ -26,12 +26,13 @@ const fs = require('fs');
     const outFile = process.argv[3];
     const fps = Number(process.argv[4] || 30);
     const dur = await page.evaluate(() => window.DUR);
-    const n = Math.round(dur * fps);
+    const st = Number(process.env.START || 0);
+    const n = Math.round((dur - st) * fps);
     const ff = spawn('ffmpeg', ['-y', '-v', 'error', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
       '-c:v', 'libx264', '-preset', 'slow', '-crf', process.env.CRF || '16', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', outFile], { stdio: ['pipe', 'inherit', 'inherit'] });
     const t0 = Date.now();
     for (let i = 0; i < n; i++) {
-      await page.evaluate(t => window.render(t), i / fps);
+      await page.evaluate(t => window.render(t), st + i / fps);
       const buf = await page.screenshot({ type: 'jpeg', quality: Number(process.env.JPGQ || 95) });
       if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
       if (i % 60 === 0) console.log(`frame ${i}/${n} ${((Date.now() - t0) / 1000).toFixed(0)}s`);

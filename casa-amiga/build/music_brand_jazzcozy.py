@@ -6,9 +6,9 @@ from scipy.signal import butter, sosfilt, fftconvolve, lfilter
 
 SR = 44100; DUR = float(os.environ.get('DUR', 29.0)); N = int(SR * DUR)
 VAR = sys.argv[2] if len(sys.argv) > 2 else 'pargo'
-BPM = {'pargo': 78, 'hizca': 70, 'arcoiris': 74, 'rhipsalis': 82}.get(VAR, 74); BEAT = 60 / BPM; BAR = 4 * BEAT
+BPM = {'pargo': 78, 'hizca': 70, 'arcoiris': 74, 'rhipsalis': 82, 'suculenta': 72}.get(VAR, 74); BEAT = 60 / BPM; BAR = 4 * BEAT
 VAR = sys.argv[2] if len(sys.argv) > 2 else 'pargo'
-rng = np.random.default_rng({'pargo': 5, 'hizca': 9, 'rhipsalis': 21}.get(VAR, 13))
+rng = np.random.default_rng({'pargo': 5, 'hizca': 9, 'rhipsalis': 21, 'suculenta': 33}.get(VAR, 13))
 t_all = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
 def hp(x, f, o=2): return sosfilt(butter(o, f, 'high', fs=SR, output='sos'), x)
@@ -95,6 +95,10 @@ elif VAR == 'rhipsalis':  # Mi bemol mayor soñador: Ebmaj9 – Cm11 – Abmaj7#
     V = [[55, 58, 62, 65], [55, 58, 63, 65], [55, 60, 62, 67], [56, 60, 63, 67]]
     R = [39, 36, 44, 34]
     MEL = [[(0,74),(1.5,77),(3,75)], [(0+SW,72),(2,70)], [(0,72),(1,74),(2.5,79)], [(1,77),(2+SW,74)]]
+elif VAR == 'suculenta':  # Do mayor luminoso: Cmaj9 – Am9 – Fmaj9 – G13sus
+    V = [[52, 55, 59, 62], [52, 55, 60, 64], [52, 55, 57, 60], [53, 57, 60, 64]]
+    R = [36, 33, 41, 43]
+    MEL = [[(0,76),(1.5,79),(3,74)], [(1,72),(2+SW,76)], [(0,77),(1.5,76),(3,72)], [(1,74),(2.5,79)]]
 else:                # Re mayor sereno: Dmaj9 – Bm11 – Gmaj9 – Em9/A
     V = [[54, 57, 61, 64], [54, 57, 61, 64], [54, 57, 59, 62], [55, 59, 62, 66]]
     R = [38, 35, 43, 33]

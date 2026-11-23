@@ -185,16 +185,18 @@ const WEEK=[
   {id:'pargoviche',hint:'Alquimia nacida en la montaña',img:'assets/brands/alima/trio.jpg'},
   {id:'alima',hint:'Un universo de colores psicodélicos',img:'assets/brands/rhipsalis/lamina.jpg'},
   {id:'rhipsalis',hint:'Negro. Fuego. Metal.',img:'assets/brands/arcoiris/fuego1.jpg'},
-  {id:'arcoiris',hint:null}];
+  {id:'arcoiris',hint:'Arte y plantas que nos devuelven a la naturaleza',img:'assets/img/macetas-luna.jpg'},
+  {id:'suculenta',hint:null}];
 const DAY=WEEK.findIndex(w=>w.id===B.id)+1, NX=WEEK[DAY-1];
 $('AdayN').textContent='DÍA '+DAY;
-$('Fdd').textContent=`Día ${DAY} de 7 · Marcas de Casa Amiga`;
+$('Fdd').textContent=`Día ${DAY} de ${WEEK.length} · Marcas de Casa Amiga`;
+if(B.badgeText)$('badgeTxt').textContent=B.badgeText;
 if(NX.hint){$('Fmn1').innerHTML='Mañana';$('Fimg').src=NX.img;$('Fpl').textContent=`Día ${DAY+1} · Una pista`;$('Fhint').textContent='“'+NX.hint+'”';
   $('Ffw').innerHTML='Síguenos para no perdértela · <span>@galeria.casaamiga</span>';$('Fring').style.display='none';}
-else{$('Fmn1').innerHTML='¡Gracias!';$('Forb').style.display='none';$('Fpl').textContent='7 marcas · 7 días';$('Fhint').textContent='¿Cuál fue tu favorita?';
+else{$('Fmn1').innerHTML='¡Gracias!';$('Forb').style.display='none';$('Fpl').textContent=`${WEEK.length} marcas · ${WEEK.length} días`;$('Fhint').textContent='¿Cuál fue tu favorita?';
   $('Ffw').innerHTML='Cuéntanos en los comentarios · <span>@galeria.casaamiga</span>';
-  const ids=WEEK.map(w=>w.id),R0=255;ids.forEach((id,k)=>{const a=-Math.PI/2+k*2*Math.PI/7;const im=document.createElement('img');im.src=`assets/brands/${id}/logo.png`;
-    im.style.left=(300+Math.cos(a)*R0-95)+'px';im.style.top=(300+Math.sin(a)*R0-95)+'px';$('Fring').appendChild(im)});}
+  const ids=WEEK.map(w=>w.id),R0=255,NN=ids.length,SZ=NN>7?168:190;ids.forEach((id,k)=>{const a=-Math.PI/2+k*2*Math.PI/NN;const im=document.createElement('img');im.src=`assets/brands/${id}/logo.png`;
+    im.style.width=im.style.height=SZ+'px';im.style.left=(300+Math.cos(a)*R0-SZ/2)+'px';im.style.top=(300+Math.sin(a)*R0-SZ/2)+'px';$('Fring').appendChild(im)});}
 function show(id,t){const [a,b]=S[id];const on=t>=a&&t<b;$(id).style.display=on?'block':'none';return on?t-a:null}
 async function render(t){let u;
   if((u=show('A',t))!==null){
