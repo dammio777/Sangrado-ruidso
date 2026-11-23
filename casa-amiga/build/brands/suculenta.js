@@ -2,7 +2,7 @@
 window.BRAND = {
   id: 'suculenta',
   name: ['Casa Suculenta'],
-  nameFont: "'Great Vibes'", nameSize: 150, nameCase: 'none',
+  nameFont: "'Great Vibes'", nameSize: 150, nameCase: 'none', hideName: true,
   handle: '@casa_suculenta_galeria_de_arte',
   introTag: 'Casa Suculenta · Marca original',
   badgeText: 'Marca original de Casa Amiga',
@@ -10,7 +10,7 @@ window.BRAND = {
   colors: { a: '#2F4A34', b: '#C2573A', b2: '#B9D39A', paper: '#F1EEE4', ink: '#2A2A22', cream: '#F3EFE3', headC: '#2F4A34' },
   fonts: { head: "'Libre Baskerville'", body: "'Cormorant Garamond'", mono: "'Space Mono'" },
   logo: 'assets/brands/suculenta/logo.png',
-  tagline: 'Arte · Plantas · Diseños biofílicos',
+  tagline: 'Arte con plantas · Diseños biofílicos',
   travel: {
     title: 'Arte que reconecta',
     sub: 'la naturaleza y el ser humano',

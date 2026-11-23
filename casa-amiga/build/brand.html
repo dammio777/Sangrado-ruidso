@@ -167,6 +167,7 @@ $('BlogoImg').src=B.logo; $('Bname').innerHTML=B.name.map(l=>`<span class="mask"
 if(B.nameFont){const n=$('Bname');n.style.fontFamily=B.nameFont;n.style.fontSize=(B.nameSize||104)+'px';n.style.textTransform=B.nameCase||'uppercase';n.style.lineHeight='1.1';}
 if(B.ringLogo){$('Blogo').style.boxShadow='0 40px 90px rgba(0,0,0,.5),0 0 0 6px rgba(255,255,255,.85)';$('El1').style.outline='6px solid rgba(255,255,255,.9)';}
 if(B.lightBg){$('Blogo').style.boxShadow='0 36px 80px rgba(90,40,30,.28),0 0 0 14px rgba(255,255,255,.8)';}
+if(B.hideName){$('Bname').style.display='none';$('Bhandle').style.top='1130px';$('Btag').style.top='1190px';}
 $('Bhandle').textContent=B.handle; $('Btag').textContent=B.tagline;
 $('Ch1').textContent=B.travel.title; $('Ch2').textContent=B.travel.sub; $('route').setAttribute('stroke',B.colors.b);
 const CARD_POS=[{l:90,t:640,w:560,h:640,r:-5,s:{l:720,t:720,r:-14}},{l:430,t:1050,w:560,h:600,r:4,s:{l:120,t:1480,r:10}}];
