@@ -189,8 +189,15 @@ function waves(svg,seed,col){let h='';for(let k=0;k<14;k++){let y=120+k*130,d=`M
 function diamonds(svg,seed,col){let h='';const cx=[640,180,1100,380,900][seed%5],cy=[960,420,1500,1650,300][seed%5];for(let k=1;k<12;k++){const r=k*110;h+=`<path d="M${cx} ${cy-r} L${cx+r} ${cy} L${cx} ${cy+r} L${cx-r} ${cy} Z" fill="none" stroke="${(col||B.colors.cream)}" stroke-opacity="${.05+(k%3)*.03}" stroke-width="4"/>`}svg.innerHTML=h}
 const DEC={brush,waves,diamonds,ridges};const dec=DEC[B.decor]||ridges;dec($('ridges'),1);dec($('ridges2'),4);
 // paleta de los afiches de Casa Amiga
-const POSTER={saboryarte:{m:'#EE8A2C',c:'#A9B37E'},hizca:{m:'#A9B37E',c:'#E6A765'},pargoviche:{m:'#E6A765',c:'#EE8A2C'},
-  alima:{m:'#EE8A2C',c:'#E6A765'},rhipsalis:{m:'#A9B37E',c:'#EE8A2C'},arcoiris:{m:'#E6A765',c:'#A9B37E'},suculenta:{m:'#A9B37E',c:'#E6A765'}};
+const POSTER={
+  montana:{m:'#D99A6C',c:'#A7BDBA'},      // naranja tostado + teal claro (logo)
+  saboryarte:{m:'#E9C6BA',c:'#A9C7B3'},   // rosa del logo + salvia
+  hizca:{m:'#F3DDB0',c:'#AFC0A0'},        // crema del logo + verde salvia
+  pargoviche:{m:'#DE7A62',c:'#EADDC9'},   // rojo Pargo + papel crema
+  alima:{m:'#CFA3AC',c:'#DCC8A8'},        // vino claro + beige de etiqueta
+  rhipsalis:{m:'#F2C230',c:'#EB93C8'},    // amarillo + magenta psicodélico
+  arcoiris:{m:'#E9A26C',c:'#CBC4BA'},     // naranja quemado claro + gris tinta
+  suculenta:{m:'#B9D39A',c:'#E6AE98'}};   // verde suculenta + terracota claro
 const blurOf=p=>p.startsWith('assets/img/')?p.replace('assets/img/','assets/blur/'):p.replace(/\.jpg$/,'-blur.jpg');
 const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
 $('Cbg').src=blurOf(B.travel.cards[0].img);
@@ -221,9 +228,8 @@ if(PT){
     if(vert){const v=document.createElement('div');v.className='pg vert';v.textContent=vert;L.insertBefore(v,L.firstChild.nextSibling);}};
   paint('A',PT.m,'Amiga','Marcas');paint('C',PT.c,'Amiga',null);paint('E',PT.m,'Amiga',null);paint('F',PT.m,'Amiga',null);
   R.setProperty('--caTxt','#5A240F');
-  const orangeMain=PT.m==='#EE8A2C';
-  // contraste sobre naranja: pastillas y botón en café, logo con aro crema
-  if(orangeMain){$('Aday').style.background='#4A1F0E';$('Aday').style.boxShadow='0 18px 40px rgba(74,31,14,.35)';$('At3').style.color='#4A1F0E';$('At3').style.textShadow='none';
+  // pastillas y botón en café oscuro para contrastar con cualquier color de marca
+  if(true){$('Aday').style.background='#4A1F0E';$('Aday').style.boxShadow='0 18px 40px rgba(74,31,14,.35)';$('At3').style.color='#4A1F0E';$('At3').style.textShadow='none';
     document.querySelector('#E .url').style.background='#4A1F0E';}
   [$('Alogo'),$('El2')].forEach(e=>{e.style.borderRadius='50%';e.style.boxShadow='0 0 0 10px rgba(255,243,224,.9),0 24px 50px rgba(74,31,14,.3)'});
   // en la escena de postales el texto va en café de Casa Amiga
