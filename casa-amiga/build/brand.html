@@ -210,14 +210,14 @@ const URL='casa-amiga-henna.vercel.app';
 const S={A:[0,3.9],B:[3.6,9.2],C:[9.0,15.6],D:[15.4,21.4],E:[21.2,27.2],F:[26.9,33.0]};const DUR=33.0;
 // semana de marcas: orden, día y pista de la próxima
 const WEEK=[
-  {id:'montana',hint:'El arte de crear se mezcla con el arte de cocinar',img:'assets/brands/saboryarte/vid.jpg'},
+  {id:'montana',hint:'Arte y plantas que nos devuelven a la naturaleza',img:'assets/img/macetas-luna.jpg'},
+  {id:'suculenta',hint:'El arte de crear se mezcla con el arte de cocinar',img:'assets/brands/saboryarte/vid.jpg'},
   {id:'saboryarte',hint:'Plantas que sanan, medicina con raíz',img:'assets/brands/hizca/extractos.jpg'},
   {id:'hizca',hint:'Un brebaje del Pacífico para tomar sin prisa',img:'assets/brands/pargoviche/botellas.jpg'},
   {id:'pargoviche',hint:'Alquimia nacida en la montaña',img:'assets/brands/alima/trio.jpg'},
   {id:'alima',hint:'Un universo de colores psicodélicos',img:'assets/brands/rhipsalis/lamina.jpg'},
   {id:'rhipsalis',hint:'Negro. Fuego. Metal.',img:'assets/brands/arcoiris/fuego1.jpg'},
-  {id:'arcoiris',hint:'Arte y plantas que nos devuelven a la naturaleza',img:'assets/img/macetas-luna.jpg'},
-  {id:'suculenta',hint:null}];
+  {id:'arcoiris',hint:null}];
 const DAY=WEEK.findIndex(w=>w.id===B.id)+1, NX=WEEK[DAY-1];
 $('AdayN').textContent='DÍA '+DAY;
 $('Fbg').src=NX.hint?blurOf(NX.img):'assets/blur/galeria.jpg';
