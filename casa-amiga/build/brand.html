@@ -77,6 +77,11 @@ html,body{width:1080px;height:1920px;overflow:hidden;background:var(--caBg)}
 .bgi{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover}
 .bgo{position:absolute;inset:0}
 .bgd{position:absolute;left:-100px;top:0;width:1280px;height:1920px}
+/* Estilo afiche Casa Amiga (días 2 a 8) */
+.pg{position:absolute;font-family:Anton,sans-serif;text-transform:uppercase;line-height:.82;white-space:nowrap;pointer-events:none}
+.pg.big{left:-60px;bottom:-120px;font-size:640px;color:rgba(255,255,255,.16)}
+.pg.vert{left:34px;top:930px;transform-origin:0 0;transform:rotate(-90deg);font-size:92px;color:rgba(74,31,14,.82);letter-spacing:2px}
+.pg.line{left:80px;right:80px;bottom:150px;height:3px;background:rgba(74,31,14,.55)}
 /* Día N */
 #Aday{position:absolute;left:50%;top:330px;transform:translateX(-50%);display:flex;align-items:center;gap:18px;padding:16px 40px;border-radius:999px;background:var(--ca);color:#fff;box-shadow:0 18px 40px rgba(242,144,33,.35);white-space:nowrap}
 #Aday b{font-family:Anton,sans-serif;font-size:78px;font-weight:400;line-height:1;letter-spacing:1px}
@@ -183,6 +188,9 @@ function brush(svg,seed){const cols=B.brushColors||[B.colors.b];let h='<defs><fi
 function waves(svg,seed,col){let h='';for(let k=0;k<14;k++){let y=120+k*130,d=`M0 ${y}`;for(let x=0;x<=1280;x+=20){d+=` L${x} ${(y+Math.sin((x+k*70+seed*40)/95)*18+Math.sin((x*.5+k*33)/60)*6).toFixed(1)}`}h+=`<path d="${d}" fill="none" stroke="${(col||B.colors.cream)}" stroke-opacity="${.07+(k%3)*.025}" stroke-width="3"/>`}svg.innerHTML=h}
 function diamonds(svg,seed,col){let h='';const cx=[640,180,1100,380,900][seed%5],cy=[960,420,1500,1650,300][seed%5];for(let k=1;k<12;k++){const r=k*110;h+=`<path d="M${cx} ${cy-r} L${cx+r} ${cy} L${cx} ${cy+r} L${cx-r} ${cy} Z" fill="none" stroke="${(col||B.colors.cream)}" stroke-opacity="${.05+(k%3)*.03}" stroke-width="4"/>`}svg.innerHTML=h}
 const DEC={brush,waves,diamonds,ridges};const dec=DEC[B.decor]||ridges;dec($('ridges'),1);dec($('ridges2'),4);
+// paleta de los afiches de Casa Amiga
+const POSTER={saboryarte:{m:'#EE8A2C',c:'#A9B37E'},hizca:{m:'#A9B37E',c:'#E6A765'},pargoviche:{m:'#E6A765',c:'#EE8A2C'},
+  alima:{m:'#EE8A2C',c:'#E6A765'},rhipsalis:{m:'#A9B37E',c:'#EE8A2C'},arcoiris:{m:'#E6A765',c:'#A9B37E'},suculenta:{m:'#A9B37E',c:'#E6A765'}};
 const blurOf=p=>p.startsWith('assets/img/')?p.replace('assets/img/','assets/blur/'):p.replace(/\.jpg$/,'-blur.jpg');
 const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
 $('Cbg').src=blurOf(B.travel.cards[0].img);
@@ -206,6 +214,24 @@ const DAY=WEEK.findIndex(w=>w.id===B.id)+1, NX=WEEK[DAY-1];
 $('AdayN').textContent='DÍA '+DAY;
 $('Fbg').src=NX.hint?blurOf(NX.img):'assets/blur/galeria.jpg';
 $('Fov').style.background='linear-gradient(to bottom,rgba(255,243,224,.55),rgba(255,236,210,.72))';
+const PT=POSTER[B.id];
+if(PT){
+  const paint=(id,col,word,vert)=>{const L=$(id);L.style.background=col;L.querySelectorAll(':scope > .bgi,:scope > .bgo,:scope > .bgd').forEach(e=>e.style.display='none');
+    const g=document.createElement('div');g.className='pg big';g.textContent=word;L.insertBefore(g,L.firstChild);
+    if(vert){const v=document.createElement('div');v.className='pg vert';v.textContent=vert;L.insertBefore(v,L.firstChild.nextSibling);}};
+  paint('A',PT.m,'Amiga','Marcas');paint('C',PT.c,'Amiga',null);paint('E',PT.m,'Amiga',null);paint('F',PT.m,'Amiga',null);
+  R.setProperty('--caTxt','#5A240F');
+  const orangeMain=PT.m==='#EE8A2C';
+  // contraste sobre naranja: pastillas y botón en café, logo con aro crema
+  if(orangeMain){$('Aday').style.background='#4A1F0E';$('Aday').style.boxShadow='0 18px 40px rgba(74,31,14,.35)';$('At3').style.color='#4A1F0E';$('At3').style.textShadow='none';
+    document.querySelector('#E .url').style.background='#4A1F0E';}
+  [$('Alogo'),$('El2')].forEach(e=>{e.style.borderRadius='50%';e.style.boxShadow='0 0 0 10px rgba(255,243,224,.9),0 24px 50px rgba(74,31,14,.3)'});
+  // en la escena de postales el texto va en café de Casa Amiga
+  document.querySelector('#C .head .h1').style.color='#4A1F0E';$('Ch2').style.color='#4A1F0E';$('Ch2').style.opacity=.85;
+  $('route').setAttribute('stroke','#4A1F0E');
+  document.querySelectorAll('#Cards .stamp').forEach(e=>{e.style.borderColor='#4A1F0E';e.style.color='#4A1F0E'});
+  const st=document.createElement('style');st.textContent='#Cards .stamp:before{border-color:#4A1F0E!important}';document.head.appendChild(st);
+}
 $('Fdd').textContent=`Día ${DAY} de ${WEEK.length} · Marcas de Casa Amiga`;
 if(B.badgeText)$('badgeTxt').textContent=B.badgeText;
 if(NX.hint){$('Fmn1').innerHTML='Mañana';$('Fimg').src=NX.img;$('Fpl').textContent=`Día ${DAY+1} · Una pista`;$('Fhint').textContent='“'+NX.hint+'”';
