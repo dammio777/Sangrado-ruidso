@@ -694,6 +694,25 @@ def song_airbus(out):
     song_gen(out, 90, 0.0, 26.325, V, P, MEL, seed=83, fade_at=24.2, final_bar=9, chop_bars=(2, 8))
 
 
+# ------------------------------------------------------------ 8) Enganche Airbus (Mi mayor, 90 BPM) y 9) Enganche Gavilán (Sol mayor, 100 BPM)
+# El compás 0 (solo shaker) se recorta en ffmpeg: el video arranca directo en el compás 1, ya con ritmo.
+def song_enganche_airbus(out):
+    V = {'Emaj9': (40, [56, 59, 63, 66]), 'C#m9': (37, [56, 59, 61, 64]), 'Amaj9': (45, [57, 61, 64, 68]), 'B9sus': (47, [57, 61, 64, 66])}
+    P = {0: [('Emaj9', 0, 4)], 1: [('Emaj9', 0, 4)], 2: [('C#m9', 0, 4)], 3: [('Amaj9', 0, 4)], 4: [('B9sus', 0, 2), ('Emaj9', 2, 2)],
+         5: [('Amaj9', 0, 2), ('B9sus', 2, 2)], 6: [('Emaj9', 0, 4)]}
+    MEL = {1: [(0.5, 76, 1.0), (1.5, 73, 1.0), (3.0, 80, 1.0)], 2: [(0.0, 78, 2.0), (2.5, 76, 1.5)], 3: [(0.5, 80, 1.0), (2.0, 76, 2.0)],
+           4: [(0.5, 73, 1.0), (1.5, 76, 1.0), (3.0, 71, 1.0)], 5: [(0.0, 78, 2.0), (2.0, 76, 2.0)], 6: [(0.0, 76, 3.5)]}
+    song_gen(out, 90, 0.0, 6 * 2.6667 + 3.6, V, P, MEL, seed=131, fade_at=6 * 2.6667 + 2.0, final_bar=6, chop_bars=(2, 5))
+
+def song_enganche_gavilan(out):
+    V = {'Gmaj9': (43, [57, 59, 62, 66]), 'Em9': (40, [55, 59, 62, 66]), 'Cmaj9': (36, [55, 59, 62, 64]), 'D9sus': (38, [55, 57, 60, 64])}
+    P = {0: [('Gmaj9', 0, 4)], 1: [('Gmaj9', 0, 4)], 2: [('Em9', 0, 4)], 3: [('Cmaj9', 0, 4)], 4: [('D9sus', 0, 2), ('Gmaj9', 2, 2)],
+         5: [('Gmaj9', 0, 4)]}
+    MEL = {1: [(0.5, 74, 1.0), (1.5, 71, 1.0), (3.0, 79, 1.0)], 2: [(0.0, 76, 2.0), (2.5, 74, 1.5)], 3: [(0.5, 79, 1.0), (2.0, 74, 2.0)],
+           4: [(0.5, 71, 1.0), (1.5, 74, 1.0), (3.0, 79, 1.0)], 5: [(0.0, 74, 3.5)]}
+    song_gen(out, 100, 0.0, 5 * 2.4 + 3.6, V, P, MEL, seed=147, fade_at=5 * 2.4 + 2.0, final_bar=5, chop_bars=(2, 4))
+
+
 if __name__ == '__main__':
-    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar, 'gavilan': song_gavilan, 'partido': song_partido, 'dia': song_dia, 'airbus': song_airbus}[sys.argv[1]](sys.argv[2])
+    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar, 'gavilan': song_gavilan, 'partido': song_partido, 'dia': song_dia, 'airbus': song_airbus, 'enganche_airbus': song_enganche_airbus, 'enganche_gavilan': song_enganche_gavilan}[sys.argv[1]](sys.argv[2])
     print('ok', sys.argv[1], sys.argv[2])

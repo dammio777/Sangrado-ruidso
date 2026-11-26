@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Enganche (capa de texto)</title>
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block;width:1080px;height:1920px;background:transparent}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · videos de ENGANCHE · capa de texto transparente (1080x1920)
+   El video es real (celular); la animación es solo el texto.
+   ?v=airbus  → «400 g. ¿Puedes?»  (14,5 s)
+   ?v=gavilan → «Mándale esto al que siempre dice que no tiene hambre»  (10,6 s)
+   Determinista: window.seek(t). Fondo transparente (se compone con ffmpeg).
+   ========================================================================= */
+const W=1080, H=1920, FONT='"Inter Display","Inter",sans-serif';
+const WHITE='#FFFFFF', AMBER='#FFC46B';
+const V=new URLSearchParams(location.search).get('v')||'airbus';
+// beat: {s:texto, y:línea base, size:px (máx., se ajusta al ancho), c:color, w:peso, t0, t1, a:opacidad}
+const CFG={
+  airbus:{ dur:14.5,
+    scrimTop:[0,14.5,.55], scrimBot:[5.7,14.5,.62],
+    beats:[
+      {s:'400 g.',   y:345, size:215, c:AMBER, w:800, t0:0.10, t1:5.50},
+      {s:'¿Puedes?', y:520, size:165, c:WHITE, w:800, t0:0.90, t1:5.50},
+      {s:'Airbus',   y:1290, size:118, c:WHITE, w:800, t0:5.80, t1:10.30},
+      {s:'Doble carne · doble cheddar · tocineta', y:1352, size:40, c:WHITE, w:600, a:.92, t0:6.20, t1:10.30},
+      {s:'Etiqueta a quien',  y:1255, size:92, c:WHITE, w:800, t0:10.60, t1:14.5},
+      {s:'no se la termina.', y:1352, size:92, c:AMBER, w:800, t0:11.00, t1:14.5},
+      {s:'Aero Burger · Santa Elena', y:1430, size:36, c:WHITE, w:600, a:.9, t0:11.70, t1:14.5},
+    ]},
+  airbus_sd:{ dur:14.5,   // versión con «Sin documentos» (128,2 BPM: compás = 1,872 s); los textos entran en el compás
+    scrimTop:[0,14.5,.55], scrimBot:[5.5,14.5,.62],
+    beats:[
+      {s:'400 g.',   y:345, size:215, c:AMBER, w:800, t0:0.06, t1:5.35},
+      {s:'¿Puedes?', y:520, size:165, c:WHITE, w:800, t0:0.94, t1:5.35},
+      {s:'Airbus',   y:1290, size:118, c:WHITE, w:800, t0:5.62, t1:9.10},
+      {s:'Doble carne · doble cheddar · tocineta', y:1352, size:40, c:WHITE, w:600, a:.92, t0:6.05, t1:9.10},
+      {s:'Etiqueta a quien',  y:1255, size:92, c:WHITE, w:800, t0:9.36, t1:14.5},
+      {s:'no se la termina.', y:1352, size:92, c:AMBER, w:800, t0:9.83, t1:14.5},
+      {s:'Aero Burger · Santa Elena', y:1430, size:36, c:WHITE, w:600, a:.9, t0:10.77, t1:14.5},
+    ]},
+  gavilan_sd:{ dur:10.56,  // cortes a 3,744 / 7,488 s = 2 y 4 compases de 128,2 BPM
+    scrimTop:[0,10.56,.55], scrimBot:[3.6,10.56,.62],
+    beats:[
+      {s:'Mándale esto',          y:330, size:178, c:WHITE, w:800, t0:0.06, t1:3.45},
+      {s:'al que siempre dice',   y:455, size:104, c:WHITE, w:800, t0:0.94, t1:3.45},
+      {s:'que no tiene hambre.',  y:570, size:104, c:AMBER, w:800, t0:1.87, t1:3.45},
+      {s:'Gavilán',               y:1290, size:118, c:WHITE, w:800, t0:3.74, t1:7.25},
+      {s:'Desgranado especial',   y:1352, size:42, c:WHITE, w:600, a:.92, t0:4.21, t1:7.25},
+      {s:'Mándaselo ya.',         y:1290, size:110, c:AMBER, w:800, t0:7.49, t1:10.56},
+      {s:'Aero Burger · Santa Elena', y:1362, size:36, c:WHITE, w:600, a:.9, t0:8.03, t1:10.56},
+    ]},
+  gavilan:{ dur:10.6,
+    scrimTop:[0,10.6,.55], scrimBot:[4.9,10.6,.62],
+    beats:[
+      {s:'Mándale esto',          y:330, size:178, c:WHITE, w:800, t0:0.10, t1:4.60},
+      {s:'al que siempre dice',   y:455, size:104, c:WHITE, w:800, t0:0.75, t1:4.60},
+      {s:'que no tiene hambre.',  y:570, size:104, c:AMBER, w:800, t0:1.40, t1:4.60},
+      {s:'Gavilán',               y:1290, size:118, c:WHITE, w:800, t0:4.90, t1:8.10},
+      {s:'Desgranado especial',   y:1352, size:42, c:WHITE, w:600, a:.92, t0:5.30, t1:8.10},
+      {s:'Mándaselo ya.',         y:1290, size:110, c:AMBER, w:800, t0:8.40, t1:10.6},
+      {s:'Aero Burger · Santa Elena', y:1362, size:36, c:WHITE, w:600, a:.9, t0:8.90, t1:10.6},
+    ]},
+}[V];
+window.DURATION=CFG.dur;
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const eOut=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);};
+
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+function fitSize(s,w,size,maxW){ ctx.font=`${w} ${size}px ${FONT}`; const mw=ctx.measureText(s).width; return mw>maxW?size*maxW/mw:size; }
+function windowAlpha(t,[a,b,mx]){ return mx*eInOut(prog(t,a,a+0.35))*(1-eInOut(prog(t,b-0.35,b))); }
+
+function scrims(t){
+  const at=windowAlpha(t,CFG.scrimTop), ab=windowAlpha(t,CFG.scrimBot);
+  if(at>0){ const g=ctx.createLinearGradient(0,0,0,640); g.addColorStop(0,`rgba(10,6,4,${at*1.25})`); g.addColorStop(.55,`rgba(10,6,4,${at*.55})`); g.addColorStop(1,'rgba(10,6,4,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,640); }
+  if(ab>0){ const g=ctx.createLinearGradient(0,1060,0,H); g.addColorStop(0,'rgba(10,6,4,0)'); g.addColorStop(.42,`rgba(10,6,4,${ab*.8})`); g.addColorStop(.7,`rgba(10,6,4,${ab})`); g.addColorStop(1,`rgba(10,6,4,${ab*.8})`); ctx.fillStyle=g; ctx.fillRect(0,1060,W,H-1060); }
+}
+function beat(b,t){
+  if(t<b.t0||t>b.t1) return;
+  const pin=prog(t,b.t0,b.t0+0.30), pout=prog(t,b.t1-0.30,b.t1);
+  const a=clamp(pin*3.2)*(1-eInOut(pout))*(b.a??1);
+  if(a<=0) return;
+  const size=fitSize(b.s,b.w,b.size,900), sc=b.size>=100?(0.86+0.14*eBack(pin)):(0.96+0.04*eOut(pin));
+  const dy=(1-eOut(pin))*22-eInOut(pout)*16;
+  ctx.save(); ctx.globalAlpha=a; ctx.font=`${b.w} ${size}px ${FONT}`; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.translate(540,b.y+dy); ctx.scale(sc,sc);
+  ctx.lineJoin='round'; ctx.lineWidth=Math.max(6,size*0.07); ctx.strokeStyle='rgba(8,5,3,.38)'; ctx.strokeText(b.s,0,0);
+  ctx.shadowColor='rgba(0,0,0,.55)'; ctx.shadowBlur=size*0.22; ctx.shadowOffsetY=size*0.03;
+  ctx.fillStyle=b.c; ctx.fillText(b.s,0,0); ctx.restore();
+}
+window.seek=async function(t){ ctx.clearRect(0,0,W,H); scrims(t); for(const b of CFG.beats) beat(b,t); };
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`800 100px "Inter Display"`),document.fonts.load(`600 40px "Inter Display"`)]);
+  await window.seek(0); return true;
+})();
+</script>
+</body>
+</html>
