@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Clásico de hoy</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* =========================================================================
+   Aero Burger · Promo "Partidos de hoy" · Reel 1080x1920 @60fps
+   Concepto: tablero de salidas de aeropuerto (letras giratorias) con los partidos como vuelos.
+   Animación determinista: window.seek(t).
+   ========================================================================= */
+const W=1080, H=1920;
+const MONO='"JetBrains Mono", monospace', TEXT='"Inter", sans-serif', DISP='"Inter Display", "Inter", sans-serif';
+const AMBER='#FFC72C', WHITE='#F4F1EA', GRAY='rgba(244,241,234,.55)', CELL='#151515';
+const DURATION=19.5; window.DURATION=DURATION;   // x1,25 = 24,4 s (39 tiempos a 96 BPM)
+
+// ---------- Escenas ----------
+const A0=0.0, A1=3.0;      // "HOY HAY CLÁSICO / EN AERO BURGER"
+const B0=3.0, B1=9.0;      // tablero con el clásico
+const C0=9.0, CLD=1.5;     // 4 tomas del local (3 tiempos cada una)
+const CLIPS=[
+  {dir:'../../01-local/frames/c1', off:0,  n:126, cap:'HOY HAY CLÁSICO'},
+  {dir:'../../01-local/frames/c6', off:0,  n:126, cap:'MÍRALO AQUÍ'},
+  {dir:'../../01-local/frames/c4', off:40, n:186, cap:'TRAE TU PARCHE'},
+  {dir:'../../02-airbus/frames/a1', off:0, n:175, cap:'PIDE TU AIRBUS'},
+];
+const C1=C0+CLIPS.length*CLD;   // 14.3
+const D0=C1;                    // cierre
+
+// ---------- Utilidades ----------
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,e)=>a+(b-a)*e;
+const eOut=x=>1-Math.pow(1-x,3);
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const cache=new Map(); const KEEP=new Set();
+function loadImg(src){ if(cache.has(src)) return cache.get(src); const img=new Image(); img.src=src; const p=img.decode().then(()=>img); cache.set(src,p); if(cache.size>30){ const k=cache.keys().next().value; if(!KEEP.has(k)) cache.delete(k);} return p; }
+const IMG={};
+// pseudoaleatorio determinista
+const rnd=(i)=>{ const x=Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x); };
+
+// ---------- Tablero de letras giratorias ----------
+const CHARSET=' ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÑ0123456789:-.';
+// dibuja una fila: cada letra gira por caracteres al azar y se detiene en su letra final
+function flapRow(ctx,str,x,y,cw,chh,gap,t,t0,{col=WHITE,seed=0,spread=0.5,step=0.028,fade=null}={}){
+  const out = fade? eInOut(prog(t,fade,fade+0.3)) : 0;
+  for(let i=0;i<str.length;i++){
+    const cx=x+i*(cw+gap);
+    const settle=t0+0.25+i*step+rnd(seed+i)*spread;
+    let ch=str[i], phase=0;
+    if(t<t0){ ch=' '; }
+    else if(t<settle){
+      const k=(t-t0)*26+rnd(seed*7+i)*10;
+      ch=CHARSET[(Math.floor(k)+i*5)%CHARSET.length]; phase=k%1;
+    }
+    ctx.save(); ctx.globalAlpha*=1-out;
+    // celda
+    const g=ctx.createLinearGradient(0,y,0,y+chh); g.addColorStop(0,'#1d1d1d'); g.addColorStop(0.5,'#141414'); g.addColorStop(0.5,'#0f0f0f'); g.addColorStop(1,'#171717');
+    rr(ctx,cx,y,cw,chh,cw*0.12); ctx.fillStyle=g; ctx.fill();
+    if(ch!==' '){
+      ctx.save(); rr(ctx,cx,y,cw,chh,cw*0.12); ctx.clip();
+      ctx.font=`800 ${Math.round(chh*0.72)}px ${MONO}`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle=col;
+      const mid=y+chh/2;
+      // mitad superior fija; la inferior se "dobla" mientras gira
+      ctx.save(); ctx.beginPath(); ctx.rect(cx,y,cw,chh/2); ctx.clip(); ctx.fillText(ch,cx+cw/2,mid+chh*0.03); ctx.restore();
+      const sy=phase>0?Math.max(0.15,Math.abs(Math.cos(phase*Math.PI))):1;
+      ctx.save(); ctx.beginPath(); ctx.rect(cx,mid,cw,chh/2); ctx.clip(); ctx.translate(0,mid); ctx.scale(1,sy); ctx.fillText(ch,cx+cw/2,chh*0.03); ctx.restore();
+      ctx.restore();
+    }
+    ctx.fillStyle='#000'; ctx.fillRect(cx,y+chh/2-1.5,cw,3);
+    ctx.restore();
+  }
+  return x+str.length*(cw+gap)-gap;
+}
+function plane(ctx,x,y,s,rot,col){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s); ctx.fillStyle=col;
+  ctx.beginPath(); ctx.ellipse(0,0,0.5,0.065,0,0,Math.PI*2); ctx.fill();
+  for(const k of [1,-1]){
+    ctx.beginPath(); ctx.moveTo(0.12,-0.05*k); ctx.lineTo(-0.12,-0.48*k); ctx.lineTo(-0.24,-0.48*k); ctx.lineTo(-0.12,-0.05*k); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-0.36,-0.04*k); ctx.lineTo(-0.47,-0.2*k); ctx.lineTo(-0.53,-0.2*k); ctx.lineTo(-0.49,-0.04*k); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+function txt(ctx,str,x,y,font,col,align,tIn,tOut,t,o={}){
+  const a=eOut(prog(t,tIn,tIn+0.4))*(tOut==null?1:1-eInOut(prog(t,tOut,tOut+0.25)));
+  if(a<=0) return;
+  ctx.save(); ctx.globalAlpha*=a; ctx.font=font; ctx.textAlign=align; ctx.fillStyle=col; if(o.ls) ctx.letterSpacing=o.ls+'px';
+  ctx.fillText(str,x,y+(1-a)*14); ctx.restore();
+}
+function dot2(ctx,x,y,r,c1,c2){ ctx.save(); ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.clip(); ctx.fillStyle=c1; ctx.fillRect(x-r,y-r,r,2*r); ctx.fillStyle=c2; ctx.fillRect(x,y-r,r,2*r); ctx.restore();
+  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke(); }
+function pill(ctx,str,x,y,bg,fg,a=1){ ctx.save(); ctx.globalAlpha*=a; ctx.font=`800 26px ${MONO}`; const w=ctx.measureText(str).width+36; rr(ctx,x-w,y,w,46,23); ctx.fillStyle=bg; ctx.fill(); ctx.fillStyle=fg; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(str,x-w/2,y+24); ctx.restore(); }
+
+function bg(ctx,t){
+  ctx.fillStyle='#050506'; ctx.fillRect(0,0,W,H);
+  const g=ctx.createRadialGradient(540,700,0,540,700,1300); g.addColorStop(0,'rgba(255,199,44,0.07)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+}
+
+// A: titular
+function sA(ctx,t){
+  if(t>A1+0.2) return;
+  const out=A1-0.25;
+  const a=1-eInOut(prog(t,out,out+0.3));
+  ctx.save(); ctx.globalAlpha=a;
+  plane(ctx,540,690,70,0,AMBER);
+  txt(ctx,'SALIDAS DE HOY  ·  SANTA ELENA',540,780,`600 28px ${TEXT}`,GRAY,'center',0.15,null,t,{ls:6});
+  const cw=58,chh=90,gap=6;
+  const s1='HOY HAY CLÁSICO', s2='EN AERO BURGER';
+  flapRow(ctx,s1,540-(s1.length*(cw+gap)-gap)/2,840,cw,chh,gap,t,0.3,{seed:1});
+  flapRow(ctx,s2,540-(s2.length*(cw+gap)-gap)/2,950,cw,chh,gap,t,0.75,{seed:40,col:AMBER});
+  ctx.restore();
+}
+// B: tablero con el clásico (un solo vuelo, en grande)
+function sB(ctx,t){
+  if(t<B0-0.1||t>B1+0.3) return;
+  const a=eOut(prog(t,B0-0.1,B0+0.3))*(1-eInOut(prog(t,B1-0.2,B1+0.15)));
+  ctx.save(); ctx.globalAlpha=a;
+  txt(ctx,'Clásico de hoy',90,420,`700 76px ${DISP}`,WHITE,'left',B0,null,t,{ls:-2});
+  txt(ctx,'Miércoles 25 de noviembre  ·  míralo en Aero Burger',90,480,`500 30px ${TEXT}`,GRAY,'left',B0+0.15,null,t);
+  txt(ctx,'HORA',90,590,`700 22px ${TEXT}`,GRAY,'left',B0+0.25,null,t,{ls:5});
+  ctx.fillStyle='rgba(244,241,234,.15)'; ctx.fillRect(90,612,900,2);
+  // hora grande
+  const tw=92,th=140; flapRow(ctx,'20:30',540-(5*(tw+8)-8)/2,650,tw,th,8,t,B0+0.35,{seed:100,col:AMBER,spread:0.3});
+  txt(ctx,'PARTIDO',90,880,`700 22px ${TEXT}`,GRAY,'left',B0+0.7,null,t,{ls:5});
+  ctx.fillStyle='rgba(244,241,234,.15)'; ctx.fillRect(90,902,900,2);
+  const cw=84,chh=122;
+  flapRow(ctx,'NACIONAL',540-(8*(cw+7)-7)/2,940,cw,chh,7,t,B0+0.85,{seed:120});
+  dot2(ctx,470,1117,19,'#ffffff','#00A859'); dot2(ctx,610,1117,19,'#D7261E','#123B8C');
+  txt(ctx,'VS',540,1132,`800 38px ${MONO}`,GRAY,'center',B0+1.3,null,t);
+  flapRow(ctx,'MEDELLÍN',540-(8*(cw+7)-7)/2,1170,cw,chh,7,t,B0+1.1,{seed:220});
+  txt(ctx,'Liga Dimayor  ·  Clausura',540,1355,`500 32px ${TEXT}`,GRAY,'center',B0+1.8,null,t,{align:'center'});
+  const blink=0.65+0.35*Math.cos((t-B0)*Math.PI*1.6);
+  if(t>B0+2.0) pill(ctx,'CLÁSICO PAISA',540+ (()=>{ctx.font='800 26px '+MONO; return (ctx.measureText('CLÁSICO PAISA').width+36)/2;})(),1385,AMBER,'#000',eOut(prog(t,B0+2.0,B0+2.3))*blink);
+  txt(ctx,'Mesa lista. Pantalla lista.',540,1530,`700 52px ${DISP}`,WHITE,'center',B0+3.0,null,t,{ls:-1});
+  txt(ctx,'¿Y tú?',540,1600,`700 52px ${DISP}`,AMBER,'center',B0+3.3,null,t,{ls:-1});
+  const pf=prog(t,B0+3.6,B0+5.4); if(pf>0&&pf<1) plane(ctx,lerp(-80,1160,eInOut(pf)),1700,54,0,'rgba(244,241,234,.6)');
+  ctx.restore();
+}
+// C: tomas del local con leyenda en tablero
+function sC(ctx,t,img){
+  if(t<C0-0.05||t>C1+0.05||!img) return;
+  const a=eOut(prog(t,C0-0.05,C0+0.15));
+  const i=clamp(Math.floor((t-C0)/CLD),0,CLIPS.length-1), c=CLIPS[i], u=(t-C0)-i*CLD;
+  const k=1+0.04*u/CLD;
+  ctx.save(); ctx.globalAlpha=a;
+  ctx.drawImage(img,540-W*k/2,960-H*k/2,W*k,H*k);
+  let g=ctx.createLinearGradient(0,1000,0,H); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(0.5,'rgba(0,0,0,.55)'); g.addColorStop(1,'rgba(0,0,0,.75)'); ctx.fillStyle=g; ctx.fillRect(0,1000,W,H-1000);
+  g=ctx.createLinearGradient(0,0,0,420); g.addColorStop(0,'rgba(0,0,0,.6)'); g.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=g; ctx.fillRect(0,0,W,420);
+  // pastilla superior con los horarios (constante)
+  ctx.font=`700 26px ${MONO}`; const s='20:30  NACIONAL VS MEDELLÍN'; const w=ctx.measureText(s).width+48;
+  rr(ctx,540-w/2,230,w,56,28); ctx.fillStyle='rgba(0,0,0,.55)'; ctx.fill(); ctx.strokeStyle='rgba(255,199,44,.6)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=AMBER; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(s,540,259);
+  // leyenda en letras giratorias
+  const cw=58,chh=88,gap=6; const str=c.cap.padEnd(14,' ');
+  flapRow(ctx,str,540-(14*(cw+gap)-gap)/2,1330,cw,chh,gap,t,C0+i*CLD-0.02,{seed:300+i*31,step:0.02,spread:0.25,col:i===3?AMBER:WHITE});
+  ctx.restore();
+}
+// D: cierre
+function sD(ctx,t){
+  if(t<D0) return;
+  const T0=D0+0.1;
+  txt(ctx,'TU PUERTA DE EMBARQUE',540,700,`600 28px ${TEXT}`,GRAY,'center',T0,null,t,{ls:6});
+  const cw=78,chh=118,gap=8, s='AERO BURGER';
+  flapRow(ctx,s,540-(s.length*(cw+gap)-gap)/2,750,cw,chh,gap,t,T0+0.1,{seed:500,col:AMBER});
+  txt(ctx,'Santa Elena',540,980,`700 54px ${DISP}`,WHITE,'center',T0+1.1,null,t,{ls:-1});
+  txt(ctx,'Llega antes del pitazo.',540,1045,`500 36px ${TEXT}`,GRAY,'center',T0+1.3,null,t);
+  // horarios
+  txt(ctx,'20:30  NACIONAL VS MEDELLÍN',540,1135,`700 26px ${MONO}`,AMBER,'center',T0+1.5,null,t);
+  const q=eOut(prog(t,T0+1.8,T0+2.3));
+  if(q>0){
+    ctx.save(); ctx.globalAlpha=q; ctx.translate(0,(1-q)*20);
+    ctx.font=`600 36px ${TEXT}`; const s2='@aero.burger'; const w=ctx.measureText(s2).width; const L=70; const x0=540-(w+L+20)/2;
+    ctx.save(); ctx.beginPath(); ctx.arc(x0+L/2,1260,L/2,0,Math.PI*2); ctx.clip(); ctx.drawImage(IMG.logo,x0,1260-L/2,L,L); ctx.restore();
+    ctx.fillStyle=WHITE; ctx.textAlign='left'; ctx.fillText(s2,x0+L+20,1272);
+    ctx.restore();
+  }
+  const pf=prog(t,T0+0.6,T0+2.4); if(pf>0&&pf<1) plane(ctx,lerp(-80,1160,eInOut(pf)),920,48,0,'rgba(255,199,44,.8)');
+}
+
+function frameSrc(t){
+  if(t<C0-0.05||t>C1+0.05) return null;
+  const i=clamp(Math.floor((t-C0)/CLD),0,CLIPS.length-1), c=CLIPS[i], u=Math.max(0,(t-C0)-i*CLD);
+  const idx=clamp(c.off+Math.floor(u*60)+1,1,c.n);
+  return `${c.dir}/${String(idx).padStart(4,'0')}.jpg`;
+}
+function render(ctx,t,img){ bg(ctx,t); sA(ctx,t); sB(ctx,t); sC(ctx,t,img); sD(ctx,t); }
+const canvas=document.getElementById('c'); const ctx=canvas.getContext('2d');
+window.seek=async function(t){ const s=frameSrc(t); render(ctx,t,s?await loadImg(s):null); };
+window.ready=(async()=>{
+  await Promise.all([document.fonts.load(`800 60px "JetBrains Mono"`),document.fonts.load(`700 60px "JetBrains Mono"`),document.fonts.load(`700 80px "Inter Display"`),document.fonts.load(`500 30px "Inter"`),document.fonts.load(`600 30px "Inter"`),document.fonts.load(`700 30px "Inter"`)]);
+  KEEP.add('../assets/logo_crop.png'); IMG.logo=await loadImg('../assets/logo_crop.png');
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+  return true;
+})();
+</script>
+</body>
+</html>

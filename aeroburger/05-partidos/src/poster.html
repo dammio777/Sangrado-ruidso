@@ -12,6 +12,8 @@ const AMBER='#FFC72C', WHITE='#F4F1EA', GRAY='rgba(244,241,234,.6)';
 const MATCH={
   '1':{time:'17:30',a:'MINEIRO',b:'BOCA',tag:'LA FINAL',comp:'CONMEBOL SUDAMERICANA',accent:AMBER,tagFg:'#000',ca:['#111','#fff'],cb:['#123B8C','#F2C230'],
        photo:'../../01-local/frames/c1/0060.jpg',ay:0.18,line:'La final se vive aquí.',hour:'5:30 p.m.'},
+  '3':{time:'20:30',a:'NACIONAL',b:'MEDELLÍN',tag:'CLÁSICO PAISA',comp:'LIGA DIMAYOR · CLAUSURA',accent:'#E8B21C',tagFg:'#000',ca:['#ffffff','#00A859'],cb:['#D7261E','#123B8C'],
+       photo:'../../01-local/frames/c4/0100.jpg',ay:0.45,alpha:0.8,line:'El clásico se vive aquí.',hour:'8:30 p.m.',date:'MIÉRCOLES 25 DE NOVIEMBRE'},
   '2':{time:'20:15',a:'CALDAS',b:'NACIONAL',tag:'A TIEMPO',comp:'LIGA DIMAYOR · CLAUSURA',accent:'#00A859',tagFg:'#fff',ca:['#ffffff','#C8102E'],cb:['#00A859','#ffffff'],
        photo:'../../01-local/frames/c6/0040.jpg',ay:0.15,alpha:0.85,line:'Vívelo en Aero Burger.',hour:'8:15 p.m.'},
 }[M];
@@ -99,7 +101,7 @@ async function draw(){
   ctx.font=`600 ${S?26:22}px ${TEXT}`; ctx.letterSpacing='6px'; ctx.textAlign='center'; ctx.fillStyle=GRAY; ctx.fillText('AERO BURGER  ·  SANTA ELENA',540,hy+lr+(S?46:36)); ctx.letterSpacing='0px';
   // bloque central
   let y=S?760:370;
-  ctx.font=`700 ${S?28:24}px ${TEXT}`; ctx.letterSpacing='7px'; ctx.fillStyle=MATCH.accent; ctx.fillText('HOY  ·  SÁBADO 21 DE NOVIEMBRE',540,y); ctx.letterSpacing='0px';
+  ctx.font=`700 ${S?28:24}px ${TEXT}`; ctx.letterSpacing='7px'; ctx.fillStyle=MATCH.accent; ctx.fillText('HOY  ·  '+(MATCH.date||'SÁBADO 21 DE NOVIEMBRE'),540,y); ctx.letterSpacing='0px';
   plane(ctx,540,y+(S?60:46),S?56:44,0,'rgba(244,241,234,.8)');
   const tcw=S?118:96, tch=S?178:144;
   y+=S?110:84; centerRow(ctx,MATCH.time,y,tcw,tch,10,AMBER);
