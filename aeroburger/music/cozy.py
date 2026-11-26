@@ -632,6 +632,68 @@ def song_partido(out):
     S.mixdown(out, (None, (22.6, 1.8)), duck=(0.3, 0.33, 0.17))
 
 
+# ------------------------------------------------------------ generador reutilizable (estructura de Gavilán / Clásico)
+def song_gen(out, bpm, bar0, dur, V, P, MEL, seed, fade_at, final_bar, swing=0.14, chop_bars=None):
+    S = Song(bpm, bar0, dur, seed=seed, swing=swing); S.ir = room_ir(seed + 3, 2.6, 2.0, 0.7)
+    chop_bars = chop_bars or (2, final_bar - 1)
+    for bar, chords in P.items():
+        for name, b0, ln in chords:
+            root, notes = V[name]; t0 = S.T(bar, b0); final = bar == final_bar
+            if final:
+                S.chord('rhodes', notes, t0, 4.0, 0.5, roll=0.05, send=0.4)
+                S.b['bass'].add(S.I.bass(root, 3.0, 0.55), t0)
+            else:
+                S.chord('rhodes', notes, t0, min(ln, 2.8) * S.beat, 0.6, roll=0.012)
+                if ln == 4: S.chord('rhodes', notes[1:], S.T(bar, 2.5, swing=True), 1.1 * S.beat, 0.4, roll=0.01)
+                if bar >= 1:
+                    S.b['bass'].add(S.I.bass(root, 1.4 * S.beat, S.v(0.75)), t0)
+                    if ln == 4:
+                        S.b['bass'].add(S.I.bass(root + 7, 0.8 * S.beat, S.v(0.5)), S.T(bar, 1.5, True))
+                        S.b['bass'].add(S.I.bass(root + 12, 0.45 * S.beat, S.v(0.45)), S.T(bar, 2.5, True))
+                    else:
+                        S.b['bass'].add(S.I.bass(root + 7, 0.45 * S.beat, S.v(0.5)), S.T(bar, b0 + 1.5, True))
+            for m in notes[:3]: S.b['pad'].add(S.I.pad(m, ln * S.beat * 0.98 if not final else 3.5, 0.45, 2000), t0, 1.0, 0, 0.4)
+            if chop_bars[0] <= bar <= chop_bars[1]:
+                for b in (0.5, 1.5, 2.25, 3.0):
+                    if b0 <= b < b0 + ln:
+                        for j, m in enumerate(notes[1:4]): S.b['keys'].add(S.I.nylon(m + 12, 0.16, S.v(0.5), 0.9), S.T(bar, b, True) + j * 0.007, 0.8, -0.3 + 0.3 * j, 0.15)
+    for bar in range(0, final_bar + 1):
+        if bar == final_bar: S.drum_hit('kick', S.T(bar, 0, hum=0.002), 0.6); continue
+        if bar == 0:
+            for k in range(8): S.drum_hit('shaker', S.T(bar, k * 0.5, True), 0.14 + 0.08 * (k % 2), 0.3)
+            continue
+        S.drum_hit('kick', S.T(bar, 0, hum=0.002), 0.78); S.drum_hit('kick', S.T(bar, 2.5, True, 0.002), 0.55)
+        if bar % 2: S.drum_hit('kick', S.T(bar, 1.75, True, 0.002), 0.3)
+        for b in (1, 3): S.drum_hit('snare', S.T(bar, b, hum=0.004), 0.5, 0.05, 0.12, brush=True)
+        for k in range(16): S.drum_hit('hat', S.T(bar, k * 0.25, True), (0.4, 0.13, 0.25, 0.13)[k % 4], -0.25, 0.05)
+    for bar, notes in MEL.items():
+        for b, m, d in notes:
+            S.b['lead'].add(S.I.bell(m, d * S.beat, S.v(0.5)), S.T(bar, b, True), 1.0, 0.15, 0.45)
+            S.b['lead'].add(S.I.bell(m + 12, d * S.beat, S.v(0.12)), S.T(bar, b, True) + 0.004, 1.0, -0.2, 0.5)
+    first = next(iter(P[0]))[0]
+    S.swell(V[first][1], S.T(0, 0, hum=0), 1.4, 0.5)
+    S.mixdown(out, (None, (fade_at, 1.6)), duck=(0.3, 0.33, 0.17))
+
+# ------------------------------------------------------------ 6) Local de día (Si bemol mayor, 77,8 BPM: compás = 3,086 s, 8 compases)
+def song_dia(out):
+    V = {'Bbmaj9': (46, [57, 60, 62, 65]), 'Gm9': (43, [57, 58, 62, 65]), 'Ebmaj9': (39, [55, 58, 62, 65]), 'F9sus': (41, [55, 58, 60, 63])}
+    P = {0: [('Bbmaj9', 0, 4)], 1: [('Bbmaj9', 0, 4)], 2: [('Gm9', 0, 4)], 3: [('Ebmaj9', 0, 4)],
+         4: [('F9sus', 0, 2), ('Bbmaj9', 2, 2)], 5: [('Gm9', 0, 4)], 6: [('Ebmaj9', 0, 2), ('F9sus', 2, 2)], 7: [('Bbmaj9', 0, 4)]}
+    MEL = {1: [(0.5, 74, 1.0), (1.5, 70, 1.0), (3.0, 77, 1.0)], 2: [(0.5, 74, 1.5), (2.5, 72, 1.5)], 3: [(0.0, 75, 2.0), (2.5, 77, 1.5)],
+           4: [(0.5, 77, 1.0), (2.0, 74, 2.0)], 5: [(0.5, 70, 1.0), (1.5, 74, 1.0), (3.0, 72, 1.0)], 6: [(0.0, 77, 2.0), (2.5, 75, 1.5)], 7: [(0.0, 74, 3.5)]}
+    song_gen(out, 77.778, 0.0, 24.686, V, P, MEL, seed=71, fade_at=22.0, final_bar=7, chop_bars=(2, 6))
+
+# ------------------------------------------------------------ 7) Airbus (Mi mayor, 90 BPM, 26,3 s)
+def song_airbus(out):
+    V = {'Emaj9': (40, [56, 59, 63, 66]), 'C#m9': (37, [56, 59, 61, 64]), 'Amaj9': (45, [57, 61, 64, 68]), 'B9sus': (47, [57, 61, 64, 66])}
+    P = {0: [('Emaj9', 0, 4)], 1: [('Emaj9', 0, 4)], 2: [('C#m9', 0, 4)], 3: [('Amaj9', 0, 4)], 4: [('B9sus', 0, 2), ('Emaj9', 2, 2)],
+         5: [('C#m9', 0, 4)], 6: [('Amaj9', 0, 4)], 7: [('Amaj9', 0, 2), ('B9sus', 2, 2)], 8: [('Emaj9', 0, 4)], 9: [('Emaj9', 0, 4)]}
+    MEL = {2: [(0.5, 76, 1.0), (1.5, 73, 1.0), (3.0, 80, 1.0)], 3: [(0.0, 78, 2.0), (2.5, 76, 1.5)], 4: [(0.5, 80, 1.0), (2.0, 76, 2.0)],
+           5: [(0.5, 73, 1.0), (1.5, 76, 1.0), (3.0, 71, 1.0)], 6: [(0.0, 78, 2.0), (2.0, 76, 2.0)], 7: [(0.5, 80, 1.5), (2.5, 78, 1.5)],
+           8: [(0.0, 76, 2.0), (2.0, 73, 2.0)], 9: [(0.0, 76, 3.5)]}
+    song_gen(out, 90, 0.0, 26.325, V, P, MEL, seed=83, fade_at=24.2, final_bar=9, chop_bars=(2, 8))
+
+
 if __name__ == '__main__':
-    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar, 'gavilan': song_gavilan, 'partido': song_partido}[sys.argv[1]](sys.argv[2])
+    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar, 'gavilan': song_gavilan, 'partido': song_partido, 'dia': song_dia, 'airbus': song_airbus}[sys.argv[1]](sys.argv[2])
     print('ok', sys.argv[1], sys.argv[2])
