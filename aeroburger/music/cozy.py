@@ -713,6 +713,14 @@ def song_enganche_gavilan(out):
     song_gen(out, 100, 0.0, 5 * 2.4 + 3.6, V, P, MEL, seed=147, fade_at=5 * 2.4 + 2.0, final_bar=5, chop_bars=(2, 4))
 
 
+def song_enganche_gavilan64(out):
+    """64,1 BPM (medio tiempo de 128,2): el compás dura 3,744 s = los cortes del enganche del Gavilán (A, B | C + cierre)."""
+    V = {'Gmaj9': (43, [57, 59, 62, 66]), 'Em9': (40, [55, 59, 62, 66]), 'Cmaj9': (36, [55, 59, 62, 64]), 'D9sus': (38, [55, 57, 60, 64])}
+    P = {0: [('Gmaj9', 0, 4)], 1: [('Gmaj9', 0, 2), ('Em9', 2, 2)], 2: [('Cmaj9', 0, 2), ('D9sus', 2, 2)], 3: [('Gmaj9', 0, 4)]}
+    MEL = {1: [(0.5, 74, 1.0), (1.5, 71, 1.0), (3.0, 79, 1.0)], 2: [(0.0, 76, 2.0), (2.5, 74, 1.5)], 3: [(0.0, 74, 3.5)]}
+    song_gen(out, 64.1, 0.0, 3 * 3.7441 + 3.6, V, P, MEL, seed=159, fade_at=3 * 3.7441 + 2.2, final_bar=3, chop_bars=(2, 2))
+
+
 if __name__ == '__main__':
-    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar, 'gavilan': song_gavilan, 'partido': song_partido, 'dia': song_dia, 'airbus': song_airbus, 'enganche_airbus': song_enganche_airbus, 'enganche_gavilan': song_enganche_gavilan}[sys.argv[1]](sys.argv[2])
+    {'menu': song_menu, 'aerosanduche': song_aerosanduche, 'llegar': song_llegar, 'gavilan': song_gavilan, 'partido': song_partido, 'dia': song_dia, 'airbus': song_airbus, 'enganche_airbus': song_enganche_airbus, 'enganche_gavilan': song_enganche_gavilan, 'enganche_gavilan64': song_enganche_gavilan64}[sys.argv[1]](sys.argv[2])
     print('ok', sys.argv[1], sys.argv[2])
