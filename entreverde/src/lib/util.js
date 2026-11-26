@@ -1,5 +1,6 @@
 import { CONFIG, FOTOS, PORCIONES } from '../data.js';
 import { nombreLinea, precioLinea, totales, nombrePersona, unidades } from './store.js';
+import INLINE from '@fotos-inline';
 
 export const dinero = (n) => '$' + Math.round(n || 0).toLocaleString('es-CO');
 export const porcion = (p) => PORCIONES[p] || p;
@@ -8,13 +9,14 @@ export const BASE = import.meta.env.BASE_URL || './';
 export function fotoSrc(key, prefer) {
   const f = FOTOS[key];
   if (!f || !f.src) return null;
+  if (INLINE[key]) return INLINE[key];
   const ws = f.widths || [f.w];
   const w = prefer ? ws.find((x) => x >= prefer) || ws[ws.length - 1] : ws[ws.length - 1];
   return `${BASE}${f.src}-${w}.webp`;
 }
 export function fotoSet(key) {
   const f = FOTOS[key];
-  if (!f || !f.src) return null;
+  if (!f || !f.src || INLINE[key]) return null;
   return (f.widths || [f.w]).map((w) => `${BASE}${f.src}-${w}.webp ${w}w`).join(', ');
 }
 
