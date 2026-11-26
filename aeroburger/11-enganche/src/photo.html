@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Planos de la Airbus (foto con upscale)</title>
+<style>html,body{margin:0;background:#120B07;overflow:hidden}canvas{display:block;width:1080px;height:1920px}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+/* Tres planos de la foto de la Airbus (escalada x4 con IA en recortes) para el enganche «Mándale esto…».
+   ?theme=1  macro de capas (queso, carne) con empuje lento     1,872 s  (1 compás de 128,2 BPM)
+   ?theme=2  tapa, papel y brasas: barrido hacia abajo           1,872 s
+   ?theme=3  retroceso hasta ver la hamburguesa completa         4,944 s  (hasta el final del video)
+   Determinista: window.seek(t). Colores naturales (sin filtros fuertes). */
+const W=1080,H=1920, SHOT=parseInt(new URLSearchParams(location.search).get('theme')||'1',10);
+const DUR={1:56/30,2:56/30,3:149/30}[SHOT]; window.DURATION=DUR;
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)), prog=(t,a,b)=>clamp((t-a)/(b-a)), lerp=(a,b,e)=>a+(b-a)*e;
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2, eOut=x=>1-Math.pow(1-x,2.2);
+const FILT='contrast(1.02) saturate(1.0) brightness(1.01)';
+const IMG={}; const loadImg=s=>{const i=new Image(); i.src=s; return i.decode().then(()=>i);};
+const canvas=document.getElementById('c'), ctx=canvas.getContext('2d');
+function cover(c,img,x,y,w,h,k=1){const s=Math.max(w/img.width,h/img.height)*k;c.drawImage(img,x+(w-img.width*s)/2,y+(h-img.height*s)/2,img.width*s,img.height*s);}
+function makeBackdrop(img){
+  const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  const s=document.createElement('canvas'); s.width=108; s.height=192; const sx=s.getContext('2d'); sx.imageSmoothingQuality='high'; cover(sx,img,0,0,108,192);
+  x.imageSmoothingQuality='high'; x.filter='blur(26px)'; x.drawImage(s,-40,-70,W+80,H+140); x.filter='none'; x.fillStyle='rgba(16,10,7,.55)'; x.fillRect(0,0,W,H); return c;
+}
+const lay=document.createElement('canvas'); lay.width=W; lay.height=H; const lx=lay.getContext('2d');
+function feathered(c,img,L,T,w,h,f){
+  lx.globalCompositeOperation='source-over'; lx.clearRect(0,0,W,H); lx.imageSmoothingQuality='high'; lx.drawImage(img,L,T,w,h);
+  const g=lx.createLinearGradient(0,T,0,T+h), q=Math.min(.45,f/h);
+  g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(q,'rgba(0,0,0,1)'); g.addColorStop(1-q,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  lx.globalCompositeOperation='destination-in'; lx.fillStyle=g; lx.fillRect(0,0,W,H); lx.globalCompositeOperation='source-over';
+  c.save(); c.filter=FILT; c.drawImage(lay,0,0); c.restore();
+}
+// dibuja el recorte escalado: (sx,sy) = punto de la foto original que cae en el punto (px,py) de la pantalla, s = píxeles de pantalla por píxel original
+function crop(img,ox,oy,sx,sy,px,py,s){ const k=s/4; ctx.save(); ctx.imageSmoothingQuality='high'; ctx.filter=FILT; ctx.drawImage(img,px-(sx-ox)*4*k,py-(sy-oy)*4*k,img.width*k,img.height*k); ctx.restore(); }
+function render(t){
+  ctx.fillStyle='#120B07'; ctx.fillRect(0,0,W,H);
+  if(SHOT===1){ const p=eInOut(prog(t,0,DUR)); crop(IMG.A,420,380,850,1000,540,930,lerp(1.70,1.95,p)); }
+  else if(SHOT===2){ const p=eInOut(prog(t,0,DUR)); crop(IMG.B,380,0,700,lerp(575,680,p),540,960,lerp(1.70,1.74,p)); }
+  else {
+    const p=eOut(prog(t,0,3.4)), s=lerp(1.65,0.82,p)+0.035*prog(t,3.4,DUR);      // retroceso y, al final, un último empuje lento
+    const fx=lerp(850,815,p), fy=lerp(950,815,p), sy=lerp(960,840,p);               // punto de la foto que queda fijo en pantalla
+    ctx.drawImage(BD,0,0);
+    feathered(ctx,IMG.full,540-fx*s,sy-fy*s,1630*s,1630*s,170);
+  }
+}
+let BD;
+window.seek=async t=>render(t);
+window.ready=(async()=>{
+  if(SHOT===1) IMG.A=await loadImg('../../11-enganche/out/air_A.png');
+  if(SHOT===2) IMG.B=await loadImg('../../11-enganche/out/air_B.png');
+  if(SHOT===3){ IMG.full=await loadImg('../../06-nuevo/assets/n_airbus_sr.png'); BD=makeBackdrop(IMG.full); }
+  await window.seek(parseFloat(new URLSearchParams(location.search).get('t')||'0')); return true;
+})();
+</script>
+</body>
+</html>
