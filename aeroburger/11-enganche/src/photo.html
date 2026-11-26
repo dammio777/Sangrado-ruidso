@@ -9,9 +9,10 @@
 <canvas id="c" width="1080" height="1920"></canvas>
 <script>
 /* Tres planos de la foto de la Airbus (escalada x4 con IA en recortes) para el enganche «Mándale esto…».
-   ?theme=1  macro de capas (queso, carne) con empuje lento     1,872 s  (1 compás de 128,2 BPM)
-   ?theme=2  tapa, papel y brasas: barrido hacia abajo           1,872 s
-   ?theme=3  retroceso hasta ver la hamburguesa completa         4,944 s  (hasta el final del video)
+   ?theme=1  macro de capas (queso, carne)                        1,87 s  (1 compás de 128,2 BPM)
+   ?theme=2  tapa, papel y brasas                                  1,87 s
+   ?theme=3  hamburguesa completa a pantalla completa              4,97 s  (hasta el final del video)
+   Los tres son planos FIJOS (sin zoom ni barrido).
    Determinista: window.seek(t). Colores naturales (sin filtros fuertes). */
 const W=1080,H=1920, SHOT=parseInt(new URLSearchParams(location.search).get('theme')||'1',10);
 const DUR={1:56/30,2:56/30,3:149/30}[SHOT]; window.DURATION=DUR;
@@ -37,15 +38,12 @@ function feathered(c,img,L,T,w,h,f){
 // dibuja el recorte escalado: (sx,sy) = punto de la foto original que cae en el punto (px,py) de la pantalla, s = píxeles de pantalla por píxel original
 function crop(img,ox,oy,sx,sy,px,py,s){ const k=s/4; ctx.save(); ctx.imageSmoothingQuality='high'; ctx.filter=FILT; ctx.drawImage(img,px-(sx-ox)*4*k,py-(sy-oy)*4*k,img.width*k,img.height*k); ctx.restore(); }
 function render(t){
+  // Sin zoom: las tres fotos son planos fijos (la única toma con movimiento es el video real del queso).
   ctx.fillStyle='#120B07'; ctx.fillRect(0,0,W,H);
-  if(SHOT===1){ const p=eInOut(prog(t,0,DUR)); crop(IMG.A,420,380,850,1000,540,930,lerp(1.70,1.95,p)); }
-  else if(SHOT===2){ const p=eInOut(prog(t,0,DUR)); crop(IMG.B,380,0,700,lerp(575,680,p),540,960,lerp(1.70,1.74,p)); }
-  else {
-    const p=eOut(prog(t,0,3.4)), s=lerp(1.65,0.82,p)+0.035*prog(t,3.4,DUR);      // retroceso y, al final, un último empuje lento
-    const fx=lerp(850,815,p), fy=lerp(950,815,p), sy=lerp(960,840,p);               // punto de la foto que queda fijo en pantalla
-    ctx.drawImage(BD,0,0);
-    feathered(ctx,IMG.full,540-fx*s,sy-fy*s,1630*s,1630*s,170);
-  }
+  if(SHOT===1) crop(IMG.A,420,380,850,1000,540,930,1.82);                 // macro de capas
+  else if(SHOT===2) crop(IMG.B,380,0,700,625,540,960,1.72);               // tapa, papel y brasas
+  else { const s=1.2, k=s; ctx.save(); ctx.imageSmoothingQuality='high'; ctx.filter=FILT;   // hamburguesa completa, a pantalla completa
+    ctx.drawImage(IMG.full,540-815*k,960-815*k,1630*k,1630*k); ctx.restore(); }
 }
 let BD;
 window.seek=async t=>render(t);
