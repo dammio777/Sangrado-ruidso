@@ -50,8 +50,8 @@ export default function Hero() {
       <div className={`wrap hero-zoom ${listo ? '' : 'antes'}`}>
         <div className="hero-grid">
           <div>
-            <a href="#desgranado" className="hero-nuevo" onClick={(ev) => { ev.preventDefault(); irA('desgranado'); }}>
-              <span className="etq-nuevo">Nuevo</span> Arma tu propio desgranado <Ico.der width="16" height="16" />
+            <a href="#volvimos" className="hero-nuevo" onClick={(ev) => { ev.preventDefault(); irA('volvimos'); }}>
+              <span className="etq-nuevo">Reapertura</span> Volvimos después de un año, con nueva imagen <Ico.der width="16" height="16" />
             </a>
             <h1 id="hero-tit" className="t-display">
               {PALABRAS.map((w, i) => (
@@ -59,7 +59,7 @@ export default function Hero() {
               ))}
               <span className="w"><span style={{ '--i': 5 }} className="acento">comparten.</span></span>
             </h1>
-            <p className="sub t-lead muted">En Santa Elena, de camino al parque. Jueves a domingo de 4 p. m. a medianoche, bajo el cielo abierto.</p>
+            <p className="sub t-lead muted">Volvimos a Santa Elena, de camino al parque, con nueva imagen y el plan de siempre: jueves a domingo de 4 p. m. a medianoche, bajo el cielo abierto.</p>
             <div className="hero-btns">
               <button type="button" className="btn btn-pri" onClick={() => uiAcc.abrirPanel('domicilio')}>Armar el pedido</button>
               <button type="button" className="btn btn-sec" onClick={() => uiAcc.abrirPanel('reservar')}>Reservar mesa</button>

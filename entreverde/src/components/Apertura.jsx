@@ -48,6 +48,7 @@ export default function Apertura() {
         <div className="ap-word">
           {LETRAS.map((l, i) => <span key={i} style={{ '--d': mid - i, '--i': i }}>{l}</span>)}
         </div>
+        <span className="ap-volv">volvimos</span>
         <div className="ap-copas">
           <svg className="ap-copa izq" viewBox="0 0 44 62" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M8 4h28l-2 16a12 12 0 0 1-24 0zM22 32v24M13 58h18M10 12h24" /></svg>
           <svg className="ap-copa der" viewBox="0 0 44 62" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M8 4h28l-2 16a12 12 0 0 1-24 0zM22 32v24M13 58h18M10 12h24" /></svg>

@@ -236,7 +236,7 @@ button.chip:hover { background: color-mix(in srgb, var(--c-hueso) 70%, var(--c-s
 @keyframes pulsoMesa { 0% { transform: scale(1); } 35% { transform: scale(1.12); } 100% { transform: scale(1); } }
 .nav-burger { display: none; }
 @media (max-width: 1080px) { .nav-links { display: none; } .nav-burger { display: inline-grid; } }
-@media (max-width: 560px) { .nav-logo .wordmark { display: none; } .estado span.txt { display: none; } .btn-mesa .lbl { display: none; } }
+@media (max-width: 560px) { .nav-logo .wordmark { display: none; } .nav .estado span.txt { display: none; } .btn-mesa .lbl { display: none; } }
 
 .menu-movil { position: fixed; inset: 0; z-index: 95; display: grid; align-content: center; padding: 96px var(--gut-r) 48px var(--gut); }
 .menu-movil a { font: 700 clamp(36px, 9vw, 56px)/1.1 var(--f-display); letter-spacing: -.03em; text-decoration: none; color: inherit; display: block; padding: 6px 0; }
@@ -762,3 +762,41 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .ig-dest { display: flex; gap: 18px; }
 .ig-dest a { display: grid; justify-items: center; gap: 6px; text-decoration: none; color: inherit; }
 .ig-circ { width: 58px; height: 58px; border-radius: 99px; display: grid; place-items: center; background: var(--c-bosque); color: var(--c-salvia); box-shadow: 0 0 0 2px var(--c-hueso), 0 0 0 4px var(--c-oliva); }
+
+/* ==========================================================================
+   VOLVIMOS (reapertura)
+   ========================================================================== */
+.volv { background: linear-gradient(180deg, var(--c-crema), color-mix(in srgb, var(--c-salvia) 26%, var(--c-crema))); }
+.volv-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 6vw, 88px); align-items: center; }
+.volv-txt { display: grid; gap: 22px; }
+.volv-txt p { margin: 0; max-width: 560px; }
+.volv-cont { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.volv-num { font: 700 clamp(72px, 9vw, 128px)/.9 var(--f-display); letter-spacing: -.05em; color: var(--c-oliva); }
+.volv-dias { font-size: clamp(28px, 3vw, 40px); }
+.volv-estado { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 17px; }
+.volv-media { position: relative; padding-bottom: 56px; }
+.volv-foto { border-radius: var(--r-card); overflow: hidden; aspect-ratio: 4 / 3; box-shadow: var(--sh-lift); background: var(--c-hueso); }
+.volv-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.volv-marca { position: absolute; left: -32px; bottom: 0; display: flex; align-items: center; gap: 18px; padding: 18px 26px 18px 18px; border-radius: var(--r-glass); background: var(--c-oliva); color: #fff; box-shadow: var(--sh-lift); }
+.volv-circ { width: 76px; height: 76px; border-radius: 99px; background: var(--c-oliva-profundo); display: grid; place-items: center; flex: none; }
+.volv-circ svg { width: 50px; height: 50px; overflow: visible; }
+.volv-e { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1s var(--ease-io) .1s; }
+.volv-hoja { opacity: 0; transform: translateY(-14px); transform-box: fill-box; transition: opacity .5s ease .8s, transform .7s var(--ease-out) .8s; }
+.volv-marca.on .volv-e { stroke-dashoffset: 0; }
+.volv-marca.on .volv-hoja { opacity: 1; transform: none; }
+.volv-lema { font: 600 10px/1.3 var(--f-body); letter-spacing: .16em; text-transform: uppercase; opacity: .9; margin-top: 6px; }
+.volv-colores { display: flex; gap: 6px; margin-top: 12px; }
+.volv-colores i { width: 18px; height: 18px; border-radius: 99px; box-shadow: 0 0 0 1.5px rgba(255,255,255,.7); }
+.volv-sello { position: absolute; top: -12px; right: 16px; font: 700 11px/1 var(--f-body); letter-spacing: .12em; text-transform: uppercase; background: var(--c-ambar); color: var(--c-bosque); padding: 7px 11px; border-radius: 99px; }
+.volv-nuevo { margin-top: clamp(48px, 6vw, 80px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.volv-it { position: relative; display: grid; gap: 8px; align-content: start; text-align: left; padding: 22px; border-radius: 24px; background: var(--c-hueso); border: 0; color: inherit; transition: transform .25s var(--ease-out), box-shadow .25s; }
+button.volv-it:hover { transform: translateY(-2px); box-shadow: var(--sh-float); }
+.volv-it b { font: 600 19px/1.2 var(--f-display); letter-spacing: -.01em; }
+.volv-ico { width: 40px; height: 40px; border-radius: 99px; display: grid; place-items: center; background: var(--c-crema); color: var(--c-oliva-profundo); margin-bottom: 4px; }
+.volv-flecha { position: absolute; top: 22px; right: 20px; color: var(--c-oliva-profundo); }
+@media (max-width: 1023px) { .volv-grid { grid-template-columns: 1fr; } .volv-marca { left: 12px; } .volv-nuevo { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .volv-nuevo { grid-template-columns: 1fr; } .volv-marca { left: 8px; right: 8px; padding: 14px 16px 14px 14px; } .volv-circ { width: 60px; height: 60px; } }
+.reduced .volv-e { stroke-dashoffset: 0; } .reduced .volv-hoja { opacity: 1; transform: none; }
+
+/* Apertura: "volvimos" */
+.ap-volv { font: 600 12px/1 var(--f-body); letter-spacing: .32em; text-transform: uppercase; color: var(--c-oliva-profundo); opacity: 0; animation: apLetra .5s 1.05s var(--ease-out) forwards; transform: translateY(6px); }

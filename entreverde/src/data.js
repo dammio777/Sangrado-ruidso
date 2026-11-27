@@ -116,6 +116,15 @@ export const CONFIG = {
   reglas: { cubre: { '1': 1, '2-3': 2.5, 'grupo': 4 }, personasPorJarra: 6 },
   /* Muestra en pantalla las marcas de "dato de ejemplo". Ponlo en false cuando lleguen los datos reales. */
   marcasEjemplo: true,
+  /* Reapertura: volvemos después de un año con nueva imagen.
+     fecha: 'AAAA-MM-DD' del primer día abiertos [CONFIRMAR]. Si es futura, el sitio muestra la cuenta regresiva;
+     si ya pasó (o es null), muestra "Ya volvimos". */
+  reapertura: {
+    activa: true,
+    fecha: null,
+    tiempoFuera: 'un año',
+    diasFuera: 365,
+  },
 };
 
 export const PORCIONES = { '1': 'para 1', '2-3': 'para 2–3', 'grupo': 'para el grupo' };
@@ -211,9 +220,9 @@ export const DESGRANADO = {
 
 /* ---------- Chat del hero. La respuesta 5 se calcula en vivo con el horario de Bogotá. ---------- */
 export const CHAT_HERO = [
-  { de: 'juli', texto: 'Oye, ¿vamos a Entreverde? 🍃' },
-  { de: 'tu', texto: '¿Dónde queda?' },
-  { de: 'juli', texto: 'En Santa Elena, de camino al parque' },
+  { de: 'juli', texto: '¡Entreverde volvió! ¿Vamos? 🍃' },
+  { de: 'tu', texto: '¿Reabrieron? ¿Dónde queda?' },
+  { de: 'juli', texto: 'Sí, con nueva imagen. En Santa Elena, de camino al parque' },
   { de: 'tu', texto: '¿Y hoy abren?' },
   { de: 'juli', texto: '__HORARIO__' },
   { de: 'tu', texto: 'Listo, pidamos para compartir' },
@@ -244,6 +253,7 @@ export const TESTIMONIOS = [
 ];
 
 export const FAQ = [
+  { q: '¿Ya reabrieron? ¿Qué cambió?', a: 'Sí, volvimos después de un año. Llegamos con nueva imagen, la carta renovada con desgranados que armas a tu gusto, combos para el parche y domicilios en todo Santa Elena. Lo de siempre se queda: el cielo abierto, la fogata y la mesa para compartir.', ajustar: true },
   { q: '¿Qué días y a qué hora abren?', a: 'De jueves a domingo, de 4:00 p. m. a 12:00 a. m. Algunos lunes festivos también abrimos.', ajustar: true, horario: true },
   { q: '¿Cómo llego?', a: 'Estamos en Santa Elena, de camino al parque, sobre la vía. Busca la reja de madera oscura y el aviso redondo de entreverde. Si vienes en carro, entras directo a la gravilla.', ajustar: true, foto: 'lugar-entrada' },
   { q: '¿Queda de camino al parque?', a: 'Sí. Es la parada perfecta antes o después del parque: llegas, pides algo para el centro y sigues.', ajustar: true },

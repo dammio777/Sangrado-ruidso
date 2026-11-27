@@ -84,7 +84,10 @@ export function mensajeParche(m) {
   return `🍃 Armé la mesa en Entreverde para ${m.personas}: ${items || 'todavía nada, ayúdenme a escoger'}. Total ${dinero(t.total)} → ${dinero(t.porPersona)} c/u. ¿Se apuntan? ${enlaceMesa(m)}`;
 }
 export function mensajeInvitar() {
-  return `Oye, ¿vamos a Entreverde? 🍃 Tragos y comida que se comparten en Santa Elena. ${urlBase()}`;
+  return `Oye, ¡Entreverde volvió! 🍃 Reabrió en Santa Elena después de un año, con nueva imagen. Tragos y comida que se comparten. ¿Vamos? ${urlBase()}`;
+}
+export function mensajeReapertura() {
+  return `¡Volvió Entreverde! 🍃 Después de un año reabrió en Santa Elena, de camino al parque, con nueva imagen y desgranados que uno mismo arma. Jueves a domingo, 4 p. m. a medianoche. ¿Armamos el parche? ${urlBase()}`;
 }
 export function detalleCustom(c) {
   return c.lista.map((g) => `${g.paso}: ${g.items.join(', ')}`).join(' · ');

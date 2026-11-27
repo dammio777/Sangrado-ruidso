@@ -3,7 +3,7 @@ import { Mono } from './ui.jsx';
 import { velocidad } from '../lib/scroll.js';
 import { reducido } from '../lib/util.js';
 
-const TEXTO = ['Tragos', 'Desgranados para compartir', 'Bajo el cielo abierto', 'Santa Elena', 'De camino al parque'];
+const TEXTO = ['Volvimos', 'Tragos', 'Desgranados para compartir', 'Bajo el cielo abierto', 'Santa Elena', 'De camino al parque'];
 
 /* Velocidad constante; con el scroll se acelera un poco (skew máx. 4°) y vuelve a su ritmo.
    Se pausa fuera de pantalla y con la pestaña oculta. */

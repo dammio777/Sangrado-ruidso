@@ -12,7 +12,7 @@ export default function CtaFinal() {
   const personas = useStore(mesa, (m) => m.personas);
   const conMesa = useStore(mesa, (m) => m.lineas.length > 0);
   const guion = [
-    { de: 'juli', texto: conMesa ? 'Ya armé la mesa 🍃' : 'Ya casi armo la mesa 🍃' },
+    { de: 'juli', texto: conMesa ? 'Entreverde volvió y ya armé la mesa 🍃' : 'Entreverde volvió, ya casi armo la mesa 🍃' },
     { de: 'tu', texto: '¿Cuántos vamos?' },
     { de: 'juli', texto: personas > 2 ? `Vamos ${personas} 🙌` : 'Todos 🙌' },
   ];
@@ -21,6 +21,7 @@ export default function CtaFinal() {
     <section ref={ref} className="sec noche cta" data-noche aria-labelledby="cta-tit">
       <Bombillos on={visto} n={17} curva={60} className="bombillos" />
       <div className="wrap" style={{ position: 'relative' }}>
+        <span className="eyebrow" style={{ justifyContent: 'center', marginBottom: 22 }}>Volvimos después de un año</span>
         <h2 id="cta-tit" className="t-heading">¿Quién se <span className="acento">apunta?</span></h2>
         {visto && <ChatParche guion={guion} mini pie={false} className="cta-chat" />}
         <div className="cta-btns">

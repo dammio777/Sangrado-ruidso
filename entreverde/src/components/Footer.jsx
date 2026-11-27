@@ -47,7 +47,7 @@ export default function Footer() {
           {LETRAS.map((l, i) => <span key={i} style={{ transform: v ? 'none' : `translateX(${(mid - i) * 0.3}em)` }}>{l}</span>)}
         </div>
         <div className="foot-legal">
-          <span>© 2026 Entreverde · Santa Elena, Medellín.</span>
+          <span>© 2026 Entreverde · De vuelta en Santa Elena, Medellín.</span>
           <span>Disfruta con moderación. Prohibida la venta de bebidas alcohólicas a menores de edad.</span>
         </div>
       </div>

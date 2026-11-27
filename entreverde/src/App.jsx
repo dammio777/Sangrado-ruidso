@@ -4,6 +4,7 @@ import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import Marquee from './components/Marquee.jsx';
 import Desgranado from './components/Desgranado.jsx';
+import Volvimos from './components/Volvimos.jsx';
 import CieloAbierto from './components/CieloAbierto.jsx';
 import Manifiesto from './components/Manifiesto.jsx';
 import Carta from './components/Carta.jsx';
@@ -36,6 +37,7 @@ export default function App() {
       <main id="contenido">
         <Hero />
         <Marquee />
+        <Volvimos />
         <Desgranado />
         <CieloAbierto />
         <Manifiesto />
