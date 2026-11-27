@@ -800,3 +800,5 @@ button.volv-it:hover { transform: translateY(-2px); box-shadow: var(--sh-float);
 
 /* Apertura: "volvimos" */
 .ap-volv { font: 600 12px/1 var(--f-body); letter-spacing: .32em; text-transform: uppercase; color: var(--c-oliva-profundo); opacity: 0; animation: apLetra .5s 1.05s var(--ease-out) forwards; transform: translateY(6px); }
+.volv-vivo { display: inline-flex; align-items: baseline; gap: 10px; }
+.volv-vivo .punto { transform: translateY(-1px); }

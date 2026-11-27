@@ -75,8 +75,10 @@ export default function Volvimos() {
             <div className="volv-estado">
               {r.ya ? (
                 <>
-                  <span className={`punto ${e.abierto ? 'vivo' : ''}`} aria-hidden="true" />
-                  <span><b>Ya estamos de vuelta.</b> {e.abierto ? `Abiertos ahora, hasta las ${horaBonita(e.cierra, true)}.` : `Te esperamos ${cuandoAbre(e)}.`}</span>
+                  <span className="volv-vivo">
+                    <span className={`punto ${e.abierto ? 'vivo' : ''}`} aria-hidden="true" />
+                    <span><b>Ya estamos de vuelta.</b> {e.abierto ? `Abiertos ahora, hasta las ${horaBonita(e.cierra, true)}` : `Te esperamos ${cuandoAbre(e)}`}</span>
+                  </span>
                 </>
               ) : (
                 <>
