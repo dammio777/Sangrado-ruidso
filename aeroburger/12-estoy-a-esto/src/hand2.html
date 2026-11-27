@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Estoy a esto de pedir una Airbus (mano realista)</title>
+<style>
+@font-face{font-family:'CaveatBrush';src:url('../assets/CaveatBrush.woff')}
+@font-face{font-family:'Baloo';src:url('../assets/Baloo2-800.woff');font-weight:800}
+html,body{margin:0;background:#F6EADF;overflow:hidden}canvas{display:block;width:1080px;height:1350px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+/* =========================================================================
+   «Estoy a esto de pedir una Airbus» · mano peluda realista (pelo procedural, semilla fija)
+   Modelo: cada parte (dedos = cilindros, palma = esfera aplastada, puño = toro esponjoso) tiene normal analítica;
+   el pelo se dibuja en 3 capas (subpelo oscuro · pelo principal en mechones · destellos finos) con luz de arriba-izquierda,
+   oclusión en las bases y los bordes, luz de borde (translucidez) y sombras de contacto entre partes.
+   ?s=1 mano completa + «Estoy a esto» · ?s=2 acercamiento a los dedos · ?ss=2 supermuestreo
+   ========================================================================= */
+const W=1080, H=1350, QS=new URLSearchParams(location.search);
+const SLIDE=QS.get('s')||'1', SS=parseFloat(QS.get('ss')||'2'), QUAL=parseFloat(QS.get('q')||'1');
+const Z = SLIDE==='2' ? {k:2.3, cx:650, cy:500} : {k:1, cx:540, cy:675};
+const BG='#F6EADF', RED='#C1121F', INK='#1d1a17';
+const hctx=document.createElement('canvas').getContext('2d');   // sin transformación: pruebas de punto en coordenadas del mundo
+const canvas=document.getElementById('c'); canvas.width=W*SS; canvas.height=H*SS; const ctx=canvas.getContext('2d');
+// ---------- utilidades
+function rng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const R=rng(20261127), rnd=(a,b)=>a+(b-a)*R(), gauss=()=>{ let s=0; for(let i=0;i<4;i++) s+=R(); return (s-2)/0.577; };
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=(x,a,b)=>Math.min(b,Math.max(a,x)), sstep=(a,b,x)=>{ const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+// ruido de valor 2D (mechones)
+const NZ=new Float32Array(1024); for(let i=0;i<1024;i++) NZ[i]=R()*2-1;
+function vnoise(x,y){ const xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi, h=(a,b)=>NZ[((a*73856093)^(b*19349663))&1023], sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
+  return lerp(lerp(h(xi,yi),h(xi+1,yi),sx),lerp(h(xi,yi+1),h(xi+1,yi+1),sx),sy); }
+function bez(P,t){ const u=1-t; return {x:u*u*u*P[0][0]+3*u*u*t*P[1][0]+3*u*t*t*P[2][0]+t*t*t*P[3][0], y:u*u*u*P[0][1]+3*u*u*t*P[1][1]+3*u*t*t*P[2][1]+t*t*t*P[3][1]}; }
+function bezD(P,t){ const u=1-t; const x=3*u*u*(P[1][0]-P[0][0])+6*u*t*(P[2][0]-P[1][0])+3*t*t*(P[3][0]-P[2][0]), y=3*u*u*(P[1][1]-P[0][1])+6*u*t*(P[2][1]-P[1][1])+3*t*t*(P[3][1]-P[2][1]); const l=Math.hypot(x,y)||1; return {x:x/l,y:y/l}; }
+// luz: arriba-izquierda y de frente
+const LV=(()=>{ const l=Math.hypot(-0.40,-0.62,0.68); return [-0.40/l,-0.62/l,0.68/l]; })();
+const DET=Math.min(Z.k,1.6);                       // más fino y denso al acercar
+function visible(x,y,m=70){ return Math.abs(x-Z.cx)<540/Z.k+m && Math.abs(y-Z.cy)<675/Z.k+m; }
+
+// ---------- partes
+// dedo: centro bézier, ancho que se afina con nudillos suaves y punta afilada
+function finger(P,w0,w1,o={}){ const f={P,w0,w1,pow:o.pow||0.75,knuckles:o.knuckles??1,flip:!!o.flip,mode:o.mode||'axis',cols:o.cols||'green'};
+  f.width=t=>{ const b=lerp(w0,w1,Math.pow(t,f.pow)); const kn=f.knuckles?(1+0.07*Math.exp(-Math.pow((t-0.34)/0.06,2))+0.05*Math.exp(-Math.pow((t-0.66)/0.05,2))):1; return b*kn*(t>0.93?lerp(1,0.55,(t-0.93)/0.07):1); };
+  const n=120; f.tab=[0]; let len=0, prev=bez(P,0); for(let i=1;i<=n;i++){ const c=bez(P,i/n); len+=Math.hypot(c.x-prev.x,c.y-prev.y); f.tab.push(len); prev=c; } f.len=len;
+  f.tAt=s=>{ let lo=0,hi=n; while(hi-lo>1){ const m=(lo+hi)>>1; if(f.tab[m]<s) lo=m; else hi=m; } return (lo+(s-f.tab[lo])/((f.tab[hi]-f.tab[lo])||1))/n; };
+  let a=0; for(let i=0;i<n;i++){ const t=(i+0.5)/n; a+=f.width(t)*(f.tab[i+1]-f.tab[i]); } f.area=a; return f; }
+function fingerPath(f,t0=0){ const n=60, L=[], Rr=[]; for(let i=0;i<=n;i++){ const t=t0+(1-t0)*i/n, c=bez(f.P,t), d=bezD(f.P,t), w=f.width(t)/2; L.push([c.x-d.y*w,c.y+d.x*w]); Rr.push([c.x+d.y*w,c.y-d.x*w]); }
+  const p=new Path2D(); p.moveTo(L[0][0],L[0][1]); for(const q of L) p.lineTo(q[0],q[1]); for(let i=n;i>=0;i--) p.lineTo(Rr[i][0],Rr[i][1]); p.closePath(); return p; }
+function ellPoly(e,n=40){ const p=new Path2D(); for(let i=0;i<=n;i++){ const a=i/n*Math.PI*2, x=Math.cos(a)*e.rx*(1+0.04*Math.sin(a*3)), y=Math.sin(a)*e.ry*(1+0.04*Math.cos(a*2)); const X=e.cx+x*Math.cos(e.rot)-y*Math.sin(e.rot), Y=e.cy+x*Math.sin(e.rot)+y*Math.cos(e.rot); i?p.lineTo(X,Y):p.moveTo(X,Y); } p.closePath(); return p; }
+
+// Proporciones esbeltas: dedos largos y finos que se afinan hasta la punta, palma y antebrazo estrechos, todo en diagonal desde el puño.
+const F1    =finger([[372,445],[412,250],[565,148],[832,228]],118,7,{pow:0.85,knuckles:0});   // dedo alto: sube en diagonal y barre a la derecha como un cuerno
+const F2    =finger([[338,430],[490,392],[668,422],[824,474]],124,8,{pow:1.12,knuckles:0});   // dedo de la pinza: baja hacia la punta
+const THUMB =finger([[392,665],[525,642],[690,613],[810,573]],150,9,{pow:1.15,knuckles:0});  // pulgar: sube hacia la punta
+const PALMF =finger([[238,850],[282,730],[330,610],[372,500]],150,236,{pow:1.1,knuckles:0});   // antebrazo que se ensancha hacia los nudillos
+const HEEL  =finger([[272,846],[340,785],[420,722],[505,660]],150,100,{pow:1,knuckles:0});     // talón de la mano hasta la base del pulgar
+const KNUCK ={cx:340,cy:500,rx:200,ry:104,rot:-1.12};                                          // masa redondeada del dorso donde nacen los dedos
+const CUFFE={cx:182,cy:842,rx:300,ry:96,rot:0.74};
+const SLEEVEP=new Path2D(); (()=>{ const pts=[[-140,880],[120,960],[250,1040],[236,1190],[205,1320],[196,1440],[-140,1440]]; SLEEVEP.moveTo(pts[0][0],pts[0][1]); for(const q of pts) SLEEVEP.lineTo(q[0],q[1]); SLEEVEP.closePath(); })();
+const SLEEVEPTS=[[-140,880],[120,960],[250,1040],[236,1190],[205,1320],[196,1440]];
+
+// ---------- lotes de trazos (un solo stroke por cubeta de color)
+const batches=new Map();
+function q(layer,x,y,ang,len,wid,L,Hh,Sat,alpha,curve){
+  const Lq=Math.round(clamp(L,4,98)*0.6), Hq=Math.round(Hh/2), Sq=Math.round(Sat/6), Wq=Math.round(wid*5), Aq=Math.round(alpha*4); const key=layer+'|'+Lq+'|'+Hq+'|'+Sq+'|'+Wq+'|'+Aq;
+  let b=batches.get(key); if(!b){ b={style:`hsl(${Hq*2} ${Sq*6}% ${Lq/0.6}%)`,w:Wq/5,a:Aq/4,path:new Path2D()}; batches.set(key,b); }
+  const ca=Math.cos(ang), sa=Math.sin(ang); b.path.moveTo(x,y); b.path.quadraticCurveTo(x+ca*len*0.5-sa*curve,y+sa*len*0.5+ca*curve,x+ca*len,y+sa*len); }
+function flush(){ ctx.lineCap='round'; for(const b of batches.values()){ ctx.strokeStyle=b.style; ctx.lineWidth=b.w; ctx.globalAlpha=b.a; ctx.stroke(b.path); } ctx.globalAlpha=1; batches.clear(); }
+function soften(path,dx,dy,blur,col){ ctx.save(); ctx.filter=`blur(${blur*SS*Z.k}px)`; ctx.fillStyle=col; ctx.translate(dx,dy); ctx.fill(path); ctx.restore(); }
+
+// ---------- pelo de un dedo
+const PAL={ green:{h0:86,h1:68,s:80,l0:16,l1:50,rim:12}, white:{h0:36,h1:34,s:16,l0:62,l1:97,rim:3}, red:{h0:355,h1:352,s:80,l0:20,l1:46,rim:8} };
+function furFinger(f,dens,opt={}){
+  const pal=PAL[f.cols], layers=[['u',0.20,[2.6,3.6],[9,16],0.88],['m',0.78,[1.0,1.7],[16,30],1],['h',0.16,[0.55,0.95],[20,36],0.78]];
+  for(const [name,d,wr,lr,alpha] of layers){
+    const N=Math.round(dens*d*f.area/Math.pow(1,1)*DET*DET*QUAL);
+    for(let i=0;i<N;i++){
+      const s=Math.pow(R(),1.0)*f.len, t=f.tAt(s), c=bez(f.P,t), d0=bezD(f.P,t), w=f.width(t)/2;
+      let u=gauss()*0.52; if(R()<0.07) u=(R()<0.5?-1:1)*(1+R()*0.22); u=clamp(u,-1.25,1.25);
+      const x=c.x-d0.y*w*u, y=c.y+d0.x*w*u; if(!visible(x,y)) continue;
+      if(name==='u' && t<0.24) continue; if(t<0.22 && R()>0.18+t*3.6) continue;                                // la base se funde con la palma
+      const uu=clamp(u,-1,1), nz=Math.sqrt(1-uu*uu), lx=-d0.y*uu, ly=d0.x*uu;
+      const diff=Math.max(clamp(lx*LV[0]+ly*LV[1]+nz*LV[2],0,1)*0.88+0.12,0.36*(1-sstep(0.12,0.55,t)));
+      const ao=0.14*(1-sstep(0,0.3,t))+0.20*sstep(0.72,1.15,Math.abs(u));
+      const cl=vnoise(x/15,y/15), cl2=vnoise(x/6+40,y/6);                 // mechones
+      const dir=Math.atan2(d0.y,d0.x)*1+(f.flip?Math.PI:0);
+      const ang=dir+gauss()*0.30+cl*0.55+uu*(0.18+(Math.abs(u)>1?0.5:0))*(name==='h'?1:0.7);
+      const len=(rnd(lr[0],lr[1])*(1+0.25*sstep(0.6,1,t)))/DET, wid=rnd(wr[0],wr[1])/DET;
+      let L=lerp(pal.l0,pal.l1,diff*(1-ao))+cl*4+cl2*1.8+gauss()*2.2;
+      if(name==='u') L=lerp(pal.l0*0.8,pal.l1*0.45,diff)*(1-ao*0.9)+cl*1.5;
+      if(name==='h') L+=10+pal.rim*Math.pow(1-nz,2)*(uu<0?1.4:0.5);
+      L+=pal.rim*Math.pow(1-nz,2.4)*(lx*LV[0]+ly*LV[1]>0?1:0.25);        // luz de borde por translucidez
+      q(name,x,y,ang,len,wid,L,lerp(pal.h0,pal.h1,diff)+gauss()*2,pal.s+gauss()*4,alpha,gauss()*3.5/DET);
+    }
+    if(name==='u') flush();                                              // el subpelo debajo del pelo principal
+    if(name==='m') flush();
+  }
+  flush();
+}
+// ---------- pelo de un elipsoide (palma / puño)
+function furEll(e,dens,cols,fuzz=1.12,flow,flat=1,noRim=false){
+  const pal=PAL[cols], area=Math.PI*e.rx*e.ry, layers=[['u',0.20,[2.8,3.8],[9,16],0.88],['m',0.78,[1.0,1.8],[16,32],1],['h',0.16,[0.55,1.0],[20,38],0.78]];
+  for(const [name,d,wr,lr,alpha] of layers){
+    const N=Math.round(dens*d*area*DET*DET*QUAL);
+    for(let i=0;i<N;i++){
+      const a=R()*Math.PI*2, r=Math.sqrt(R())*fuzz, xl=Math.cos(a)*r, yl=Math.sin(a)*r, cs=Math.cos(e.rot), sn=Math.sin(e.rot);
+      const x=e.cx+(xl*e.rx)*cs-(yl*e.ry)*sn, y=e.cy+(xl*e.rx)*sn+(yl*e.ry)*cs; if(!visible(x,y)) continue;
+      if(noRim&&name==='u'&&r>0.78) continue;
+      const r2=Math.min(1,xl*xl+yl*yl)*flat, nz=Math.sqrt(1-r2), nx=xl*cs-yl*sn, ny=xl*sn+yl*cs;
+      const diff=clamp(nx*LV[0]+ny*LV[1]+nz*LV[2],0,1)*0.88+0.12, cl=vnoise(x/16,y/16), cl2=vnoise(x/6+40,y/6);
+      const ang=flow(x,y)+gauss()*0.34+cl*0.6;
+      const ao=0.22*flat*sstep(0.7,1.1,Math.sqrt(xl*xl+yl*yl));
+      let L=lerp(pal.l0,pal.l1,diff*(1-ao))+cl*4+cl2*1.8+gauss()*2.2;
+      if(name==='u') L=lerp(pal.l0*0.8,pal.l1*0.45,diff)*(1-ao*0.9);
+      if(name==='h') L+=10+pal.rim;
+      L+=pal.rim*Math.pow(1-nz,2.4)*(nx*LV[0]+ny*LV[1]>0?1:0.25);
+      q(name,x,y,ang,rnd(lr[0],lr[1])/DET,rnd(wr[0],wr[1])/DET,L,lerp(pal.h0,pal.h1,diff)+gauss()*2,pal.s+gauss()*4,alpha,gauss()*3.5/DET);
+    }
+    if(name!=='h') flush();
+  }
+  flush();
+}
+function furSleeve(){
+  for(const [d,wr,lr,alpha] of [[0.9,[2.6,3.6],[9,14],0.9],[3.0,[1.0,1.7],[10,20],1]]){
+    const N=Math.round(d*160000*DET*DET*QUAL/9); let n=0, tries=0;
+    while(n<N&&tries<N*4){ tries++; const x=rnd(-90,270), y=rnd(980,1420); if(!visible(x,y)||!hctx.isPointInPath(SLEEVEP,x,y)) continue; n++;
+      const fold=0.5+0.5*Math.sin((x*0.9-y*0.35)/38), sh=lerp(0.35,1,fold)*(1-0.4*sstep(1180,1400,y)), cl=vnoise(x/14,y/14);
+      q('s',x,y,-0.9+gauss()*0.45+cl*0.4,rnd(lr[0],lr[1])/DET,rnd(wr[0],wr[1])/DET,18+sh*30+cl*3+gauss()*2,355+gauss()*2,82,alpha,gauss()*3); }
+    flush(); }
+}
+function sleeveFuzz(){ const pts=SLEEVEPTS; for(let i=0;i<pts.length-1;i++){ const [x0,y0]=pts[i],[x1,y1]=pts[i+1], L=Math.hypot(x1-x0,y1-y0), nx=(y1-y0)/L, ny=-(x1-x0)/L, N=Math.round(L*1.6*DET*QUAL); for(let k=0;k<N;k++){ const t=R(), x=x0+(x1-x0)*t, y=y0+(y1-y0)*t; if(!visible(x,y)) continue; const ang=Math.atan2(ny,nx)+gauss()*0.6; q('s',x,y,ang,rnd(7,15)/DET,rnd(1,1.7)/DET,34+gauss()*8,355+gauss()*2,82,1,gauss()*2); } } flush(); }
+function drawHand(){
+  // sombra de contacto suave sobre el fondo
+  for(const f of [F2,THUMB,PALMF,HEEL]) soften(fingerPath(f),26,50,30,'rgba(120,80,50,.15)');
+  // manga roja y sombra del puño sobre ella
+  ctx.fillStyle='#7a0813'; ctx.fill(SLEEVEP); furSleeve(); sleeveFuzz();
+  soften(ellPoly(CUFFE),8,26,20,'rgba(40,0,6,.55)');
+  // antebrazo y dorso de la mano, dedo alto, dedo de la pinza y pulgar (de atrás hacia delante)
+  ctx.fillStyle='#3d5a0b'; ctx.fill(fingerPath(PALMF,0.05)); ctx.fill(fingerPath(HEEL,0.05)); furFinger(PALMF,0.62); furFinger(HEEL,0.62);
+  ctx.fillStyle='#3d5a0b'; ctx.fill(ellPoly(KNUCK)); furEll(KNUCK,0.60,'green',1.06,(x,y)=>-1.12+0.25*(x-KNUCK.cx)/KNUCK.rx,0.04,true);
+  soften(fingerPath(F1,0.5),3,20,12,'rgba(15,28,0,.30)'); furFinger(F1,0.66);
+  soften(fingerPath(F2,0.62),4,24,16,'rgba(20,34,0,.28)'); furFinger(F2,0.66);
+  soften(fingerPath(THUMB,0.55),6,28,16,'rgba(20,34,0,.28)'); furFinger(THUMB,0.66);
+  // puño blanco esponjoso
+  soften(ellPoly(CUFFE),10,16,16,'rgba(35,52,0,.5)');
+  ctx.fillStyle='#b9aea3'; ctx.fill(ellPoly(CUFFE));
+  furEll(CUFFE,0.62,'white',1.10,(x,y)=>-0.9+0.9*Math.sin((x*0.021)+(y*0.017)));
+}
+// ---------- textos
+function handText(str,x,y,size,col,rot=0){ ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.font=`${size}px CaveatBrush`; ctx.textAlign='center'; ctx.fillStyle=col; ctx.fillText(str,0,0); ctx.restore(); }
+function arrow(){ ctx.save(); ctx.strokeStyle=RED; ctx.lineWidth=6.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.beginPath(); ctx.moveTo(838,742); ctx.bezierCurveTo(884,706,872,646,818,608); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(822,650); ctx.lineTo(814,604); ctx.lineTo(858,622); ctx.stroke();
+  for(const [a,b,c,d] of [[430,796,460,814],[436,846,468,856],[1008,748,1030,720],[1034,780,1066,772]]){ ctx.beginPath(); ctx.moveTo(a,b); ctx.lineTo(c,d); ctx.stroke(); } ctx.restore(); }
+
+async function draw(){
+  await Promise.all([document.fonts.load('80px CaveatBrush'),document.fonts.load('800 80px Baloo')]);
+  ctx.setTransform(SS,0,0,SS,0,0); ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+  const vg=ctx.createRadialGradient(540,560,160,540,675,1050); vg.addColorStop(0,'rgba(255,250,244,.65)'); vg.addColorStop(1,'rgba(226,198,176,.30)'); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  ctx.save(); ctx.translate(540-Z.cx*Z.k,675-Z.cy*Z.k); ctx.scale(Z.k,Z.k);
+  // isPointInPath usa coordenadas de lienzo: para la manga se pasa en píxeles reales (ver furSleeve)
+  drawHand();
+  if(SLIDE==='1'){ arrow(); handText('Estoy a esto',770,836,122,RED,-0.03);
+    ctx.save(); ctx.fillStyle=INK; ctx.font='800 18px Baloo'; ctx.textAlign='center'; ctx.fillText('de pedir una',736,520); ctx.fillText('Airbus',736,541); ctx.restore(); ctx.restore();
+  } else { ctx.restore(); ctx.save(); ctx.setTransform(SS,0,0,SS,0,0); ctx.fillStyle=INK; ctx.font='800 80px Baloo'; ctx.textAlign='center'; ctx.fillText('de pedir',540,714); ctx.fillText('una Airbus',540,798);
+    ctx.font='600 26px Inter'; ctx.fillStyle='rgba(60,45,30,.55)'; ctx.letterSpacing='3px'; ctx.fillText('@AERO.BURGER  ·  SANTA ELENA',540,1290); ctx.restore(); }
+  return true;
+}
+window.ready=draw();
+</script>
+</body>
+</html>
