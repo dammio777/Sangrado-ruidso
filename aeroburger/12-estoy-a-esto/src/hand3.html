@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aero Burger — Estoy a esto de pedir una Airbus (forma medida de la referencia)</title>
+<style>
+@font-face{font-family:'CaveatBrush';src:url('../assets/CaveatBrush.woff')}
+@font-face{font-family:'Baloo';src:url('../assets/Baloo2-800.woff');font-weight:800}
+html,body{margin:0;background:#F6EADF;overflow:hidden}canvas{display:block;width:1080px;height:1350px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+/* =========================================================================
+   «Estoy a esto de pedir una Airbus» · mano peluda con la FORMA medida de la referencia
+   Las siluetas (mano verde, puño blanco, manga roja) salen de src/measure_reference.py como mapas (máscara, normales,
+   flujo del pelo, espesor, borde difuso). El pelo, la luz y los colores son propios: 3 capas de trazos con luz de
+   arriba-izquierda, luz de borde (translucidez), mechones y sombras de contacto.
+   ?s=1 mano completa + «Estoy a esto» · ?s=2 acercamiento a los dedos · ?ss=2 supermuestreo · ?q=1 densidad
+   ========================================================================= */
+const W=1080, H=1350, OFFY=15, QS=new URLSearchParams(location.search);
+const SLIDE=QS.get('s')||'1', SS=parseFloat(QS.get('ss')||'2'), QUAL=parseFloat(QS.get('q')||'1');
+const Z = SLIDE==='2' ? {k:3.0, cx:650, cy:525} : {k:1, cx:540, cy:675};
+const BG='#F6EADF', RED='#C1121F', INK='#1d1a17';
+const canvas=document.getElementById('c'); canvas.width=W*SS; canvas.height=H*SS; const ctx=canvas.getContext('2d');
+function rng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const R=rng(20261127), rnd=(a,b)=>a+(b-a)*R(), gauss=()=>{ let s=0; for(let i=0;i<4;i++) s+=R(); return (s-2)/0.577; };
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=(x,a,b)=>Math.min(b,Math.max(a,x)), sstep=(a,b,x)=>{ const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+const NZ=new Float32Array(1024); for(let i=0;i<1024;i++) NZ[i]=R()*2-1;
+function vnoise(x,y){ const xi=Math.floor(x), yi=Math.floor(y), xf=x-xi, yf=y-yi, h=(a,b)=>NZ[((a*73856093)^(b*19349663))&1023], sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
+  return lerp(lerp(h(xi,yi),h(xi+1,yi),sx),lerp(h(xi,yi+1),h(xi+1,yi+1),sx),sy); }
+const LV=(()=>{ const l=Math.hypot(-0.40,-0.62,0.68); return [-0.40/l,-0.62/l,0.68/l]; })();
+const DET=Math.min(Z.k,2.4);
+function visible(x,y,m=70){ return Math.abs(x-Z.cx)<540/Z.k+m && Math.abs(y-Z.cy)<675/Z.k+m; }
+
+// ---------- mapas de forma
+function loadMap(src){ return new Promise(res=>{ const im=new Image(); im.onload=()=>{ const c=document.createElement('canvas'); c.width=im.width; c.height=im.height; const x=c.getContext('2d'); x.drawImage(im,0,0); res({img:im,w:im.width,h:im.height,d:x.getImageData(0,0,im.width,im.height).data}); }; im.src=src; }); }
+function samp(m,x,y,ch){ const X=x, Y=y-OFFY; if(X<0||Y<0||X>=m.w-1||Y>=m.h-1) return 0; const x0=Math.floor(X), y0=Math.floor(Y), fx=X-x0, fy=Y-y0, i=(y0*m.w+x0)*4+ch, s=m.w*4;
+  return (m.d[i]*(1-fx)*(1-fy)+m.d[i+4]*fx*(1-fy)+m.d[i+s]*(1-fx)*fy+m.d[i+s+4]*fx*fy)/255; }
+async function loadPart(name){ const P={name}; for(const k of ['mask','fuzz','thick','nrm','flow']) P[k]=await loadMap(`../assets/${name}_${k}.png`);
+  let n=0,x0=1e9,y0=1e9,x1=-1,y1=-1; const m=P.mask; for(let y=0;y<m.h;y++) for(let x=0;x<m.w;x++) if(m.d[(y*m.w+x)*4]>127){ n++; if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; }
+  const ac=document.createElement('canvas'); ac.width=m.w; ac.height=m.h; const ax=ac.getContext('2d'), id=ax.createImageData(m.w,m.h); for(let i=0;i<m.w*m.h;i++){ id.data[i*4]=id.data[i*4+1]=id.data[i*4+2]=255; id.data[i*4+3]=m.d[i*4]; } ax.putImageData(id,0,0); P.alpha=ac;   // máscara como canal alfa
+  P.area=n; P.bbox=[x0-14,y0+OFFY-14,x1+14,y1+OFFY+14]; return P; }
+
+// ---------- lotes de trazos (un solo stroke por cubeta de color)
+const batches=new Map();
+function q(layer,x,y,ang,len,wid,L,Hh,Sat,alpha,curve){
+  const Lq=Math.round(clamp(L,4,98)*0.6), Hq=Math.round(Hh/2), Sq=Math.round(Sat/6), Wq=Math.round(wid*5), Aq=Math.round(alpha*4); const key=layer+'|'+Lq+'|'+Hq+'|'+Sq+'|'+Wq+'|'+Aq;
+  let b=batches.get(key); if(!b){ b={style:`hsl(${Hq*2} ${Sq*6}% ${Lq/0.6}%)`,w:Wq/5,a:Aq/4,path:new Path2D()}; batches.set(key,b); }
+  const ca=Math.cos(ang), sa=Math.sin(ang); b.path.moveTo(x,y); b.path.quadraticCurveTo(x+ca*len*0.5-sa*curve,y+sa*len*0.5+ca*curve,x+ca*len,y+sa*len); }
+function flush(){ ctx.lineCap='round'; for(const b of batches.values()){ ctx.strokeStyle=b.style; ctx.lineWidth=b.w; ctx.globalAlpha=b.a; ctx.stroke(b.path); } ctx.globalAlpha=1; batches.clear(); }
+const oc=document.createElement('canvas'); oc.width=W; oc.height=H; const ox=oc.getContext('2d');
+function silhouette(P,col){ ox.globalCompositeOperation='source-over'; ox.clearRect(0,0,W,H); ox.fillStyle=col; ox.fillRect(0,0,W,H); ox.globalCompositeOperation='destination-in'; ox.drawImage(P.alpha,0,OFFY); ctx.drawImage(oc,0,0); }
+function shadow(P,dx,dy,blur,col){ ox.globalCompositeOperation='source-over'; ox.clearRect(0,0,W,H); ox.fillStyle=col; ox.fillRect(0,0,W,H); ox.globalCompositeOperation='destination-in'; ox.drawImage(P.alpha,0,OFFY);
+  ctx.save(); ctx.filter=`blur(${blur*SS*Z.k}px)`; ctx.drawImage(oc,dx,dy); ctx.restore(); }
+
+// ---------- pelo de una pieza
+const PAL={ green:{h0:86,h1:68,s:80,l0:16,l1:50,rim:12}, white:{h0:36,h1:34,s:16,l0:62,l1:97,rim:3}, red:{h0:355,h1:352,s:80,l0:19,l1:46,rim:8} };
+function angMix(a,b,t){ let d=Math.atan2(Math.sin(b-a),Math.cos(b-a)); return a+d*t; }
+function furPart(P,dens,cols,o={}){
+  const pal=PAL[cols], lm=o.lenMul||1, layers=[['u',0.20,[2.4,3.4],[9,15],0.88],['m',0.80,[0.8,1.4],[15,27],1],['h',0.22,[0.5,0.85],[19,34],0.8]];
+  const [bx0,by0,bx1,by1]=P.bbox;
+  for(const [name,d,wr,lr,alpha] of layers){
+    const N=Math.round(dens*d*P.area*DET*DET*QUAL); let made=0, tries=0;
+    while(made<N && tries<N*6){ tries++;
+      const x=rnd(bx0,bx1), y=rnd(by0,by1); if(!visible(x,y)) continue;
+      const fz=samp(P.fuzz,x,y,0); if(R()>Math.pow(fz,1.5)) continue; made++;
+      const mk=samp(P.mask,x,y,0), nx=samp(P.nrm,x,y,0)*2-1, ny=samp(P.nrm,x,y,1)*2-1, nz=samp(P.nrm,x,y,2)*2-1;
+      const fxv=samp(P.flow,x,y,0)*2-1, fyv=samp(P.flow,x,y,1)*2-1, T=samp(P.thick,x,y,0);
+      const cl=vnoise(x/15,y/15), cl2=vnoise(x/6+40,y/6);
+      let ang=Math.atan2(fyv,fxv)+gauss()*0.38+cl*0.6;
+      if(mk<0.8) ang=angMix(ang,Math.atan2(ny,nx)+gauss()*0.3,(0.8-mk)*0.95);           // en el borde el pelo sale hacia afuera
+      const diff=clamp(nx*LV[0]+ny*LV[1]+nz*LV[2],0,1)*0.88+0.12, ao=(o.ao??0.22)*(1-sstep(0.22,0.75,T));
+      const len=rnd(lr[0],lr[1])*lm/DET, wid=rnd(wr[0],wr[1])/DET;
+      let L=lerp(pal.l0,pal.l1,diff*(1-ao))+cl*4+cl2*1.8+gauss()*2.2;
+      if(o.fold) L*=o.fold(x,y);
+      if(name==='u') L=lerp(pal.l0*0.8,pal.l1*0.45,diff)*(1-ao*0.9)+cl*1.5;
+      if(name==='h') L+=10+pal.rim*Math.pow(1-nz,2)*(nx*LV[0]+ny*LV[1]>0?1.4:0.5);
+      L+=pal.rim*Math.pow(1-nz,2.4)*(nx*LV[0]+ny*LV[1]>0?1:0.25);
+      q(name,x,y,ang,len,wid,L,lerp(pal.h0,pal.h1,diff)+gauss()*2,pal.s+gauss()*4,alpha,gauss()*6/DET);
+    }
+    if(name!=='h') flush();
+  }
+  flush();
+}
+
+// ---------- textos
+function handText(str,x,y,size,col,rot=0){ ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.font=`${size}px CaveatBrush`; ctx.textAlign='center'; ctx.fillStyle=col; ctx.fillText(str,0,0); ctx.restore(); }
+function arrow(){ ctx.save(); ctx.strokeStyle=RED; ctx.lineWidth=6.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.beginPath(); ctx.moveTo(838,757); ctx.bezierCurveTo(884,721,872,661,818,623); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(822,665); ctx.lineTo(814,619); ctx.lineTo(858,637); ctx.stroke();
+  for(const [a,b,c,d] of [[430,812,460,830],[436,862,468,872],[1008,764,1030,736],[1034,796,1066,788]]){ ctx.beginPath(); ctx.moveTo(a,b); ctx.lineTo(c,d); ctx.stroke(); } ctx.restore(); }
+
+async function draw(){
+  await Promise.all([document.fonts.load('80px CaveatBrush'),document.fonts.load('800 80px Baloo')]);
+  const [hand,cuff,sleeve]=await Promise.all([loadPart('hand'),loadPart('cuff'),loadPart('sleeve')]);
+  ctx.setTransform(SS,0,0,SS,0,0); ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+  const vg=ctx.createRadialGradient(540,560,160,540,675,1050); vg.addColorStop(0,'rgba(255,250,244,.65)'); vg.addColorStop(1,'rgba(226,198,176,.30)'); ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  ctx.save(); ctx.translate(540-Z.cx*Z.k,675-Z.cy*Z.k); ctx.scale(Z.k,Z.k);
+  shadow(hand,26,50,28,'rgba(120,80,50,.15)'); shadow(cuff,18,34,24,'rgba(120,80,50,.12)');
+  silhouette(sleeve,'#6d0610');   // base oscura de la manga
+  furPart(sleeve,0.55,'red',{fold:(x,y)=>0.55+0.45*(0.5+0.5*Math.sin((x*0.9-y*0.35)/38)),lenMul:0.9});
+  shadow(cuff,10,18,14,'rgba(40,0,6,.5)');
+  furPart(hand,0.64,'green');
+  shadow(cuff,8,14,14,'rgba(35,52,0,.42)');
+  furPart(cuff,0.62,'white',{lenMul:1.25,ao:0.14});
+  if(SLIDE==='1'){ arrow(); handText('Estoy a esto',770,851,122,RED,-0.03);
+    ctx.save(); ctx.fillStyle=INK; ctx.font='800 17px Baloo'; ctx.textAlign='center'; ctx.fillText('de pedir una',664,531); ctx.fillText('Airbus',664,548); ctx.restore(); ctx.restore();
+  } else { ctx.restore(); ctx.save(); ctx.setTransform(SS,0,0,SS,0,0); ctx.fillStyle=INK; ctx.font='800 70px Baloo'; ctx.textAlign='center'; ctx.fillText('de pedir',560,648); ctx.fillText('una Airbus',560,724);
+    ctx.font='600 26px Inter'; ctx.fillStyle='rgba(60,45,30,.55)'; ctx.letterSpacing='3px'; ctx.fillText('@AERO.BURGER  ·  SANTA ELENA',540,1290); ctx.restore(); }
+  return true;
+}
+window.ready=draw();
+</script>
+</body>
+</html>
